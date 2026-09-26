@@ -469,185 +469,656 @@ export class LensHuntVisuals {
     private static generateHomeObjects(scene: Scene) {
         // 1. Smartphone Face Unlock (obj_phone_face: 140x190)
         const gPhone = scene.make.graphics({ x: 0, y: 0 });
+        // Soft outer drop shadow & glow
+        gPhone.fillStyle(0x00e5ff, 0.15);
+        gPhone.fillRoundedRect(16, 6, 108, 178, 22);
+
+        // Sleek Titanium Outer Frame
         gPhone.fillStyle(0x1e293b, 1);
-        gPhone.fillRoundedRect(20, 10, 100, 170, 20); // phone chassis
-        gPhone.lineStyle(3, 0x64748b, 1);
+        gPhone.fillRoundedRect(20, 10, 100, 170, 20);
+        gPhone.lineStyle(2.5, 0x64748b, 1);
         gPhone.strokeRoundedRect(20, 10, 100, 170, 20);
 
-        // Screen
-        gPhone.fillStyle(0x090d1a, 1);
-        gPhone.fillRoundedRect(26, 22, 88, 146, 14);
+        // Side volume & power buttons
+        gPhone.fillStyle(0x475569, 1);
+        gPhone.fillRect(17, 45, 3, 22); // Volume Up/Down
+        gPhone.fillRect(17, 72, 3, 16);
+        gPhone.fillRect(120, 52, 3, 24); // Power button
 
-        // Screen Face Scan Visual
-        gPhone.lineStyle(2, 0x00e5ff, 0.9);
-        gPhone.strokeCircle(70, 80, 26); // face oval
+        // Ultra-thin Bezel OLED Screen (Deep Glass Midnight)
+        gPhone.fillStyle(0x050814, 1);
+        gPhone.fillRoundedRect(24, 14, 92, 162, 16);
+
+        // Top Dynamic Island / Camera Pill Notch
+        gPhone.fillStyle(0x020617, 1);
+        gPhone.fillRoundedRect(53, 18, 34, 10, 5);
+        gPhone.fillStyle(0x00e5ff, 0.9);
+        gPhone.fillCircle(59, 23, 2.5); // IR sensor
+        gPhone.fillStyle(0x1e293b, 1);
+        gPhone.fillCircle(77, 23, 3); // Selfie lens
+
+        // Screen Wallpaper Gradient / Digital Mesh Background
+        gPhone.fillStyle(0x0f172a, 0.9);
+        gPhone.fillRoundedRect(26, 32, 88, 126, 10);
+        gPhone.fillStyle(0x0284c7, 0.25);
+        gPhone.fillCircle(70, 85, 38);
+
+        // Biometric Face ID Scan Visual
+        // Holographic facial mesh outline
+        gPhone.lineStyle(2, 0x00e5ff, 0.95);
+        gPhone.strokeCircle(70, 78, 24); // Head oval
+        gPhone.fillStyle(0x38bdf8, 0.9);
+        gPhone.fillCircle(62, 74, 3); // Eye L
+        gPhone.fillCircle(78, 74, 3); // Eye R
+        gPhone.lineStyle(2, 0x38bdf8, 0.9);
+        gPhone.beginPath(); gPhone.arc(70, 84, 8, 0, Math.PI, false); gPhone.strokePath(); // Smile
+        // Nose bridge
+        gPhone.lineStyle(1.5, 0x00e5ff, 0.7);
+        gPhone.lineBetween(70, 72, 70, 80);
+
+        // 3D Laser Scan Grid Dots
         gPhone.fillStyle(0x00e676, 1);
-        gPhone.fillCircle(62, 75, 3); // eye L
-        gPhone.fillCircle(78, 75, 3); // eye R
-        gPhone.beginPath(); gPhone.arc(70, 86, 8, 0, Math.PI, false); gPhone.strokePath(); // smile
+        const scanDots = [
+            { x: 54, y: 64 }, { x: 86, y: 64 },
+            { x: 50, y: 78 }, { x: 90, y: 78 },
+            { x: 56, y: 92 }, { x: 84, y: 92 },
+            { x: 70, y: 60 }, { x: 70, y: 96 }
+        ];
+        scanDots.forEach(d => {
+            gPhone.fillCircle(d.x, d.y, 2);
+        });
 
-        // Scan Mesh Dots & Brackets
+        // Glowing Laser Scanning Horizon Line
         gPhone.lineStyle(2, 0x00e676, 1);
-        gPhone.strokeRect(40, 50, 60, 60);
+        gPhone.lineBetween(40, 80, 100, 80);
+        gPhone.fillStyle(0x00e676, 0.25);
+        gPhone.fillRect(40, 74, 60, 12);
 
-        // Home bar
-        gPhone.fillStyle(0xffffff, 0.8);
-        gPhone.fillRoundedRect(55, 158, 30, 4, 2);
+        // Biometric Brackets [ ]
+        gPhone.lineStyle(2.5, 0x00e5ff, 1);
+        gPhone.beginPath(); gPhone.moveTo(42, 58); gPhone.lineTo(42, 50); gPhone.lineTo(50, 50); gPhone.strokePath();
+        gPhone.beginPath(); gPhone.moveTo(98, 58); gPhone.lineTo(98, 50); gPhone.lineTo(90, 50); gPhone.strokePath();
+        gPhone.beginPath(); gPhone.moveTo(42, 100); gPhone.lineTo(42, 108); gPhone.lineTo(50, 108); gPhone.strokePath();
+        gPhone.beginPath(); gPhone.moveTo(98, 100); gPhone.lineTo(98, 108); gPhone.lineTo(90, 108); gPhone.strokePath();
+
+        // Lock Status Icon (Unlocked Green)
+        gPhone.fillStyle(0x00e676, 1);
+        gPhone.fillRoundedRect(63, 122, 14, 11, 3);
+        gPhone.lineStyle(2, 0x00e676, 1);
+        gPhone.beginPath(); gPhone.arc(70, 120, 5, Math.PI, 0, false); gPhone.strokePath();
+
+        // Diagonal Glass Specular Highlight
+        gPhone.fillStyle(0xffffff, 0.12);
+        gPhone.beginPath();
+        gPhone.moveTo(30, 16);
+        gPhone.lineTo(75, 16);
+        gPhone.lineTo(26, 110);
+        gPhone.lineTo(26, 60);
+        gPhone.closePath();
+        gPhone.fillPath();
+
+        // Home Navigation Bar Pill
+        gPhone.fillStyle(0xffffff, 0.85);
+        gPhone.fillRoundedRect(52, 165, 36, 4, 2);
         gPhone.generateTexture('obj_phone_face', 140, 190);
+        gPhone.destroy();
 
         // 2. Smart Speaker (obj_smart_speaker: 140x180)
         const gSpk = scene.make.graphics({ x: 0, y: 0 });
-        // Fabric Cylinder Body
-        gSpk.fillStyle(0x334155, 1);
-        gSpk.fillRoundedRect(35, 40, 70, 110, 18);
-        gSpk.lineStyle(3, 0x475569, 1);
-        gSpk.strokeRoundedRect(35, 40, 70, 110, 18);
-
-        // Top Glowing LED Ring (Cyan/Mint)
-        gSpk.fillStyle(0x00e5ff, 1);
-        gSpk.fillEllipse(70, 40, 32, 12);
-        gSpk.lineStyle(3, 0x69f0ae, 1);
-        gSpk.strokeEllipse(70, 40, 32, 12);
+        // Ambient Soundwave Halo
+        gSpk.fillStyle(0x00e5ff, 0.12);
+        gSpk.fillCircle(70, 38, 48);
 
         // Soundwave Emitting Arcs
-        gSpk.lineStyle(3, 0x00e5ff, 0.8);
-        gSpk.beginPath(); gSpk.arc(70, 20, 20, -Math.PI * 0.8, -Math.PI * 0.2, false); gSpk.strokePath();
-        gSpk.beginPath(); gSpk.arc(70, 10, 36, -Math.PI * 0.8, -Math.PI * 0.2, false); gSpk.strokePath();
+        gSpk.lineStyle(3, 0x00e5ff, 0.85);
+        gSpk.beginPath(); gSpk.arc(70, 24, 22, -Math.PI * 0.85, -Math.PI * 0.15, false); gSpk.strokePath();
+        gSpk.lineStyle(2.5, 0x69f0ae, 0.75);
+        gSpk.beginPath(); gSpk.arc(70, 12, 38, -Math.PI * 0.85, -Math.PI * 0.15, false); gSpk.strokePath();
+        gSpk.lineStyle(2, 0x38bdf8, 0.6);
+        gSpk.beginPath(); gSpk.arc(70, 2, 54, -Math.PI * 0.85, -Math.PI * 0.15, false); gSpk.strokePath();
+
+        // Speaker Drop Shadow
+        gSpk.fillStyle(0x000000, 0.4);
+        gSpk.fillEllipse(70, 162, 74, 18);
+
+        // Cylindrical Speaker Body (Woven Acoustic Fabric)
+        gSpk.fillStyle(0x1e293b, 1);
+        gSpk.fillRoundedRect(32, 42, 76, 115, 20);
+        gSpk.lineStyle(2, 0x334155, 1);
+        gSpk.strokeRoundedRect(32, 42, 76, 115, 20);
+
+        // Textured Fabric Grille Mesh Micro-lines
+        gSpk.lineStyle(1, 0x334155, 0.6);
+        for (let y = 52; y < 148; y += 7) {
+            gSpk.lineBetween(36, y, 104, y);
+        }
+        for (let x = 40; x < 100; x += 8) {
+            gSpk.lineBetween(x, 50, x, 150);
+        }
+
+        // Side Highlight Sheen
+        gSpk.fillStyle(0xffffff, 0.08);
+        gSpk.fillRect(36, 50, 12, 98);
+
+        // Top Illuminated Capacitive Touch Disc
+        gSpk.fillStyle(0x0f172a, 1);
+        gSpk.fillEllipse(70, 42, 36, 14);
+
+        // Vibrant Multi-Color LED Glow Ring (Cyan / Mint / Violet gradient illusion)
+        gSpk.fillStyle(0x00e5ff, 1);
+        gSpk.fillEllipse(70, 42, 34, 12);
+        gSpk.fillStyle(0x69f0ae, 0.8);
+        gSpk.fillEllipse(64, 42, 20, 9);
+        gSpk.fillStyle(0xa855f7, 0.8);
+        gSpk.fillEllipse(78, 42, 18, 9);
+
+        // Glass Touch Center Disc
+        gSpk.fillStyle(0x090d16, 0.9);
+        gSpk.fillEllipse(70, 42, 22, 7);
+
+        // Volume + and - Touch Glyphs
+        gSpk.fillStyle(0xffffff, 0.9);
+        gSpk.fillRect(60, 41, 6, 2); // minus
+        gSpk.fillRect(74, 41, 6, 2); // plus h
+        gSpk.fillRect(76, 39, 2, 6); // plus v
+
+        // Non-slip Base Ring
+        gSpk.fillStyle(0x0f172a, 1);
+        gSpk.fillRoundedRect(42, 154, 56, 8, 4);
         gSpk.generateTexture('obj_smart_speaker', 140, 180);
+        gSpk.destroy();
 
         // 3. Streaming Television (obj_streaming_tv: 250x200)
         const gTV = scene.make.graphics({ x: 0, y: 0 });
-        // Frame
-        gTV.fillStyle(0x0f172a, 1);
-        gTV.fillRoundedRect(15, 10, 220, 140, 12);
-        gTV.lineStyle(3, 0x475569, 1);
-        gTV.strokeRoundedRect(15, 10, 220, 140, 12);
+        // Ambient Ambilight Wall Glow
+        gTV.fillStyle(0x38bdf8, 0.2);
+        gTV.fillRoundedRect(4, 4, 242, 156, 18);
+        gTV.fillStyle(0xa855f7, 0.15);
+        gTV.fillCircle(200, 70, 60);
 
-        // Screen
+        // TV Outer Bezel Frame (Ultra-slim Metallic)
+        gTV.fillStyle(0x0a0f1d, 1);
+        gTV.fillRoundedRect(12, 10, 226, 144, 10);
+        gTV.lineStyle(2, 0x334155, 1);
+        gTV.strokeRoundedRect(12, 10, 226, 144, 10);
+
+        // OLED Screen (Deep Pitch Black)
+        gTV.fillStyle(0x020617, 1);
+        gTV.fillRoundedRect(18, 16, 214, 132, 6);
+
+        // Smart TV UI Header Bar
+        gTV.fillStyle(0x0f172a, 0.85);
+        gTV.fillRoundedRect(22, 20, 206, 18, 4);
+        // Brand logo & Menu items
+        gTV.fillStyle(0xef4444, 1);
+        gTV.fillRect(28, 24, 12, 10); // Red streaming logo
+        gTV.fillStyle(0x94a3b8, 1);
+        gTV.fillRect(46, 27, 20, 4);
+        gTV.fillRect(72, 27, 24, 4);
+        gTV.fillStyle(0x00e5ff, 1);
+        gTV.fillRect(102, 27, 28, 4); // "AI For You" active tab
+
+        // "AI RECOMMENDED" Section Banner Header
+        gTV.fillStyle(0x38bdf8, 1);
+        gTV.fillRect(26, 44, 52, 5);
+
+        // Movie Card 1 (Left - SciFi Neon City)
         gTV.fillStyle(0x1e1b4b, 1);
-        gTV.fillRoundedRect(22, 18, 206, 124, 8);
+        gTV.fillRoundedRect(26, 54, 56, 76, 6);
+        gTV.fillStyle(0x4338ca, 0.9);
+        gTV.fillCircle(54, 78, 16);
+        gTV.fillStyle(0x00e5ff, 0.7);
+        gTV.fillRect(32, 104, 44, 6);
+        gTV.fillRect(32, 114, 30, 4);
 
-        // Recommended Video Cards Row on Screen
-        gTV.fillStyle(0x38bdf8, 0.7);
-        gTV.fillRoundedRect(34, 45, 44, 60, 6);
-        gTV.fillStyle(0x00e676, 1); // Highlighted Recommended Video
-        gTV.fillRoundedRect(88, 38, 54, 74, 8);
-        gTV.lineStyle(2, 0xffffff, 1);
-        gTV.strokeRoundedRect(88, 38, 54, 74, 8);
-        gTV.fillStyle(0xf43f5e, 0.7);
-        gTV.fillRoundedRect(152, 45, 44, 60, 6);
+        // Movie Card 2 (Center - HIGHLIGHTED AI RECOMMENDATION)
+        // Outer glowing recommendation border
+        gTV.fillStyle(0x00e676, 0.35);
+        gTV.fillRoundedRect(88, 48, 74, 88, 8);
+        gTV.fillStyle(0x064e3b, 1);
+        gTV.fillRoundedRect(91, 51, 68, 82, 6);
+        gTV.lineStyle(2.5, 0x00e676, 1);
+        gTV.strokeRoundedRect(91, 51, 68, 82, 6);
 
-        // TV Stand
-        gTV.fillStyle(0x64748b, 1);
-        gTV.fillRect(115, 150, 20, 25);
-        gTV.fillRect(85, 175, 80, 10);
+        // Hero Art Thumbnail inside center card
+        gTV.fillStyle(0x047857, 1);
+        gTV.fillRoundedRect(94, 54, 62, 44, 4);
+        // Star & Play Icon
+        this.drawStar(gTV, 125, 74, 5, 12, 5, 0xffd600, 0xffa000);
+        // AI Match Badge
+        gTV.fillStyle(0x00e676, 1);
+        gTV.fillRoundedRect(96, 102, 42, 10, 3);
+        // Play button
+        gTV.fillStyle(0xffffff, 1);
+        gTV.fillTriangle(144, 104, 150, 107, 144, 110);
+        gTV.fillStyle(0xffffff, 0.8);
+        gTV.fillRect(96, 116, 54, 5);
+
+        // Movie Card 3 (Right - Sunset Adventure)
+        gTV.fillStyle(0x451a03, 1);
+        gTV.fillRoundedRect(168, 54, 56, 76, 6);
+        gTV.fillStyle(0xd97706, 0.9);
+        gTV.fillCircle(196, 80, 15);
+        gTV.fillStyle(0xfbbf24, 0.7);
+        gTV.fillRect(174, 104, 44, 6);
+        gTV.fillRect(174, 114, 28, 4);
+
+        // Screen Diagonal Glass Sheen
+        gTV.fillStyle(0xffffff, 0.08);
+        gTV.beginPath();
+        gTV.moveTo(35, 16);
+        gTV.lineTo(95, 16);
+        gTV.lineTo(20, 140);
+        gTV.lineTo(20, 80);
+        gTV.closePath();
+        gTV.fillPath();
+
+        // Sleek TV Stand & Integrated Soundbar
+        // Soundbar
+        gTV.fillStyle(0x1e293b, 1);
+        gTV.fillRoundedRect(50, 154, 150, 12, 4);
+        gTV.lineStyle(1.5, 0x475569, 1);
+        gTV.strokeRoundedRect(50, 154, 150, 12, 4);
+        gTV.fillStyle(0x00e5ff, 1);
+        gTV.fillCircle(125, 160, 2); // Soundbar LED
+
+        // Pedestal Stem & Base
+        gTV.fillStyle(0x475569, 1);
+        gTV.fillRect(116, 166, 18, 16);
+        gTV.fillStyle(0x334155, 1);
+        gTV.fillRoundedRect(80, 182, 90, 10, 4);
+        gTV.lineStyle(2, 0x64748b, 1);
+        gTV.strokeRoundedRect(80, 182, 90, 10, 4);
         gTV.generateTexture('obj_streaming_tv', 250, 200);
+        gTV.destroy();
 
         // 4. Robot Vacuum (obj_robot_vacuum: 170x120)
         const gVac = scene.make.graphics({ x: 0, y: 0 });
-        // Disc Body
+        // Laser Scan Fan on Floor
+        gVac.fillStyle(0x00e5ff, 0.15);
+        gVac.beginPath();
+        gVac.moveTo(85, 55);
+        gVac.lineTo(165, 25);
+        gVac.lineTo(168, 85);
+        gVac.closePath();
+        gVac.fillPath();
+
+        // Floor Shadow
+        gVac.fillStyle(0x000000, 0.35);
+        gVac.fillEllipse(85, 78, 80, 32);
+
+        // Main Circular Disc Chassis (Brushed Slate Graphite)
         gVac.fillStyle(0x1e293b, 1);
-        gVac.fillEllipse(85, 65, 75, 40);
-        gVac.lineStyle(4, 0x00e5ff, 1);
-        gVac.strokeEllipse(85, 65, 75, 40);
+        gVac.fillEllipse(85, 65, 74, 38);
+        gVac.lineStyle(3, 0x475569, 1);
+        gVac.strokeEllipse(85, 65, 74, 38);
 
-        // Top Lidar Turret Sensor
+        // Inner Matte Metallic Lid Ring
         gVac.fillStyle(0x0f172a, 1);
-        gVac.fillCircle(85, 50, 20);
-        gVac.lineStyle(3, 0x00e676, 1);
-        gVac.strokeCircle(85, 50, 20);
+        gVac.fillEllipse(85, 63, 60, 28);
+        gVac.lineStyle(2, 0x00e5ff, 0.7);
+        gVac.strokeEllipse(85, 63, 60, 28);
 
-        // Front laser scan beam
-        gVac.lineStyle(2, 0x00e676, 0.7);
-        gVac.lineBetween(85, 50, 140, 30);
-        gVac.lineBetween(85, 50, 145, 50);
-        gVac.lineBetween(85, 50, 140, 70);
+        // Raised LiDAR Laser Turret (Top Sensor Dome)
+        gVac.fillStyle(0x1e293b, 1);
+        gVac.fillCircle(85, 48, 18);
+        gVac.lineStyle(2.5, 0x00e676, 1);
+        gVac.strokeCircle(85, 48, 18);
+
+        // LiDAR Optical Lens & Spinning Beacon
+        gVac.fillStyle(0x00e5ff, 1);
+        gVac.fillCircle(85, 48, 8);
+        gVac.fillStyle(0xffffff, 1);
+        gVac.fillCircle(83, 46, 2.5);
+
+        // Front Rubber Bumper with IR Proximity Sensors
+        gVac.lineStyle(4, 0x0a0f1d, 1);
+        gVac.beginPath();
+        gVac.arc(85, 65, 37, -Math.PI * 0.25, Math.PI * 0.25, false);
+        gVac.strokePath();
+
+        // Edge Cleaning Side Brush Whisker Bristles
+        gVac.lineStyle(2, 0xffffff, 0.9);
+        gVac.lineBetween(142, 75, 162, 70);
+        gVac.lineBetween(142, 75, 164, 82);
+        gVac.lineBetween(142, 75, 156, 90);
+
+        // Power / Docking Touch Button
+        gVac.fillStyle(0x00e676, 1);
+        gVac.fillCircle(85, 74, 6);
+        gVac.lineStyle(1.5, 0xffffff, 1);
+        gVac.strokeCircle(85, 74, 6);
+
+        // Laser Scan Ray Lines
+        gVac.lineStyle(2, 0x00e676, 0.85);
+        gVac.lineBetween(85, 48, 150, 35);
+        gVac.lineBetween(85, 48, 158, 55);
+        gVac.lineBetween(85, 48, 150, 75);
         gVac.generateTexture('obj_robot_vacuum', 170, 120);
+        gVac.destroy();
 
         // 5. Manual Toaster (obj_toaster: 150x140)
         const gTst = scene.make.graphics({ x: 0, y: 0 });
-        gTst.fillStyle(0x94a3b8, 1); // Chrome body
-        gTst.fillRoundedRect(25, 40, 100, 75, 16);
+        // Drop Shadow
+        gTst.fillStyle(0x000000, 0.3);
+        gTst.fillEllipse(75, 126, 68, 12);
+
+        // Toaster Body (Brushed Stainless Steel Chrome)
+        gTst.fillStyle(0x94a3b8, 1);
+        gTst.fillRoundedRect(22, 38, 106, 78, 16);
         gTst.lineStyle(3, 0x475569, 1);
-        gTst.strokeRoundedRect(25, 40, 100, 75, 16);
+        gTst.strokeRoundedRect(22, 38, 106, 78, 16);
 
-        // Toast Slots & Bread Toast
-        gTst.fillStyle(0xd97706, 1); // Brown toast slice
-        gTst.fillRoundedRect(45, 20, 22, 35, 6);
-        gTst.fillRoundedRect(75, 20, 22, 35, 6);
+        // Chrome Metallic Specular Reflection Band
+        gTst.fillStyle(0xe2e8f0, 0.85);
+        gTst.fillRoundedRect(28, 44, 94, 28, 8);
+        gTst.fillStyle(0x64748b, 0.4);
+        gTst.fillRect(28, 76, 94, 26);
 
-        // Mechanical Push Lever
+        // Dual Top Bread Slots
         gTst.fillStyle(0x1e293b, 1);
-        gTst.fillRect(125, 65, 15, 8);
-        gTst.fillCircle(140, 69, 7);
+        gTst.fillRoundedRect(36, 32, 28, 14, 4);
+        gTst.fillRoundedRect(76, 32, 28, 14, 4);
+
+        // Glowing Orange Nichrome Heating Coils Inside Slots
+        gTst.lineStyle(2, 0xf97316, 0.9);
+        gTst.lineBetween(40, 39, 60, 39);
+        gTst.lineBetween(80, 39, 100, 39);
+
+        // 2 Slices of Golden-Brown Artisanal Toast Popping Out
+        // Left Toast
+        gTst.fillStyle(0xd97706, 1);
+        gTst.fillRoundedRect(38, 14, 24, 30, 6);
+        gTst.fillStyle(0xfde68a, 1);
+        gTst.fillRoundedRect(42, 18, 16, 20, 4);
+        // Right Toast
+        gTst.fillStyle(0xd97706, 1);
+        gTst.fillRoundedRect(78, 10, 24, 34, 6);
+        gTst.fillStyle(0xfde68a, 1);
+        gTst.fillRoundedRect(82, 14, 16, 24, 4);
+
+        // Mechanical Push Slider Track & Chrome Lever
+        gTst.fillStyle(0x1e293b, 1);
+        gTst.fillRect(124, 52, 6, 42); // Vertical slot track
+        // Lever Arm & Knob
+        gTst.fillStyle(0x475569, 1);
+        gTst.fillRect(120, 68, 14, 8);
+        gTst.fillStyle(0x0f172a, 1);
+        gTst.fillCircle(136, 72, 8);
+        gTst.fillStyle(0xe2e8f0, 1);
+        gTst.fillCircle(135, 70, 3); // Chrome highlight
+
+        // Rotary Browning Dial 1-6
+        gTst.fillStyle(0x334155, 1);
+        gTst.fillCircle(75, 92, 14);
+        gTst.lineStyle(2, 0x1e293b, 1);
+        gTst.strokeCircle(75, 92, 14);
+        gTst.fillStyle(0xf59e0b, 1);
+        gTst.fillCircle(75, 84, 2.5); // Dial pointer dot
+        // Numbers indicator ticks
+        gTst.fillStyle(0xffffff, 0.7);
+        gTst.fillRect(66, 91, 3, 2);
+        gTst.fillRect(81, 91, 3, 2);
+
+        // Defrost / Cancel Push Buttons
+        gTst.fillStyle(0xef4444, 1);
+        gTst.fillCircle(45, 92, 5);
+        gTst.fillStyle(0x38bdf8, 1);
+        gTst.fillCircle(105, 92, 5);
+
+        // Non-slip Rubber Feet
+        gTst.fillStyle(0x0f172a, 1);
+        gTst.fillRoundedRect(30, 114, 16, 6, 2);
+        gTst.fillRoundedRect(94, 114, 16, 6, 2);
         gTst.generateTexture('obj_toaster', 150, 140);
+        gTst.destroy();
 
         // 6. Ordinary Lamp Switch (obj_lamp_switch: 120x180)
         const gLmp = scene.make.graphics({ x: 0, y: 0 });
-        // Lamp Shade
-        gLmp.fillStyle(0xfbbf24, 1);
+        // Ambient Warm Golden Lamp Glow
+        gLmp.fillStyle(0xfef08a, 0.22);
+        gLmp.fillTriangle(60, 40, 10, 175, 110, 175);
+        gLmp.fillCircle(60, 45, 36);
+
+        // Textured Linen Fabric Drum Lampshade
+        gLmp.fillStyle(0xfef3c7, 1);
         gLmp.beginPath();
-        gLmp.moveTo(40, 20);
-        gLmp.lineTo(80, 20);
-        gLmp.lineTo(95, 75);
-        gLmp.lineTo(25, 75);
+        gLmp.moveTo(38, 22);
+        gLmp.lineTo(82, 22);
+        gLmp.lineTo(96, 78);
+        gLmp.lineTo(24, 78);
         gLmp.closePath();
         gLmp.fillPath();
+        gLmp.lineStyle(2.5, 0xd97706, 1);
+        gLmp.strokePath();
 
-        // Stand pole & Base
-        gLmp.fillStyle(0x475569, 1);
-        gLmp.fillRect(57, 75, 6, 65);
-        gLmp.fillEllipse(60, 145, 30, 12);
+        // Lampshade Texture Weave Lines
+        gLmp.lineStyle(1, 0xfbbf24, 0.5);
+        gLmp.lineBetween(40, 40, 80, 40);
+        gLmp.lineBetween(32, 60, 88, 60);
 
-        // Mechanical Pull Cord / Rocker Switch
-        gLmp.lineStyle(2, 0xffffff, 0.9);
-        gLmp.lineBetween(72, 75, 72, 105);
+        // Internal Glowing Lightbulb Silhouette
+        gLmp.fillStyle(0xf59e0b, 0.85);
+        gLmp.fillCircle(60, 52, 14);
+
+        // Top Finial & Brushed Brass Stem
         gLmp.fillStyle(0xd97706, 1);
-        gLmp.fillCircle(72, 107, 5);
+        gLmp.fillCircle(60, 18, 5); // Brass top finial
+        gLmp.fillRect(57, 78, 6, 68); // Brass metallic rod
+        gLmp.fillStyle(0xfde68a, 1);
+        gLmp.fillRect(59, 78, 2, 68); // Rod highlight
+
+        // Mechanical Bead Pull Chain & Toggle Switch
+        gLmp.fillStyle(0xd97706, 1);
+        for (let y = 78; y <= 112; y += 6) {
+            gLmp.fillCircle(73, y, 2); // Brass bead chain
+        }
+        gLmp.fillStyle(0xb45309, 1);
+        gLmp.fillCircle(73, 116, 4.5); // Brass pull acorn bead
+
+        // In-line Rocker Toggle Switch Box (Physical Circuit)
+        gLmp.fillStyle(0x1e293b, 1);
+        gLmp.fillRoundedRect(72, 134, 20, 14, 3);
+        gLmp.fillStyle(0xef4444, 1); // Rocker ON switch
+        gLmp.fillRect(75, 137, 8, 8);
+        gLmp.fillStyle(0x64748b, 1);
+        gLmp.fillRect(83, 137, 6, 8);
+
+        // Heavy Carrara Marble Base
+        gLmp.fillStyle(0xf8fafc, 1);
+        gLmp.fillEllipse(60, 150, 36, 14);
+        gLmp.lineStyle(2, 0xcb9a67, 1); // Brass rim on base
+        gLmp.strokeEllipse(60, 150, 36, 14);
+        // Marble Veins
+        gLmp.lineStyle(1, 0x94a3b8, 0.6);
+        gLmp.lineBetween(48, 148, 65, 152);
+
+        // Table Shadow
+        gLmp.fillStyle(0x000000, 0.25);
+        gLmp.fillEllipse(60, 164, 44, 10);
         gLmp.generateTexture('obj_lamp_switch', 120, 180);
+        gLmp.destroy();
 
         // 7. Mechanical Analog Clock (obj_analog_clock: 140x140)
         const gClk = scene.make.graphics({ x: 0, y: 0 });
-        gClk.fillStyle(0x78350f, 1); // Wooden rim
-        gClk.fillCircle(70, 70, 55);
-        gClk.fillStyle(0xfffbeb, 1); // Dial
-        gClk.fillCircle(70, 70, 46);
+        const cx = 70;
+        const cy = 70;
 
-        // Clock tick marks
-        gClk.fillStyle(0x1e293b, 1);
-        gClk.fillRect(68, 28, 4, 8); // 12
-        gClk.fillRect(68, 104, 4, 8); // 6
-        gClk.fillRect(28, 68, 8, 4); // 9
-        gClk.fillRect(104, 68, 8, 4); // 3
+        // Drop Shadow
+        gClk.fillStyle(0x000000, 0.35);
+        gClk.fillCircle(cx + 3, cy + 4, 56);
 
-        // Mechanical Hands (Hour and Minute)
+        // Polished Mahogany Wood Frame
+        gClk.fillStyle(0x451a03, 1);
+        gClk.fillCircle(cx, cy, 58);
+        gClk.fillStyle(0x78350f, 1);
+        gClk.fillCircle(cx, cy, 54);
+
+        // Polished Brass Bezel Inner Rim
+        gClk.lineStyle(3, 0xd97706, 1);
+        gClk.strokeCircle(cx, cy, 50);
+
+        // Parchment Dial Face
+        gClk.fillStyle(0xfffbeb, 1);
+        gClk.fillCircle(cx, cy, 47);
+
+        // Hour Tick Marks (12, 1..11)
+        for (let i = 0; i < 12; i++) {
+            const angle = (i * Math.PI) / 6;
+            const isMajor = i % 3 === 0;
+            const r1 = 44;
+            const r2 = isMajor ? 34 : 38;
+            gClk.lineStyle(isMajor ? 3 : 1.5, 0x1e293b, 1);
+            gClk.beginPath();
+            gClk.moveTo(cx + Math.sin(angle) * r1, cy - Math.cos(angle) * r1);
+            gClk.lineTo(cx + Math.sin(angle) * r2, cy - Math.cos(angle) * r2);
+            gClk.strokePath();
+        }
+
+        // Roman Numerals 12, 3, 6, 9
+        gClk.fillStyle(0x0f172a, 1);
+        gClk.fillRect(cx - 3, cy - 35, 6, 3); // XII block
+        gClk.fillRect(cx + 30, cy - 2, 3, 6); // III
+        gClk.fillRect(cx - 2, cy + 30, 4, 3); // VI
+        gClk.fillRect(cx - 33, cy - 2, 3, 6); // IX
+
+        // Subtle Escapement Gears Visible through transparent dial center
+        gClk.fillStyle(0xd97706, 0.25);
+        gClk.fillCircle(cx, cy, 14);
+        gClk.lineStyle(1.5, 0xb45309, 0.4);
+        gClk.strokeCircle(cx, cy, 14);
+
+        // Ornate Black Hour Hand (Pointing towards 10 o'clock)
         gClk.lineStyle(4, 0x0f172a, 1);
-        gClk.lineBetween(70, 70, 70, 44);
-        gClk.lineBetween(70, 70, 92, 70);
+        gClk.beginPath();
+        gClk.moveTo(cx, cy);
+        gClk.lineTo(cx - 18, cy - 14);
+        gClk.strokePath();
+
+        // Ornate Black Minute Hand (Pointing towards 2 o'clock)
+        gClk.lineStyle(3, 0x0f172a, 1);
+        gClk.beginPath();
+        gClk.moveTo(cx, cy);
+        gClk.lineTo(cx + 24, cy - 24);
+        gClk.strokePath();
+
+        // Red Sweeping Second Hand
+        gClk.lineStyle(1.5, 0xef4444, 1);
+        gClk.beginPath();
+        gClk.moveTo(cx - 6, cy + 10);
+        gClk.lineTo(cx + 10, cy - 36);
+        gClk.strokePath();
+        gClk.fillStyle(0xef4444, 1);
+        gClk.fillCircle(cx, cy, 3);
+
+        // Center Brass Pinion Nut
+        gClk.fillStyle(0xd97706, 1);
+        gClk.fillCircle(cx, cy, 2);
+
+        // Glass Dome Specular Reflection Arc
+        gClk.fillStyle(0xffffff, 0.2);
+        gClk.beginPath();
+        gClk.arc(cx, cy, 44, -Math.PI * 0.75, -Math.PI * 0.25, false);
+        gClk.lineTo(cx + 15, cy - 25);
+        gClk.arc(cx, cy, 28, -Math.PI * 0.25, -Math.PI * 0.75, true);
+        gClk.closePath();
+        gClk.fillPath();
         gClk.generateTexture('obj_analog_clock', 140, 140);
+        gClk.destroy();
 
         // 8. Kitchen Blender (obj_blender: 130x170)
         const gBln = scene.make.graphics({ x: 0, y: 0 });
-        // Glass Pitcher
-        gBln.fillStyle(0x38bdf8, 0.45);
+        // Drop Shadow
+        gBln.fillStyle(0x000000, 0.3);
+        gBln.fillEllipse(65, 156, 56, 12);
+
+        // Clear Faceted Glass/Tritan Pitcher Jar
+        gBln.fillStyle(0x38bdf8, 0.25);
         gBln.beginPath();
-        gBln.moveTo(40, 25);
-        gBln.lineTo(90, 25);
-        gBln.lineTo(82, 100);
-        gBln.lineTo(48, 100);
+        gBln.moveTo(38, 26);
+        gBln.lineTo(92, 26);
+        gBln.lineTo(84, 96);
+        gBln.lineTo(46, 96);
         gBln.closePath();
         gBln.fillPath();
-        gBln.lineStyle(3, 0x0284c7, 1);
+        gBln.lineStyle(2.5, 0x0284c7, 1);
         gBln.strokePath();
 
-        // Blender Base & Speed Dial
+        // Swirling Berry Smoothie Liquid
+        gBln.fillStyle(0xe11d48, 0.85);
+        gBln.beginPath();
+        gBln.moveTo(42, 48);
+        gBln.lineTo(88, 48);
+        gBln.lineTo(82, 94);
+        gBln.lineTo(48, 94);
+        gBln.closePath();
+        gBln.fillPath();
+
+        // Smoothie Vortex Wave Highlights
+        gBln.fillStyle(0xf43f5e, 0.9);
+        gBln.fillEllipse(65, 52, 20, 6);
+        gBln.fillStyle(0xfde047, 0.9); // Fruit droplet
+        gBln.fillCircle(58, 62, 2.5);
+        gBln.fillCircle(72, 70, 2);
+
+        // Measurement Markings (oz / ml)
+        gBln.fillStyle(0xffffff, 0.75);
+        gBln.fillRect(44, 38, 10, 2);
+        gBln.fillRect(45, 54, 8, 2);
+        gBln.fillRect(46, 70, 8, 2);
+        gBln.fillRect(48, 86, 6, 2);
+
+        // Pitcher Handle
+        gBln.lineStyle(5, 0x1e293b, 1);
+        gBln.beginPath();
+        gBln.moveTo(90, 34);
+        gBln.lineTo(108, 42);
+        gBln.lineTo(104, 84);
+        gBln.lineTo(84, 88);
+        gBln.strokePath();
+
+        // Pitcher Lid with Removable Clear Cap
+        gBln.fillStyle(0x0f172a, 1);
+        gBln.fillRoundedRect(34, 18, 62, 10, 3);
+        gBln.fillStyle(0x38bdf8, 0.8);
+        gBln.fillRoundedRect(56, 12, 18, 8, 2);
+
+        // Stainless Steel 4-Blade Assembly at Bottom
+        gBln.fillStyle(0x94a3b8, 1);
+        gBln.fillRect(52, 94, 26, 6);
+        gBln.fillStyle(0x475569, 1);
+        gBln.fillTriangle(65, 94, 55, 90, 65, 92);
+        gBln.fillTriangle(65, 94, 75, 90, 65, 92);
+
+        // Cast-Metal Heavy Duty Motor Base (Brushed Charcoal & Chrome)
         gBln.fillStyle(0x1e293b, 1);
-        gBln.fillRoundedRect(35, 100, 60, 50, 10);
+        gBln.fillRoundedRect(30, 100, 70, 52, 10);
+        gBln.lineStyle(2, 0x475569, 1);
+        gBln.strokeRoundedRect(30, 100, 70, 52, 10);
+
+        // Chrome Front Bezel Plate
+        gBln.fillStyle(0x334155, 1);
+        gBln.fillRoundedRect(36, 106, 58, 40, 6);
+
+        // Heavy Rotary Speed Knob (0-1-2-3-Pulse)
+        gBln.fillStyle(0x0f172a, 1);
+        gBln.fillCircle(65, 125, 12);
+        gBln.lineStyle(2, 0xd97706, 1);
+        gBln.strokeCircle(65, 125, 12);
         gBln.fillStyle(0xffd600, 1);
-        gBln.fillCircle(65, 125, 10); // Physical speed knob
-        gBln.lineStyle(2, 0x000000, 1);
-        gBln.lineBetween(65, 125, 65, 118);
+        gBln.fillCircle(65, 116, 2.5); // Knob indicator
+
+        // Manual Metal Toggle Switches (Power / Pulse)
+        gBln.fillStyle(0x94a3b8, 1);
+        gBln.fillRect(42, 122, 4, 10);
+        gBln.fillRect(84, 122, 4, 10);
+
+        // Non-slip Base Rubber Feet
+        gBln.fillStyle(0x0a0f1d, 1);
+        gBln.fillRoundedRect(34, 150, 12, 5, 2);
+        gBln.fillRoundedRect(84, 150, 12, 5, 2);
         gBln.generateTexture('obj_blender', 130, 170);
+        gBln.destroy();
     }
 
     // ==========================================
@@ -1299,13 +1770,16 @@ export class LensHuntVisuals {
         const sbY = cy + 68;
 
         // Long curled monkey tail (styled as in bg.png)
+        const tailCurve = new Phaser.Curves.CubicBezier(
+            new Phaser.Math.Vector2(cx - 18, cy + 30),
+            new Phaser.Math.Vector2(cx - 55, cy + 30),
+            new Phaser.Math.Vector2(cx - 65, cy - 10),
+            new Phaser.Math.Vector2(cx - 45, cy - 25)
+        );
         g.lineStyle(10, 0x4a1942, 1); // Dark violet fur
-        g.beginPath();
-        g.moveTo(cx - 18, cy + 30);
-        g.bezierCurveTo(cx - 55, cy + 30, cx - 65, cy - 10, cx - 45, cy - 25);
-        g.strokePath();
+        tailCurve.draw(g, 24);
         g.lineStyle(3, 0x1f0b24, 1); // Tail dark stroke
-        g.strokePath();
+        tailCurve.draw(g, 24);
 
         // Legs (Light blue-gray trousers matching bg.png)
         g.fillStyle(0xdbeafe, 1);

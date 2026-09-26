@@ -62,7 +62,7 @@ export const HUNT_ZONES: ZoneConfig[] = [
         themeColor: 0x10b981, // Emerald Mint
         themeHex: '#10b981',
         bgMusicKey: 'detective_home',
-        worldWidth: 3800,
+        worldWidth: 7680,
         scrollSpeed: 180,
         requiredAIDiscoveries: 4,
         objects: [
@@ -78,11 +78,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Recognizes a Face',
                 detailedExplanation: 'AI uses the camera to map 3D facial landmarks and compares them to your saved face profile to unlock securely.',
                 visualDiagramType: 'face_match',
-                worldX: 620,
-                worldY: 620,
+                worldX: 1300,
+                worldY: 585,
                 width: 140,
                 height: 190,
-                hintText: 'Look at the smartphone glowing on the coffee table!'
+                hintText: 'Look at the smartphone glowing on the foyer console table!'
             },
             {
                 id: 'smart_speaker',
@@ -95,11 +95,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Listens and Responds',
                 detailedExplanation: 'AI listens to acoustic soundwaves, converts speech into words, and understands user voice commands in real time.',
                 visualDiagramType: 'soundwave_listen',
-                worldX: 1350,
-                worldY: 570,
+                worldX: 3000,
+                worldY: 588,
                 width: 140,
                 height: 180,
-                hintText: 'Check the speaker with the glowing LED ring on the shelf!'
+                hintText: 'Check the speaker with the glowing LED ring on the kitchen island!'
             },
             {
                 id: 'streaming_tv',
@@ -112,11 +112,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Recommends Videos',
                 detailedExplanation: 'AI analyzes movies and shows you previously enjoyed to recommend brand-new personalized videos you might like.',
                 visualDiagramType: 'card_recommend',
-                worldX: 2150,
-                worldY: 480,
+                worldX: 4380,
+                worldY: 370,
                 width: 250,
                 height: 200,
-                hintText: 'Observe the smart entertainment TV unit!'
+                hintText: 'Observe the smart entertainment TV unit in the living room!'
             },
             {
                 id: 'robot_vacuum',
@@ -129,11 +129,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Maps the Room & Detects Obstacles',
                 detailedExplanation: 'AI uses optical sensors and laser LIDAR to map the floor plan, detect furniture obstacles, and navigate efficiently.',
                 visualDiagramType: 'map_obstacles',
-                worldX: 3000,
-                worldY: 790,
+                worldX: 6200,
+                worldY: 760,
                 width: 170,
                 height: 120,
-                hintText: 'Look down near the rug for the roaming floor vacuum!'
+                hintText: 'Look down in the sunroom for the roaming floor vacuum!'
             },
             // --- Non-AI Decoys (4) ---
             {
@@ -147,8 +147,8 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Fixed Heat & Spring',
                 detailedExplanation: 'Heating coils warm bread using a simple bi-metal timer spring. It has no camera, voice sensor, or AI logic.',
                 visualDiagramType: 'gear_spin',
-                worldX: 1000,
-                worldY: 620,
+                worldX: 2520,
+                worldY: 608,
                 width: 150,
                 height: 140,
                 hintText: 'A toaster uses electricity and a mechanical spring.'
@@ -164,8 +164,8 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Physical Circuit Switch',
                 detailedExplanation: 'Pressing the switch physically closes a wire circuit to illuminate the bulb. No software or AI calculations happen.',
                 visualDiagramType: 'button_arrow',
-                worldX: 1750,
-                worldY: 590,
+                worldX: 3680,
+                worldY: 480,
                 width: 120,
                 height: 180,
                 hintText: 'Lamps turn on and off through direct electrical circuits.'
@@ -181,11 +181,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Gear-Driven Quartz Motion',
                 detailedExplanation: 'Tick-tock! Escapement gears turn the hands at a fixed constant speed without learning or pattern adjustments.',
                 visualDiagramType: 'timer_tick',
-                worldX: 2550,
-                worldY: 380,
+                worldX: 500,
+                worldY: 230,
                 width: 140,
                 height: 140,
-                hintText: 'Analog clocks use fixed mechanical clockwork.'
+                hintText: 'Check the wall in the foyer/study for the mechanical ticking clock!'
             },
             {
                 id: 'regular_blender',
@@ -198,8 +198,8 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Direct Motor Spin',
                 detailedExplanation: 'A motor turns the blade at whatever speed dial is selected. It does not identify foods or make smart decisions.',
                 visualDiagramType: 'gear_spin',
-                worldX: 3380,
-                worldY: 640,
+                worldX: 6980,
+                worldY: 593,
                 width: 130,
                 height: 170,
                 hintText: 'Blenders spin at fixed motor speeds.'

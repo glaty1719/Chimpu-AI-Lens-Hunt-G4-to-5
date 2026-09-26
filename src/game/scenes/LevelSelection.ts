@@ -194,7 +194,7 @@ export class LevelSelection extends Scene {
             btnG.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 18);
             btnCont.add(btnG);
 
-            const btnTxt = this.add.text(0, 0, 'INVESTIGATE', {
+            const btnTxt = this.add.text(0, 0, 'PLAY', {
                 fontFamily: 'Arial Black',
                 fontSize: '22px',
                 color: '#ffffff',
