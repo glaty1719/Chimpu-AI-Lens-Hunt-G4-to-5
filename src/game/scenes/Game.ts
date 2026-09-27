@@ -61,13 +61,15 @@ export class Game extends Scene {
         this.scene.launch('UIScene', { gameScene: this, zoneId: this.currentZoneId });
         this.scene.bringToTop('UIScene');
 
-        // 3. Register UI Events
+        // 3. Register UI & Control Events
         this.events.on('pause-game', this.onPauseGame, this);
         this.events.on('resume-game', this.onResumeGame, this);
         this.events.on('restart-game', this.onRestartGame, this);
         this.events.on('quit-game', this.onQuitGame, this);
         this.events.on('home-game', this.onHomeGame, this);
         this.events.on('trigger-scan', this.onTriggerScan, this);
+        this.events.on('chimpu-move', (dir: number) => { this.worldView?.setTouchMoveDir(dir); }, this);
+        this.events.on('request-hud-sync', this.broadcastHUDState, this);
         this.events.on('shutdown', this.cleanup, this);
 
         // 4. Initialize Parallax World View
@@ -87,31 +89,34 @@ export class Game extends Scene {
             this.onScanCompleted(result);
         });
 
-        // 6. Setup Keyboard Controls (Left/Right arrow, Space, Enter)
+        // 6. Setup Keyboard Controls (Space/Enter: Scan, Tab/Q/E: Cycle Targets, Arrow Keys & WASD: Skate Move)
         this.setupKeyboardControls();
 
-        // 7. Initial HUD Broadcast
-        this.broadcastHUDState();
+        // 7. Listen for clicks outside objects to deselect & remove reticle
+        this.input.on('pointerdown', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
+            if (this.scanner?.isModalOpen() || this.albumActivity || this.finaleModal || this.isZoneFinished) {
+                return;
+            }
 
-        // If Tutorial is active, pre-select the first smartphone object after a brief delay
-        if (this.isTutorialActive) {
-            this.time.delayedCall(800, () => {
-                this.worldView?.selectObject(0); // Smartphone Face Unlock
-            });
-        }
+            // Ignore top HUD area and bottom console area
+            if (pointer.y <= 120 || pointer.y >= 960) {
+                return;
+            }
+
+            const clickedObject = currentlyOver.some((obj) => this.worldView?.isObjectHitZone(obj));
+            if (!clickedObject) {
+                this.onDeselectObject();
+            }
+        });
+
+        // 8. Initial HUD Broadcast
+        this.broadcastHUDState();
     }
 
     private setupKeyboardControls() {
         if (!this.input.keyboard) return;
 
-        this.input.keyboard.on('keydown-LEFT', () => {
-            this.worldView?.selectPrevObject();
-        });
-
-        this.input.keyboard.on('keydown-RIGHT', () => {
-            this.worldView?.selectNextObject();
-        });
-
+        // Space and Enter triggers Holographic Scan
         this.input.keyboard.on('keydown-SPACE', () => {
             this.onTriggerScan();
         });
@@ -119,6 +124,34 @@ export class Game extends Scene {
         this.input.keyboard.on('keydown-ENTER', () => {
             this.onTriggerScan();
         });
+
+        // Tab, Q, E cycle targets
+        this.input.keyboard.on('keydown-TAB', (e: KeyboardEvent) => {
+            e.preventDefault();
+            this.worldView?.selectNextObject();
+        });
+
+        this.input.keyboard.on('keydown-Q', () => {
+            this.worldView?.selectPrevObject();
+        });
+
+        this.input.keyboard.on('keydown-E', () => {
+            this.worldView?.selectNextObject();
+        });
+    }
+
+    private onDeselectObject() {
+        if (!this.worldView || !this.scanner) return;
+        if (this.worldView.getSelectedObjectIndex() === -1) return;
+
+        this.worldView.deselectObject();
+        this.scanner.unlock();
+
+        if (this.isTutorialActive) {
+            this.tutorialStep = 1;
+        }
+
+        this.broadcastHUDState();
     }
 
     private onObjectSelected(obj: WorldObjectItem) {
@@ -166,7 +199,11 @@ export class Game extends Scene {
             this.worldView.markObjectDiscovered(selectedIndex);
         }
 
-        // 2. Tally AI discoveries
+        // 2. Clear selection and unlock scanner so neither AI nor non-AI objects remain selected after scanning
+        this.worldView.deselectObject();
+        this.scanner?.unlock();
+
+        // 3. Tally AI discoveries
         if (result.isAI) {
             this.discoveredAIObjects.add(result.objectData.id);
             this.batteryPercent = Math.min(100, this.batteryPercent + result.batteryChargedPercent);
@@ -174,6 +211,9 @@ export class Game extends Scene {
 
             // Chimpu celebration skateboard trick
             this.worldView.playChimpuTrick();
+
+            // Check if all AI targets in current room are discovered to roll into next room
+            this.worldView.checkRoomProgression();
         } else {
             this.totalScore += result.scoreAdded;
         }
@@ -325,6 +365,7 @@ export class Game extends Scene {
         if (this.input.keyboard) {
             this.input.keyboard.removeAllListeners();
         }
+        this.input.off('pointerdown');
 
         this.events.off('pause-game', this.onPauseGame, this);
         this.events.off('resume-game', this.onResumeGame, this);
@@ -332,5 +373,6 @@ export class Game extends Scene {
         this.events.off('quit-game', this.onQuitGame, this);
         this.events.off('home-game', this.onHomeGame, this);
         this.events.off('trigger-scan', this.onTriggerScan, this);
+        this.events.off('request-hud-sync', this.broadcastHUDState, this);
     }
 }

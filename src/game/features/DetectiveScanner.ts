@@ -80,6 +80,11 @@ export class DetectiveScanner {
         const screenX = target.worldX - scrollX;
         const screenY = target.worldY;
 
+        if (this.reticleContainer.x === -500 && this.reticleContainer.y === -500) {
+            this.reticleContainer.setPosition(screenX, screenY);
+            this.reticleContainer.setScale(1.2);
+        }
+
         this.reticleContainer.setVisible(true);
 
         // Smooth glide to target position
@@ -94,6 +99,12 @@ export class DetectiveScanner {
                 AudioManager.getInstance().playSFX('lock_on');
             }
         });
+    }
+
+    public unlock() {
+        this.currentTarget = null;
+        this.reticleContainer.setVisible(false);
+        this.reticleContainer.setPosition(-500, -500);
     }
 
     public updateReticlePosition(scrollX: number) {
@@ -145,9 +156,11 @@ export class DetectiveScanner {
             onComplete: () => {
                 this.scanBeamGraphics.clear();
                 this.isScanning = false;
+                this.unlock(); // Hide reticle after scanning any object
 
                 // 2. Open Holographic Breakdown Modal
                 this.showBreakdownModal(target, () => {
+                    this.unlock();
                     if (onDone) onDone();
                 });
             }

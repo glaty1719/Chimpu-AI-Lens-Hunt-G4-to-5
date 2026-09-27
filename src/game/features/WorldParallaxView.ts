@@ -7,8 +7,8 @@ export interface WorldObjectItem {
     container: GameObjects.Container;
     sprite: GameObjects.Sprite | GameObjects.Image;
     glowGraphics: GameObjects.Graphics;
-    labelBadge: GameObjects.Container;
-    statusIcon: GameObjects.Image;
+    statusIconCont: GameObjects.Container;
+    hitZone: GameObjects.Zone;
     isDiscovered: boolean;
     worldX: number;
     worldY: number;
@@ -20,6 +20,12 @@ export class WorldParallaxView {
     private worldWidth: number;
     private screenWidth: number;
     private screenHeight: number;
+    private roomWidth: number = 1920;
+    private totalRooms: number = 1;
+    private currentRoomIndex: number = 0;
+    private maxUnlockedRoomIndex: number = 0;
+    private patrolDir: number = 1;
+    private isTransitioningRoom: boolean = false;
 
     // Camera & Scroll State
     private scrollX: number = 0;
@@ -38,11 +44,27 @@ export class WorldParallaxView {
     private worldObjects: WorldObjectItem[] = [];
     private selectedObjectIndex: number = -1;
 
-    // Chimpu Character Object
+    // Chimpu Character Object & Movement Physics
     private chimpuContainer!: GameObjects.Container;
     private chimpuSprite!: GameObjects.Sprite;
-    private chimpuY: number = 890;
-    private chimpuTargetX: number = 320;
+    private chimpuShadow!: GameObjects.Graphics;
+    private chimpuThrusterGlow!: GameObjects.Graphics;
+    private chimpuWorldX: number = 380;
+    private chimpuBaseY: number = 890;
+    private chimpuCurrentY: number = 890;
+    private chimpuVx: number = 0;
+    private isJumping: boolean = false;
+    private touchMoveDir: number = 0;
+
+    // Turbo Speed & Acceleration Boost (Hold down & Rapid Tap mechanics)
+    private holdDuration: number = 0;
+    private tapBoost: number = 0;
+    private lastTapTime: number = 0;
+    private lastTapDir: number = 0;
+
+    // Keyboard Input
+    private cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
+    private wasdKeys: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key } | null = null;
 
     // Callbacks
     private onObjectSelectCallback: (obj: WorldObjectItem, index: number) => void;
@@ -59,13 +81,28 @@ export class WorldParallaxView {
         this.worldWidth = zoneConfig.worldWidth;
         this.screenWidth = scene.scale.width;
         this.screenHeight = scene.scale.height;
+        this.roomWidth = 1920;
+        this.totalRooms = Math.max(1, Math.ceil(this.worldWidth / this.roomWidth));
+        this.currentRoomIndex = 0;
+        this.maxUnlockedRoomIndex = 0;
+        this.patrolDir = 1;
+        this.isTransitioningRoom = false;
         this.onObjectSelectCallback = onSelect;
         this.onObjectDoubleTapCallback = onDoubleTap;
+
+        if (this.scene.input.keyboard) {
+            this.cursors = this.scene.input.keyboard.createCursorKeys();
+            this.wasdKeys = {
+                W: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+                A: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+                S: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+                D: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+            };
+        }
 
         this.createEnvironmentLayers();
         this.createWorldObjects();
         this.createChimpuCharacter();
-        this.setupDragAndTouchControls();
     }
 
     private createEnvironmentLayers() {
@@ -229,25 +266,7 @@ export class WorldParallaxView {
         roomG.fillCircle(632, 480, 14);
         roomG.fillCircle(660, 485, 16);
 
-        // Large Backlit Circular Vanity Mirror (X: 1300, Y: 240)
-        roomG.fillStyle(0xfde68a, 0.3);
-        roomG.fillCircle(1300, 240, 120);
-        roomG.lineStyle(8, 0xd97706, 1);
-        roomG.strokeCircle(1300, 240, 105);
-        roomG.fillStyle(0x1e3d32, 0.9);
-        roomG.fillCircle(1300, 240, 101);
-        roomG.fillStyle(0xffffff, 0.15);
-        roomG.fillEllipse(1275, 205, 55, 25);
 
-        // Designer Sconce Fixtures with Radiant Downlight Cones (at X: 980, 1620)
-        [980, 1620].forEach(sx => {
-            roomG.fillStyle(0xd97706, 1);
-            roomG.fillRoundedRect(sx - 10, 260, 20, 34, 5);
-            roomG.fillStyle(0xfde68a, 1);
-            roomG.fillCircle(sx, 277, 6);
-            roomG.fillStyle(0xfef08a, 0.15);
-            roomG.fillTriangle(sx, 294, sx - 90, 680, sx + 90, 680);
-        });
 
         // Floor 1: Luxury Oak Herringbone Parquet (0 to 1920)
         roomG.fillStyle(0x5c2c16, 1);
@@ -327,9 +346,7 @@ export class WorldParallaxView {
             roomG.fillStyle(0xd97706, 1);
             roomG.fillRoundedRect(x + 168, 230, 7, 34, 3);
         }
-        // Under-Cabinet Warm LED Strip Glow
-        roomG.fillStyle(0xfef08a, 0.35);
-        roomG.fillRect(2290, 280, 1490, 55);
+
 
         // Stainless Steel Range Hood (X: 2950 to 3170, Y: 140 to 280)
         roomG.fillStyle(0x334155, 1);
@@ -382,11 +399,7 @@ export class WorldParallaxView {
             roomG.fillRoundedRect(x, 50, 12, 670, 3);
         }
 
-        // Frameless 75" Smart OLED Wall TV Ambient Backlight Glow (AmbiLight effect)
-        roomG.fillStyle(0x00e5ff, 0.22);
-        roomG.fillRoundedRect(4150, 220, 460, 280, 30);
-        roomG.fillStyle(0x3b82f6, 0.18);
-        roomG.fillRoundedRect(4130, 200, 500, 320, 36);
+
 
         // Large Panoramic Garden Window Frame & Drapes (X: 4900 to 5550, Y: 110 to 540)
         roomG.lineStyle(8, 0xffffff, 0.95);
@@ -405,10 +418,7 @@ export class WorldParallaxView {
         roomG.fillCircle(4850, 88, 12);
         roomG.fillCircle(5600, 88, 12);
 
-        // Volumetric Moonlight Beams from window
-        roomG.fillStyle(0xfef08a, 0.1);
-        roomG.fillTriangle(4950, 110, 5350, 110, 4400, 720);
-        roomG.fillTriangle(5150, 110, 5550, 110, 4800, 720);
+
 
         // Floor 3: Dark Walnut Hardwood Planks (3840 to 5760)
         roomG.fillStyle(0x3b1807, 1);
@@ -483,15 +493,7 @@ export class WorldParallaxView {
         roomG.fillStyle(0xd97706, 0.9);
         roomG.fillRect(0, 40, ww, 4);
 
-        // Recessed Ceiling Downlights across all rooms (casting soft illumination cones)
-        for (let lx = 200; lx < ww; lx += 380) {
-            roomG.fillStyle(0xd97706, 1);
-            roomG.fillCircle(lx, 28, 8);
-            roomG.fillStyle(0xfde68a, 1);
-            roomG.fillCircle(lx, 28, 4);
-            roomG.fillStyle(0xfef08a, 0.08);
-            roomG.fillTriangle(lx, 32, lx - 110, 720, lx + 110, 720);
-        }
+
 
         // Baseboard Skirting Trim (Y: 706 to 724)
         roomG.fillStyle(0x0f172a, 1);
@@ -555,23 +557,7 @@ export class WorldParallaxView {
         furnG.lineTo(2660, 628);
         furnG.strokePath();
 
-        // Hanging Pendant Lamps in Kitchen (X: 2650, 3350)
-        [2650, 3350].forEach(px => {
-            furnG.fillStyle(0x1e293b, 1);
-            furnG.fillRect(px - 2, 40, 4, 180);
-            furnG.fillStyle(0xd97706, 1);
-            furnG.beginPath();
-            furnG.moveTo(px - 36, 250);
-            furnG.lineTo(px + 36, 250);
-            furnG.lineTo(px + 20, 218);
-            furnG.lineTo(px - 20, 218);
-            furnG.closePath();
-            furnG.fillPath();
-            furnG.fillStyle(0xfde68a, 1);
-            furnG.fillCircle(px, 252, 12);
-            furnG.fillStyle(0xfef08a, 0.18);
-            furnG.fillTriangle(px, 252, px - 140, 680, px + 140, 680);
-        });
+
 
         // --- ROOM 3: Living Room Entertainment Credenza & Luxury Rug ---
         furnG.fillStyle(0x000000, 0.35);
@@ -599,19 +585,7 @@ export class WorldParallaxView {
         furnG.fillStyle(0x00e5ff, 1);
         furnG.fillCircle(4380, 668, 3);
 
-        // Modern Standing Arc Floor Lamp (X: 5620)
-        furnG.lineStyle(5, 0xd97706, 1);
-        const lampArc = new Phaser.Curves.CubicBezier(
-            new Phaser.Math.Vector2(5640, 750),
-            new Phaser.Math.Vector2(5650, 360),
-            new Phaser.Math.Vector2(5540, 260),
-            new Phaser.Math.Vector2(5450, 320)
-        );
-        lampArc.draw(furnG, 24);
-        furnG.fillStyle(0xd97706, 1);
-        furnG.fillEllipse(5450, 320, 42, 20);
-        furnG.fillStyle(0xfef08a, 0.25);
-        furnG.fillTriangle(5450, 320, 5280, 750, 5620, 750);
+
 
         // --- ROOM 4: Sunroom Breakfast Bar & Planters (X: 5760 to 7680) ---
         furnG.fillStyle(0x000000, 0.4);
@@ -826,40 +800,29 @@ export class WorldParallaxView {
                 ease: 'Sine.easeInOut'
             });
 
-            // 3. Modern Glassmorphism Name Tag Pill (positioned neatly below object)
-            const badgeW = Math.max(objData.name.length * 9.5 + 42, 130);
-            const badgeH = 30;
-            const badgeCont = this.scene.add.container(0, objData.height / 2 + 20);
+            // 3. Status Discovery Tick Badge (Top Right of Object) - displayed only for AI objects
+            const badgeOffset = Math.max(objData.width, objData.height) * 0.38 + 10;
+            const statusIconCont = this.scene.add.container(badgeOffset, -badgeOffset);
 
-            const badgeG = this.scene.add.graphics();
-            badgeG.fillStyle(0x0a1128, 0.9);
-            badgeG.fillRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, badgeH / 2);
-            badgeG.lineStyle(1.5, objData.isAI ? 0x00e5ff : 0x94a3b8, 0.7);
-            badgeG.strokeRoundedRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, badgeH / 2);
-            // Indicator pip
-            badgeG.fillStyle(objData.isAI ? 0x00e5ff : 0xfbbf24, 1);
-            badgeG.fillCircle(-badgeW / 2 + 14, 0, 4);
+            const statusBg = this.scene.add.graphics();
+            // Glowing emerald check badge
+            statusBg.fillStyle(0x00e676, 0.45);
+            statusBg.fillCircle(0, 0, 22);
+            statusBg.fillStyle(0x059669, 1);
+            statusBg.fillCircle(0, 0, 18);
+            statusBg.lineStyle(2.5, 0xffffff, 1);
+            statusBg.strokeCircle(0, 0, 18);
 
-            const badgeTxt = this.scene.add.text(6, 0, objData.name, {
-                fontFamily: 'Arial, sans-serif',
-                fontSize: '13px',
-                fontStyle: 'bold',
+            // Bold Tick / Checkmark symbol
+            const tickText = this.scene.add.text(0, 0, '✓', {
+                fontFamily: 'Arial Black',
+                fontSize: '20px',
                 color: '#ffffff',
-                align: 'center'
+                stroke: '#064e3b',
+                strokeThickness: 3
             }).setOrigin(0.5);
 
-            badgeCont.add([badgeG, badgeTxt]);
-            cont.add(badgeCont);
-
-            // 4. Status Discovery Badge (Top Right of Object)
-            const statusIconCont = this.scene.add.container(objData.width / 2 - 4, -objData.height / 2 + 4);
-            const statusBg = this.scene.add.graphics();
-            statusBg.fillStyle(0x0f172a, 0.95);
-            statusBg.fillCircle(0, 0, 16);
-            statusBg.lineStyle(2, 0x00e676, 1);
-            statusBg.strokeCircle(0, 0, 16);
-            const statusIcon = this.scene.add.image(0, 0, 'icon_recognizes').setScale(0.3);
-            statusIconCont.add([statusBg, statusIcon]);
+            statusIconCont.add([statusBg, tickText]);
             statusIconCont.setVisible(false);
             cont.add(statusIconCont);
 
@@ -867,8 +830,10 @@ export class WorldParallaxView {
             const hitW = Math.max(objData.width + 30, 100);
             const hitH = Math.max(objData.height + 40, 100);
             const hitZone = this.scene.add.zone(0, 0, hitW, hitH).setInteractive({ useHandCursor: true });
+            hitZone.setData('isWorldObject', true);
 
             hitZone.on('pointerover', () => {
+                if (worldItem.isDiscovered && worldItem.data.isAI) return;
                 this.scene.tweens.add({
                     targets: cont,
                     scale: 1.06,
@@ -888,6 +853,9 @@ export class WorldParallaxView {
 
             let lastTapTime = 0;
             hitZone.on('pointerdown', () => {
+                // If scanned AI object, it is not clickable
+                if (worldItem.isDiscovered && worldItem.data.isAI) return;
+
                 const now = Date.now();
                 const isDoubleTap = now - lastTapTime < 350;
                 lastTapTime = now;
@@ -907,8 +875,8 @@ export class WorldParallaxView {
                 container: cont,
                 sprite: sprite,
                 glowGraphics: glow,
-                labelBadge: badgeCont,
-                statusIcon: statusIcon,
+                statusIconCont: statusIconCont,
+                hitZone: hitZone,
                 isDiscovered: false,
                 worldX: objData.worldX,
                 worldY: objData.worldY
@@ -919,11 +887,23 @@ export class WorldParallaxView {
     }
 
     private createChimpuCharacter() {
-        this.chimpuContainer = this.scene.add.container(this.chimpuTargetX, this.chimpuY)
+        this.chimpuWorldX = 380;
+        this.chimpuCurrentY = this.chimpuBaseY;
+
+        this.chimpuContainer = this.scene.add.container(this.chimpuWorldX, this.chimpuCurrentY)
             .setDepth(UILayers.GAME_PLAYER);
 
+        // 1. Soft Dynamic Ground Shadow
+        this.chimpuShadow = this.scene.add.graphics();
+        this.chimpuShadow.fillStyle(0x000000, 0.35);
+        this.chimpuShadow.fillEllipse(0, 52, 130, 24);
+        this.chimpuContainer.add(this.chimpuShadow);
 
-        // Unified Chimpu Riding Skateboard Character Sprite (Single sprite with feet planted on deck)
+        // 2. Skateboard Neon Thruster / Hover Glow
+        this.chimpuThrusterGlow = this.scene.add.graphics();
+        this.chimpuContainer.add(this.chimpuThrusterGlow);
+
+        // 3. Unified Chimpu Riding Skateboard Character Sprite
         const defaultTex = this.scene.textures.exists('chimpu_riding_skateboard')
             ? 'chimpu_riding_skateboard'
             : (this.scene.textures.exists('chimpu_skater_move') ? 'chimpu_skater_move' : 'chimpu_detective_1');
@@ -931,85 +911,295 @@ export class WorldParallaxView {
             .setScale(0.38);
         this.chimpuContainer.add(this.chimpuSprite);
 
-        // Synchronized Hoverboard Floating Oscillation
+        // Gentle Floating Hover Bob
         this.scene.tweens.add({
             targets: this.chimpuSprite,
-            y: '-=8',
-            duration: 500,
+            y: '-=6',
+            duration: 450,
             yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut'
         });
     }
 
-    private setupDragAndTouchControls() {
-        let isDragging = false;
-        let dragStartX = 0;
-        let startScrollX = 0;
-
-        this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-            if (pointer.y > this.screenHeight - 120 && pointer.x > this.screenWidth - 300) {
-                return; // Scanner button area
-            }
-            isDragging = true;
-            this.isUserInteracting = true;
-            dragStartX = pointer.x;
-            startScrollX = this.targetScrollX;
-        });
-
-        this.scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-            if (!isDragging) return;
-            const deltaX = pointer.x - dragStartX;
-            this.targetScrollX = Phaser.Math.Clamp(
-                startScrollX - deltaX,
-                0,
-                this.worldWidth - this.screenWidth
-            );
-        });
-
-        this.scene.input.on('pointerup', () => {
-            isDragging = false;
-            // Resume gentle auto-scroll after a pause
-            this.scene.time.delayedCall(3000, () => {
-                this.isUserInteracting = false;
-            });
-        });
-    }
-
     public update(_time: number, delta: number) {
-        if (this.isPaused) return;
+        if (this.isPaused || this.isTransitioningRoom) return;
 
-        const dt = delta / 1000;
+        const dt = Math.min(delta / 1000, 0.1);
 
-        // Auto-Scroll Behavior: gently scroll forward until reaching end of corridor
-        if (this.isAutoScrolling && !this.isUserInteracting) {
-            this.targetScrollX += this.zoneConfig.scrollSpeed * dt;
-            if (this.targetScrollX > this.worldWidth - this.screenWidth) {
-                this.targetScrollX = this.worldWidth - this.screenWidth;
+        // 1. Read Arrow Keys & WASD Input
+        let moveX = this.touchMoveDir;
+        let moveY = 0;
+        let jumpRequested = false;
+
+        if (this.cursors && this.wasdKeys) {
+            const isLeft = this.cursors.left.isDown || this.wasdKeys.A.isDown;
+            const isRight = this.cursors.right.isDown || this.wasdKeys.D.isDown;
+            const isUp = this.cursors.up.isDown || this.wasdKeys.W.isDown;
+            const isDown = this.cursors.down.isDown || this.wasdKeys.S.isDown;
+
+            const leftJustDown = Phaser.Input.Keyboard.JustDown(this.cursors.left) || Phaser.Input.Keyboard.JustDown(this.wasdKeys.A);
+            const rightJustDown = Phaser.Input.Keyboard.JustDown(this.cursors.right) || Phaser.Input.Keyboard.JustDown(this.wasdKeys.D);
+
+            if (leftJustDown) {
+                this.applyTapBoost(-1);
+            } else if (rightJustDown) {
+                this.applyTapBoost(1);
+            }
+
+            if (isLeft && !isRight) moveX = -1;
+            else if (isRight && !isLeft) moveX = 1;
+
+            if (isUp && !isDown) {
+                moveY = -1;
+                jumpRequested = true;
+            } else if (isDown && !isUp) {
+                moveY = 1;
             }
         }
 
-        // Smooth camera scroll interpolation (Lerp)
-        this.scrollX = Phaser.Math.Linear(this.scrollX, this.targetScrollX, 0.12);
+        // Track continuous hold duration for progressive turbo acceleration
+        if (moveX !== 0) {
+            this.holdDuration += dt;
+        } else {
+            this.holdDuration = Math.max(0, this.holdDuration - dt * 3.5);
+        }
 
-        // Apply Parallax Offsets across layers
-        // Far background (outdoor scenery seen through windows / distant skyline): 0.35x parallax
+        // Decay tap boost impulse over time
+        if (this.tapBoost > 0) {
+            this.tapBoost = Math.max(0, this.tapBoost - dt * 260);
+        }
+
+        // Progressive hold turbo boost: up to +520 px/s after continuous hold
+        const holdProgress = Phaser.Math.Clamp(this.holdDuration / 1.6, 0, 1.0);
+        const holdBoost = holdProgress * 520;
+
+        // Dynamic max speeds combining base + hold ramp + rapid tap boost
+        const baseCruiseSpeed = this.zoneConfig.scrollSpeed; // e.g. 180 px/s
+        const totalExtraSpeed = holdBoost + this.tapBoost;
+
+        const maxForwardSpeed = baseCruiseSpeed + 300 + totalExtraSpeed; // normal max ~480, turbo max ~1150 px/s!
+        const maxReverseSpeed = -(260 + totalExtraSpeed * 0.85); // normal max -260, turbo max -920 px/s!
+
+        // Dynamically track which room Chimpu is currently standing in (Room 0 to maxUnlockedRoomIndex)
+        const activeRoom = Phaser.Math.Clamp(
+            Math.floor(this.chimpuWorldX / this.roomWidth),
+            0,
+            this.maxUnlockedRoomIndex
+        );
+        this.currentRoomIndex = activeRoom;
+
+        // Turnaround points for current room patrol
+        const minPatrolX = this.currentRoomIndex * this.roomWidth + 240;
+        const maxPatrolX = Math.min(this.worldWidth, (this.currentRoomIndex + 1) * this.roomWidth) - 240;
+
+        // Hard bounds across all unlocked rooms (can skate all the way to Room 0!)
+        const minRoomX = 120;
+        const maxRoomX = Math.min(this.worldWidth, (this.maxUnlockedRoomIndex + 1) * this.roomWidth) - 120;
+
+        // Auto patrol flip when cruising without user input in the current room
+        if (!this.isUserInteracting) {
+            if (this.chimpuWorldX >= maxPatrolX && this.patrolDir > 0) {
+                this.patrolDir = -1;
+            } else if (this.chimpuWorldX <= minPatrolX && this.patrolDir < 0) {
+                this.patrolDir = 1;
+            }
+        }
+
+        // 2. Update Horizontal Velocity (chimpuVx)
+        if (moveX > 0) {
+            // Accelerate forward with skate thrust & turbo responsiveness
+            const accelRate = 8.5 + (holdProgress * 4.5);
+            this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, maxForwardSpeed, dt * accelRate);
+            this.isUserInteracting = true;
+            this.patrolDir = 1;
+        } else if (moveX < 0) {
+            // Skate backward into previous rooms
+            const accelRate = 9.0 + (holdProgress * 4.5);
+            this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, maxReverseSpeed, dt * accelRate);
+            this.isUserInteracting = true;
+            this.patrolDir = -1;
+        } else {
+            // Smoothly glide towards patrol speed in current room
+            const targetCruiseVx = this.patrolDir * baseCruiseSpeed;
+            if (this.isAutoScrolling && !this.isUserInteracting) {
+                this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, targetCruiseVx, dt * 3.5);
+            } else {
+                this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, targetCruiseVx, dt * 2.5);
+            }
+        }
+
+        // 3. Update Vertical Position (Lane riding & Jump)
+        const targetBaseY = this.chimpuBaseY + moveY * 35; // Lane range: 855 to 925
+        this.chimpuCurrentY = Phaser.Math.Linear(this.chimpuCurrentY, targetBaseY, dt * 5.0);
+
+        // Skateboard Ollie / Hop on UP tap
+        if (jumpRequested && !this.isJumping) {
+            this.isJumping = true;
+            this.scene.tweens.add({
+                targets: this.chimpuSprite,
+                y: -50,
+                duration: 250,
+                yoyo: true,
+                ease: 'Quad.easeOut',
+                onComplete: () => {
+                    this.chimpuSprite.y = -10;
+                    this.isJumping = false;
+                }
+            });
+        }
+
+        // 4. Update Chimpu World Position clamped within Unlocked Space
+        this.chimpuWorldX += this.chimpuVx * dt;
+        this.chimpuWorldX = Phaser.Math.Clamp(this.chimpuWorldX, minRoomX, maxRoomX);
+
+        // 5. Camera stays locked and framed on whichever Room Chimpu is currently visiting
+        const roomBaseScroll = this.currentRoomIndex * this.roomWidth;
+        this.targetScrollX = Phaser.Math.Clamp(
+            roomBaseScroll,
+            0,
+            this.worldWidth - this.screenWidth
+        );
+
+        // Smooth camera scroll interpolation (Lerp)
+        const cameraLerpSpeed = Math.min(10.0, 6.0 + holdProgress * 4.0);
+        this.scrollX = Phaser.Math.Linear(this.scrollX, this.targetScrollX, dt * cameraLerpSpeed);
+
+        // 6. Apply Parallax Offsets across layers
         this.farLayerCont.x = -this.scrollX * 0.35;
-        // Room interior architecture (walls, floors, furniture, fixtures): 1.0x locked with objects
         this.midLayerCont.x = -this.scrollX;
-        // Interactive game objects: 1.0x
         this.objectLayerCont.x = -this.scrollX;
-        // Foreground overlay / vignette: 1.0x
         this.nearLayerCont.x = -this.scrollX;
 
-        // Chimpu follows screen position smoothly with skateboard roll
+        // 7. Update Chimpu Screen Coordinates & Sprite Pose
+        const chimpuScreenX = this.chimpuWorldX - this.scrollX;
+        this.chimpuContainer.x = chimpuScreenX;
+        this.chimpuContainer.y = this.chimpuCurrentY;
+
+        // Dynamic tilt angle and facing direction
+        if (this.chimpuVx > 15) {
+            this.chimpuSprite.setFlipX(false);
+            const targetAngle = Phaser.Math.Clamp((this.chimpuVx / 550) * 8, 0, 9);
+            this.chimpuContainer.setAngle(Phaser.Math.Linear(this.chimpuContainer.angle, targetAngle, dt * 8.0));
+        } else if (this.chimpuVx < -15) {
+            this.chimpuSprite.setFlipX(true);
+            const targetAngle = Phaser.Math.Clamp((this.chimpuVx / 450) * -8, -9, 0);
+            this.chimpuContainer.setAngle(Phaser.Math.Linear(this.chimpuContainer.angle, targetAngle, dt * 8.0));
+        } else {
+            this.chimpuContainer.setAngle(Phaser.Math.Linear(this.chimpuContainer.angle, 0, dt * 6.0));
+        }
+
+        // 8. Render Dynamic Skateboard Thruster Wake & Glow
+        this.chimpuThrusterGlow.clear();
+        const isMovingFast = Math.abs(this.chimpuVx) > 220;
+        const isSuperTurbo = Math.abs(this.chimpuVx) > 520;
+        const isMovingBack = this.chimpuVx < -50;
+        const glowColor = this.zoneConfig.themeHex ? parseInt(this.zoneConfig.themeHex.replace('#', '0x')) : 0x00e5ff;
+
+        if (isSuperTurbo) {
+            const glowLength = Math.min(130, (Math.abs(this.chimpuVx) / maxForwardSpeed) * 130);
+            // Outer blazing cyan flame
+            this.chimpuThrusterGlow.fillStyle(0x00e5ff, 0.65);
+            this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -55 : 55, 38, glowLength, 20);
+            // Inner hot core plasma
+            this.chimpuThrusterGlow.fillStyle(0xfde047, 0.9);
+            this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -48 : 48, glowLength * 0.6, 10);
+            this.chimpuThrusterGlow.fillStyle(0xffffff, 1);
+            this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -42 : 42, glowLength * 0.3, 6);
+        } else if (isMovingFast) {
+            const glowLength = Math.min(85, (Math.abs(this.chimpuVx) / 500) * 85);
+            this.chimpuThrusterGlow.fillStyle(0x00f2fe, 0.45);
+            this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -45 : 45, 38, glowLength, 16);
+            this.chimpuThrusterGlow.fillStyle(0xffffff, 0.7);
+            this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -40 : 40, 38, glowLength * 0.5, 8);
+        } else if (isMovingBack) {
+            this.chimpuThrusterGlow.fillStyle(0xf59e0b, 0.5);
+            this.chimpuThrusterGlow.fillEllipse(45, 38, 50, 14);
+        } else {
+            this.chimpuThrusterGlow.fillStyle(glowColor, 0.22);
+            this.chimpuThrusterGlow.fillEllipse(0, 42, 70, 14);
+        }
+
+        // 9. Update Ground Shadow scale based on jump/height
+        const shadowScale = this.isJumping ? 0.75 : 1.0;
+        const shadowAlpha = this.isJumping ? 0.2 : 0.35;
+        this.chimpuShadow.setScale(shadowScale);
+        this.chimpuShadow.setAlpha(shadowAlpha);
+    }
+
+    public isObjectHitZone(gameObject: GameObjects.GameObject): boolean {
+        if (gameObject.getData('isWorldObject') !== true) return false;
+        const found = this.worldObjects.find(o => o.hitZone === gameObject);
+        if (found && found.isDiscovered && found.data.isAI) {
+            return false; // Scanned AI object is not clickable / treated as outside clicks
+        }
+        return true;
+    }
+
+    public deselectObject() {
+        this.selectedObjectIndex = -1;
+        this.worldObjects.forEach((obj) => {
+            obj.glowGraphics.clear();
+            if (obj.isDiscovered && obj.data.isAI) {
+                const r = Math.max(obj.data.width, obj.data.height) * 0.65;
+                obj.glowGraphics.fillStyle(0x00e676, 0.12);
+                obj.glowGraphics.fillCircle(0, 0, r * 0.85);
+            } else {
+                const glowColor = obj.data.isAI ? 0x00e5ff : 0xffd600;
+                const r = Math.max(obj.data.width, obj.data.height) * 0.65;
+                obj.glowGraphics.fillStyle(glowColor, 0.18);
+                obj.glowGraphics.fillCircle(0, 0, r * 0.85);
+            }
+        });
+    }
+
+    public applyTapBoost(dir: number) {
+        const now = Date.now();
+        const timeSinceLast = now - this.lastTapTime;
+        if (dir === this.lastTapDir && timeSinceLast < 450) {
+            // Rapid repetitive clicks/taps boost impulse
+            this.tapBoost = Math.min(this.tapBoost + 180, 520);
+            this.chimpuVx += dir * 130;
+        } else {
+            this.tapBoost = Math.min(this.tapBoost + 80, 520);
+            this.chimpuVx += dir * 70;
+        }
+        this.lastTapTime = now;
+        this.lastTapDir = dir;
+    }
+
+    public setTouchMoveDir(dir: number) {
+        this.touchMoveDir = dir;
+        if (dir !== 0) {
+            this.applyTapBoost(dir);
+            this.isUserInteracting = true;
+            this.patrolDir = dir > 0 ? 1 : -1;
+        } else {
+            this.scene.time.delayedCall(1200, () => {
+                if (this.touchMoveDir === 0) {
+                    this.isUserInteracting = false;
+                }
+            });
+        }
     }
 
     public selectObject(index: number) {
         if (index < 0 || index >= this.worldObjects.length) return;
+        const selected = this.worldObjects[index];
+
+        // Scanned AI objects cannot be selected or clicked again
+        if (selected.isDiscovered && selected.data.isAI) {
+            return;
+        }
 
         this.selectedObjectIndex = index;
-        const selected = this.worldObjects[index];
+
+        // Ensure current room tracks the selected object
+        this.currentRoomIndex = Phaser.Math.Clamp(
+            Math.floor(selected.worldX / this.roomWidth),
+            0,
+            this.maxUnlockedRoomIndex
+        );
 
         // Highlight selected object in world with detective scanning reticle
         this.worldObjects.forEach((obj, i) => {
@@ -1055,20 +1245,14 @@ export class WorldParallaxView {
                 obj.glowGraphics.lineTo(offset, offset);
                 obj.glowGraphics.lineTo(offset, offset - bracketSize);
                 obj.glowGraphics.strokePath();
+            } else if (obj.isDiscovered && obj.data.isAI) {
+                obj.glowGraphics.fillStyle(0x00e676, 0.12);
+                obj.glowGraphics.fillCircle(0, 0, r * 0.85);
             } else {
                 obj.glowGraphics.fillStyle(glowColor, 0.18);
                 obj.glowGraphics.fillCircle(0, 0, r * 0.85);
             }
         });
-
-        // Smoothly center the camera near the selected object
-        const desiredScroll = Phaser.Math.Clamp(
-            selected.worldX - this.screenWidth * 0.45,
-            0,
-            this.worldWidth - this.screenWidth
-        );
-        this.targetScrollX = desiredScroll;
-        this.isUserInteracting = true;
 
         this.onObjectSelectCallback(selected, index);
     }
@@ -1078,18 +1262,182 @@ export class WorldParallaxView {
         const obj = this.worldObjects[index];
         obj.isDiscovered = true;
 
-        // Update status icon
-        obj.statusIcon.setTexture(obj.data.isAI ? 'icon_recognizes' : 'icon_gear');
-        obj.statusIcon.setVisible(true);
+        if (obj.data.isAI) {
+            // 1. Fade shade effect - ONLY for AI objects
+            obj.sprite.setTint(0x334155);
+            obj.sprite.setAlpha(0.35);
 
-        // Flash celebration particles around object
+            // 2. Disable hitZone interactivity - AI object is not clickable once scanned
+            obj.hitZone.disableInteractive();
+
+            // Completed green subtle aura
+            obj.glowGraphics.clear();
+            const r = Math.max(obj.data.width, obj.data.height) * 0.65;
+            obj.glowGraphics.fillStyle(0x00e676, 0.12);
+            obj.glowGraphics.fillCircle(0, 0, r * 0.85);
+
+            // 3. Display glowing tick sign badge near it - ONLY for AI objects
+            obj.statusIconCont.setVisible(true);
+            obj.statusIconCont.setScale(0);
+            this.scene.tweens.add({
+                targets: obj.statusIconCont,
+                scale: 1,
+                duration: 320,
+                ease: 'Back.easeOut'
+            });
+        } else {
+            // Decoy / Non-AI object remains normal, clickable, no fade shade, no tick badge
+            obj.sprite.clearTint();
+            obj.sprite.setAlpha(1.0);
+            obj.statusIconCont.setVisible(false);
+
+            // Clear target selection reticle / brackets and restore idle amber glow
+            obj.glowGraphics.clear();
+            const glowColor = 0xffd600;
+            const r = Math.max(obj.data.width, obj.data.height) * 0.65;
+            obj.glowGraphics.fillStyle(glowColor, 0.18);
+            obj.glowGraphics.fillCircle(0, 0, r * 0.85);
+        }
+
+        // Celebration bounce
         this.scene.tweens.add({
             targets: obj.sprite,
-            scale: 1.18,
+            scale: 1.15,
             duration: 180,
             yoyo: true,
             repeat: 1,
-            ease: 'Back.easeOut'
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                obj.sprite.setScale(1.0);
+            }
+        });
+    }
+
+    /**
+     * Checks if all AI objects in the current highest unlocked room are discovered.
+     * If so, automatically unlocks and transitions Chimpu & camera to the next room!
+     */
+    public checkRoomProgression(): boolean {
+        const roomMin = this.maxUnlockedRoomIndex * this.roomWidth;
+        const roomMax = (this.maxUnlockedRoomIndex + 1) * this.roomWidth;
+
+        // Get AI targets in latest unlocked room
+        const currentRoomAITargets = this.worldObjects.filter(
+            (o) => o.data.isAI && o.worldX >= roomMin && o.worldX < roomMax
+        );
+
+        if (currentRoomAITargets.length > 0 && currentRoomAITargets.every((o) => o.isDiscovered)) {
+            if (this.maxUnlockedRoomIndex + 1 < this.totalRooms) {
+                this.advanceToNextRoom();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public advanceToNextRoom() {
+        if (this.isTransitioningRoom) return;
+        this.isTransitioningRoom = true;
+
+        const nextRoomIndex = this.maxUnlockedRoomIndex + 1;
+        this.maxUnlockedRoomIndex = nextRoomIndex;
+        const nextRoomScrollX = nextRoomIndex * this.roomWidth;
+        const targetChimpuX = nextRoomScrollX + 380;
+
+        // Clear current object selection
+        this.selectedObjectIndex = -1;
+        this.worldObjects.forEach((obj) => {
+            obj.glowGraphics.clear();
+        });
+
+        // Show celebration room clear banner
+        this.showRoomClearBanner(nextRoomIndex + 1);
+
+        // Chimpu skates forward towards the next room
+        this.chimpuSprite.setFlipX(false);
+        this.patrolDir = 1;
+
+        // Smooth tween for Camera and Chimpu into next room
+        const startScrollX = this.scrollX;
+        const startChimpuX = this.chimpuWorldX;
+
+        this.scene.tweens.addCounter({
+            from: 0,
+            to: 1,
+            duration: 1800,
+            ease: 'Cubic.easeInOut',
+            onUpdate: (tween) => {
+                const val = tween.getValue();
+                this.scrollX = Phaser.Math.Linear(startScrollX, nextRoomScrollX, val);
+                this.chimpuWorldX = Phaser.Math.Linear(startChimpuX, targetChimpuX, val);
+
+                this.farLayerCont.x = -this.scrollX * 0.35;
+                this.midLayerCont.x = -this.scrollX;
+                this.objectLayerCont.x = -this.scrollX;
+                this.nearLayerCont.x = -this.scrollX;
+
+                this.chimpuContainer.x = this.chimpuWorldX - this.scrollX;
+            },
+            onComplete: () => {
+                this.currentRoomIndex = nextRoomIndex;
+                this.scrollX = nextRoomScrollX;
+                this.targetScrollX = nextRoomScrollX;
+                this.chimpuWorldX = targetChimpuX;
+                this.chimpuVx = this.zoneConfig.scrollSpeed;
+                this.patrolDir = 1;
+                this.isTransitioningRoom = false;
+                this.isUserInteracting = false;
+            }
+        });
+    }
+
+    private showRoomClearBanner(nextRoomNum: number) {
+        const bannerCont = this.scene.add.container(this.screenWidth / 2, this.screenHeight / 2 - 120)
+            .setDepth(UILayers.UI_MODAL_OVERLAY);
+
+        const bg = this.scene.add.graphics();
+        bg.fillStyle(0x0f172a, 0.94);
+        bg.fillRoundedRect(-320, -55, 640, 110, 22);
+        bg.lineStyle(3, 0x10b981, 1);
+        bg.strokeRoundedRect(-320, -55, 640, 110, 22);
+
+        const text1 = this.scene.add.text(0, -20, '🎉 ROOM CLEARED!', {
+            fontSize: '28px',
+            fontFamily: 'Inter, Outfit, sans-serif',
+            fontStyle: 'bold',
+            color: '#10b981'
+        }).setOrigin(0.5);
+
+        const text2 = this.scene.add.text(0, 18, `Rolling into Room ${nextRoomNum} ➡️`, {
+            fontSize: '20px',
+            fontFamily: 'Inter, Outfit, sans-serif',
+            color: '#f8fafc'
+        }).setOrigin(0.5);
+
+        bannerCont.add([bg, text1, text2]);
+        bannerCont.setScale(0.7);
+        bannerCont.setAlpha(0);
+
+        this.scene.tweens.add({
+            targets: bannerCont,
+            scale: 1,
+            alpha: 1,
+            duration: 350,
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                this.scene.time.delayedCall(1200, () => {
+                    this.scene.tweens.add({
+                        targets: bannerCont,
+                        alpha: 0,
+                        y: '-=40',
+                        duration: 350,
+                        ease: 'Quad.easeIn',
+                        onComplete: () => {
+                            bannerCont.destroy();
+                        }
+                    });
+                });
+            }
         });
     }
 
@@ -1103,14 +1451,14 @@ export class WorldParallaxView {
         }
         this.scene.tweens.add({
             targets: this.chimpuContainer,
-            y: this.chimpuY - 60,
+            y: this.chimpuBaseY - 60,
             angle: 360,
             duration: 600,
             yoyo: true,
             ease: 'Back.easeOut',
             onComplete: () => {
                 this.chimpuContainer.setAngle(0);
-                this.chimpuContainer.setY(this.chimpuY);
+                this.chimpuContainer.setY(this.chimpuBaseY);
                 if (this.chimpuSprite.anims) {
                     this.chimpuSprite.stop();
                 }
@@ -1169,14 +1517,44 @@ export class WorldParallaxView {
         return this.selectedObjectIndex;
     }
 
+    public getCurrentRoomIndex(): number {
+        return this.currentRoomIndex;
+    }
+
+    public getMaxUnlockedRoomIndex(): number {
+        return this.maxUnlockedRoomIndex;
+    }
+
     public selectNextObject() {
-        const nextIndex = (this.selectedObjectIndex + 1) % this.worldObjects.length;
-        this.selectObject(nextIndex);
+        const roomMin = this.currentRoomIndex * this.roomWidth;
+        const roomMax = (this.currentRoomIndex + 1) * this.roomWidth;
+        const roomIndices: number[] = [];
+        this.worldObjects.forEach((obj, idx) => {
+            if (obj.worldX >= roomMin && obj.worldX < roomMax && !(obj.isDiscovered && obj.data.isAI)) {
+                roomIndices.push(idx);
+            }
+        });
+        if (roomIndices.length === 0) return;
+
+        const currentPos = roomIndices.indexOf(this.selectedObjectIndex);
+        const nextPos = (currentPos + 1) % roomIndices.length;
+        this.selectObject(roomIndices[nextPos]);
     }
 
     public selectPrevObject() {
-        const prevIndex = (this.selectedObjectIndex - 1 + this.worldObjects.length) % this.worldObjects.length;
-        this.selectObject(prevIndex);
+        const roomMin = this.currentRoomIndex * this.roomWidth;
+        const roomMax = (this.currentRoomIndex + 1) * this.roomWidth;
+        const roomIndices: number[] = [];
+        this.worldObjects.forEach((obj, idx) => {
+            if (obj.worldX >= roomMin && obj.worldX < roomMax && !(obj.isDiscovered && obj.data.isAI)) {
+                roomIndices.push(idx);
+            }
+        });
+        if (roomIndices.length === 0) return;
+
+        const currentPos = roomIndices.indexOf(this.selectedObjectIndex);
+        const prevPos = (currentPos - 1 + roomIndices.length) % roomIndices.length;
+        this.selectObject(roomIndices[prevPos]);
     }
 
     public destroy() {

@@ -13,22 +13,22 @@ export interface HuntObjectData {
     tagline: string;
     detailedExplanation: string;
     visualDiagramType:
-        | 'face_match'
-        | 'soundwave_listen'
-        | 'card_recommend'
-        | 'map_obstacles'
-        | 'speech_to_words'
-        | 'language_translate'
-        | 'question_cards'
-        | 'plant_scan'
-        | 'route_highlight'
-        | 'robot_swerve'
-        | 'traffic_boxes'
-        | 'landmark_card'
-        | 'gear_spin'
-        | 'timer_tick'
-        | 'button_arrow'
-        | 'fixed_calc';
+    | 'face_match'
+    | 'soundwave_listen'
+    | 'card_recommend'
+    | 'map_obstacles'
+    | 'speech_to_words'
+    | 'language_translate'
+    | 'question_cards'
+    | 'plant_scan'
+    | 'route_highlight'
+    | 'robot_swerve'
+    | 'traffic_boxes'
+    | 'landmark_card'
+    | 'gear_spin'
+    | 'timer_tick'
+    | 'button_arrow'
+    | 'fixed_calc';
     worldX: number; // corridor X position
     worldY: number; // corridor Y position
     width: number;
@@ -79,9 +79,9 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 detailedExplanation: 'AI uses the camera to map 3D facial landmarks and compares them to your saved face profile to unlock securely.',
                 visualDiagramType: 'face_match',
                 worldX: 1300,
-                worldY: 585,
-                width: 140,
-                height: 190,
+                worldY: 610,
+                width: 100,
+                height: 140,
                 hintText: 'Look at the smartphone glowing on the foyer console table!'
             },
             {
@@ -181,8 +181,8 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Gear-Driven Quartz Motion',
                 detailedExplanation: 'Tick-tock! Escapement gears turn the hands at a fixed constant speed without learning or pattern adjustments.',
                 visualDiagramType: 'timer_tick',
-                worldX: 500,
-                worldY: 230,
+                worldX: 1300,
+                worldY: 240,
                 width: 140,
                 height: 140,
                 hintText: 'Check the wall in the foyer/study for the mechanical ticking clock!'

@@ -3,7 +3,6 @@ import { IconButton } from '../ui/IconButton';
 import { PausePanel } from '../ui/PausePanel';
 import { SettingsPanel } from '../ui/SettingsPanel';
 import { UILayers } from '../utils/UILayers';
-import { UIPositions } from '../utils/UIPositions';
 
 export interface HuntHUDState {
     zoneId: number;
@@ -40,8 +39,16 @@ export class UIScene extends Scene {
 
     // Bottom Action HUD (Scanner Button & Controls Hint)
     private scannerBtnContainer!: GameObjects.Container;
+    private scannerBtnBg!: GameObjects.Graphics;
+    private scannerBtnTitle!: GameObjects.Text;
+    private scannerBtnIcon?: GameObjects.Image;
+    private scanHitZone!: GameObjects.Zone;
     private scannerBtnGlowTween: Phaser.Tweens.Tween | null = null;
-    private controlsHintContainer!: GameObjects.Container;
+    private isScannerBtnEnabled: boolean = false;
+
+    // Side Navigation Movement Buttons (Left & Right Ends of Screen)
+    private leftNavBtnCont!: GameObjects.Container;
+    private rightNavBtnCont!: GameObjects.Container;
 
     // Interactive Tutorial Finger Pointer
     private tutorialPointer!: GameObjects.Container;
@@ -62,12 +69,15 @@ export class UIScene extends Scene {
 
         this.setupTopLeftHUD();
         this.setupTopRightHUD();
-        this.setupBottomScannerButton();
+        this.setupBottomControlConsole();
         this.setupTutorialPointer();
 
         // Listen for HUD updates and events from Game Scene
         this.gameEvents.on('update-hunt-hud', this.onUpdateHuntHUD, this);
         this.gameEvents.on('show-zone-complete', this.onZoneCompleteBanner, this);
+
+        // Request initial HUD state synchronization from Game Scene
+        this.gameEvents.emit('request-hud-sync');
 
         this.events.on('shutdown', this.cleanup, this);
     }
@@ -199,79 +209,155 @@ export class UIScene extends Scene {
         this.pauseButton.setDepth(UILayers.UI_BUTTONS);
     }
 
-    private setupBottomScannerButton() {
+    private setupBottomControlConsole() {
         const { width, height } = this.scale;
-        const btnX = width - 170;
-        const btnY = height - 75;
+        const centerX = width / 2;
+        const centerY = height - 70;
+
+        // --- 2. Left Movement Button (Left of Scanner) ---
+        const leftX = centerX - 182;
+        const btnRadius = 37;
+        this.leftNavBtnCont = this.add.container(leftX, centerY).setDepth(UILayers.UI_BUTTONS);
+
+        const leftBg = this.add.graphics();
+        leftBg.fillStyle(0x061e36, 0.95);
+        leftBg.fillRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 18);
+        leftBg.fillStyle(0x0284c7, 0.35);
+        leftBg.fillRoundedRect(-btnRadius + 2, -btnRadius + 2, btnRadius * 2 - 4, btnRadius - 2, 14);
+        leftBg.lineStyle(2.5, 0x00e5ff, 0.95);
+        leftBg.strokeRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 18);
+        this.leftNavBtnCont.add(leftBg);
+
+        const leftIcon = this.add.text(0, 0, '◀', {
+            fontFamily: 'Arial Black',
+            fontSize: '30px',
+            color: '#38bdf8',
+            stroke: '#05131e',
+            strokeThickness: 3
+        }).setOrigin(0.5);
+
+        this.leftNavBtnCont.add(leftIcon);
+
+        const leftHitZone = this.add.zone(0, 0, btnRadius * 2, btnRadius * 2)
+            .setInteractive({ useHandCursor: true });
+
+        leftHitZone.on('pointerdown', () => {
+            this.gameEvents.emit('chimpu-move', -1);
+            this.leftNavBtnCont.setScale(0.92);
+            leftIcon.setColor('#00e5ff');
+        });
+        const onLeftRelease = () => {
+            this.gameEvents.emit('chimpu-move', 0);
+            this.leftNavBtnCont.setScale(1.0);
+            leftIcon.setColor('#38bdf8');
+        };
+        leftHitZone.on('pointerup', onLeftRelease);
+        leftHitZone.on('pointerout', onLeftRelease);
+        leftHitZone.on('pointercancel', onLeftRelease);
+        this.leftNavBtnCont.add(leftHitZone);
+
+        // --- 3. Center Scanner Button ---
         const btnW = 250;
-        const btnH = 80;
+        const btnH = 74;
+        this.scannerBtnContainer = this.add.container(centerX, centerY).setDepth(UILayers.UI_BUTTONS);
 
-        this.scannerBtnContainer = this.add.container(btnX, btnY).setDepth(UILayers.UI_BUTTONS);
+        this.scannerBtnBg = this.add.graphics();
+        this.scannerBtnContainer.add(this.scannerBtnBg);
 
-        const btnG = this.add.graphics();
-        btnG.fillStyle(0x04192b, 0.95);
-        btnG.fillRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 20);
-        btnG.fillStyle(0x0284c7, 0.35);
-        btnG.fillRoundedRect(-btnW / 2 + 3, -btnH / 2 + 3, btnW - 6, btnH / 2 - 2, 16);
-        btnG.lineStyle(3, 0x00e5ff, 1);
-        btnG.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 20);
-        this.scannerBtnContainer.add(btnG);
-
-        // Lens Icon inside Scanner Button
         if (this.textures.exists('lens_home')) {
-            const lensIcon = this.add.image(-btnW / 2 + 45, 0, 'lens_home').setScale(0.38);
-            this.scannerBtnContainer.add(lensIcon);
+            this.scannerBtnIcon = this.add.image(-btnW / 2 + 42, 0, 'lens_home').setScale(0.36);
+            this.scannerBtnContainer.add(this.scannerBtnIcon);
         }
 
-        const btnTitle = this.add.text(25, -10, 'SCAN OBJECT', {
+        this.scannerBtnTitle = this.add.text(24, 0, 'SCAN OBJECT', {
             fontFamily: 'Arial Black',
-            fontSize: '20px',
+            fontSize: '21px',
             color: '#ffffff',
             stroke: '#05131e',
             strokeThickness: 4
         }).setOrigin(0.5);
 
-        const btnSub = this.add.text(25, 16, 'TAP OR [SPACE]', {
-            fontFamily: 'Arial Black',
-            fontSize: '14px',
-            color: '#00e5ff'
-        }).setOrigin(0.5);
+        this.scannerBtnContainer.add(this.scannerBtnTitle);
 
-        this.scannerBtnContainer.add([btnTitle, btnSub]);
-
-        // Interactive Trigger
-        const hitZone = this.add.zone(0, 0, btnW, btnH).setInteractive({ useHandCursor: true });
-        hitZone.on('pointerdown', () => {
+        this.scanHitZone = this.add.zone(0, 0, btnW, btnH).setInteractive({ useHandCursor: true });
+        this.scanHitZone.on('pointerdown', (pointer: Phaser.Input.Pointer, _lx: number, _ly: number, event: Phaser.Types.Input.EventData) => {
+            event?.stopPropagation();
+            if (!this.isScannerBtnEnabled) return;
             this.animateButtonPress(this.scannerBtnContainer);
             this.gameEvents.emit('trigger-scan');
         });
-        this.scannerBtnContainer.add(hitZone);
+        this.scannerBtnContainer.add(this.scanHitZone);
+
+        // Initially disabled until an object is selected
+        this.setScannerButtonEnabled(false);
+
+        // --- 4. Right Movement Button (Right of Scanner) ---
+        const rightX = centerX + 182;
+        this.rightNavBtnCont = this.add.container(rightX, centerY).setDepth(UILayers.UI_BUTTONS);
+
+        const rightBg = this.add.graphics();
+        rightBg.fillStyle(0x061e36, 0.95);
+        rightBg.fillRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 18);
+        rightBg.fillStyle(0x0284c7, 0.35);
+        rightBg.fillRoundedRect(-btnRadius + 2, -btnRadius + 2, btnRadius * 2 - 4, btnRadius - 2, 14);
+        rightBg.lineStyle(2.5, 0x00e5ff, 0.95);
+        rightBg.strokeRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 18);
+        this.rightNavBtnCont.add(rightBg);
+
+        const rightIcon = this.add.text(0, 0, '▶', {
+            fontFamily: 'Arial Black',
+            fontSize: '30px',
+            color: '#38bdf8',
+            stroke: '#05131e',
+            strokeThickness: 3
+        }).setOrigin(0.5);
+
+        this.rightNavBtnCont.add(rightIcon);
+
+        const rightHitZone = this.add.zone(0, 0, btnRadius * 2, btnRadius * 2)
+            .setInteractive({ useHandCursor: true });
+
+        rightHitZone.on('pointerdown', () => {
+            this.gameEvents.emit('chimpu-move', 1);
+            this.rightNavBtnCont.setScale(0.92);
+            rightIcon.setColor('#00e5ff');
+        });
+        const onRightRelease = () => {
+            this.gameEvents.emit('chimpu-move', 0);
+            this.rightNavBtnCont.setScale(1.0);
+            rightIcon.setColor('#38bdf8');
+        };
+        rightHitZone.on('pointerup', onRightRelease);
+        rightHitZone.on('pointerout', onRightRelease);
+        rightHitZone.on('pointercancel', onRightRelease);
+        this.rightNavBtnCont.add(rightHitZone);
     }
 
     private setupTutorialPointer() {
-        this.tutorialPointer = this.add.container(0, 0)
+        const isTutorial = this.currentZoneId === 1;
+        this.tutorialPointer = this.add.container(this.scale.width / 2, this.scale.height / 2)
             .setDepth(UILayers.OVERLAY_PANEL + 15)
-            .setVisible(false);
+            .setVisible(isTutorial);
 
         const ptrBody = this.add.container(0, 0);
         const ptrG = this.add.graphics();
         ptrG.fillStyle(0xfbbf24, 1);
-        ptrG.fillRoundedRect(-120, -40, 240, 52, 16);
+        ptrG.fillRoundedRect(-140, -42, 280, 56, 16);
         ptrG.lineStyle(3, 0xffffff, 1);
-        ptrG.strokeRoundedRect(-120, -40, 240, 52, 16);
+        ptrG.strokeRoundedRect(-140, -42, 280, 56, 16);
 
         // Downward Triangle
         ptrG.fillStyle(0xfbbf24, 1);
         ptrG.beginPath();
-        ptrG.moveTo(-16, 12);
-        ptrG.lineTo(16, 12);
-        ptrG.lineTo(0, 28);
+        ptrG.moveTo(-16, 14);
+        ptrG.lineTo(16, 14);
+        ptrG.lineTo(0, 30);
         ptrG.closePath();
         ptrG.fillPath();
 
         this.tutorialPointerText = this.add.text(0, -14, '👇 TAP OBJECT TO SELECT', {
             fontFamily: 'Arial Black',
-            fontSize: '16px',
+            fontSize: '17px',
             color: '#0f172a'
         }).setOrigin(0.5);
 
@@ -295,24 +381,24 @@ export class UIScene extends Scene {
 
         this.drawBattery(state.batteryPercent);
 
-        // Pulse scanner button if a target is selected
-        if (state.hasTargetSelected && !state.isScanning) {
-            this.pulseScannerButton(true);
-        } else {
-            this.pulseScannerButton(false);
-        }
+        // Update Scanner Button enabled/disabled state
+        const canScan = state.hasTargetSelected && !state.isScanning;
+        this.setScannerButtonEnabled(canScan);
 
         // Tutorial Guidance
         if (state.isTutorialActive) {
-            this.tutorialPointer.setVisible(true);
-            if (state.tutorialStep === 1) {
-                // Point to object
+            if (!state.hasTargetSelected) {
+                // Whenever an object is not selected during tutorial, display at center of screen
+                this.tutorialPointer.setVisible(true);
                 this.tutorialPointerText.setText('👇 TAP OBJECT TO SELECT');
-                this.tutorialPointer.setPosition(620, 520);
-            } else if (state.tutorialStep === 2) {
-                // Point to Scanner Button
+                this.tutorialPointer.setPosition(this.scale.width / 2, this.scale.height / 2);
+            } else if (state.hasTargetSelected && !state.isScanning) {
+                // Point to Scanner Button when object is selected
+                this.tutorialPointer.setVisible(true);
                 this.tutorialPointerText.setText('👇 TAP SCAN TO ANALYZE!');
                 this.tutorialPointer.setPosition(this.scannerBtnContainer.x, this.scannerBtnContainer.y - 85);
+            } else {
+                this.tutorialPointer.setVisible(false);
             }
         } else {
             this.tutorialPointer.setVisible(false);
@@ -339,6 +425,44 @@ export class UIScene extends Scene {
         }
 
         this.batteryPercentText.setText(`${clamped}%`);
+    }
+
+    private setScannerButtonEnabled(enabled: boolean) {
+        this.isScannerBtnEnabled = enabled;
+        const btnW = 250;
+        const btnH = 74;
+
+        this.scannerBtnBg.clear();
+
+        if (enabled) {
+            this.scannerBtnBg.fillStyle(0x061e36, 0.95);
+            this.scannerBtnBg.fillRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 18);
+            this.scannerBtnBg.fillStyle(0x0284c7, 0.4);
+            this.scannerBtnBg.fillRoundedRect(-btnW / 2 + 2, -btnH / 2 + 2, btnW - 4, btnH / 2 - 2, 14);
+            this.scannerBtnBg.lineStyle(2.5, 0x00e5ff, 1);
+            this.scannerBtnBg.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 18);
+
+            this.scannerBtnTitle.setColor('#ffffff');
+            this.scannerBtnTitle.setAlpha(1);
+            if (this.scannerBtnIcon) this.scannerBtnIcon.setAlpha(1);
+            this.scannerBtnContainer.setAlpha(1);
+
+            this.scanHitZone.setInteractive({ useHandCursor: true });
+        } else {
+            this.scannerBtnBg.fillStyle(0x0a101d, 0.7);
+            this.scannerBtnBg.fillRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 18);
+            this.scannerBtnBg.lineStyle(2, 0x334155, 0.6);
+            this.scannerBtnBg.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 18);
+
+            this.scannerBtnTitle.setColor('#94a3b8');
+            this.scannerBtnTitle.setAlpha(0.6);
+            if (this.scannerBtnIcon) this.scannerBtnIcon.setAlpha(0.4);
+            this.scannerBtnContainer.setAlpha(0.5);
+
+            this.scanHitZone.disableInteractive();
+        }
+
+        this.pulseScannerButton(enabled);
     }
 
     private pulseScannerButton(enable: boolean) {

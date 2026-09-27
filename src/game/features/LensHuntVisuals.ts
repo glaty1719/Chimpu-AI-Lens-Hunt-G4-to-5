@@ -467,100 +467,100 @@ export class LensHuntVisuals {
     // ==========================================
 
     private static generateHomeObjects(scene: Scene) {
-        // 1. Smartphone Face Unlock (obj_phone_face: 140x190)
+        // 1. Smartphone Face Unlock (obj_phone_face: 100x140)
         const gPhone = scene.make.graphics({ x: 0, y: 0 });
         // Soft outer drop shadow & glow
         gPhone.fillStyle(0x00e5ff, 0.15);
-        gPhone.fillRoundedRect(16, 6, 108, 178, 22);
+        gPhone.fillRoundedRect(14, 6, 72, 128, 16);
 
         // Sleek Titanium Outer Frame
         gPhone.fillStyle(0x1e293b, 1);
-        gPhone.fillRoundedRect(20, 10, 100, 170, 20);
-        gPhone.lineStyle(2.5, 0x64748b, 1);
-        gPhone.strokeRoundedRect(20, 10, 100, 170, 20);
+        gPhone.fillRoundedRect(16, 8, 68, 124, 15);
+        gPhone.lineStyle(2, 0x64748b, 1);
+        gPhone.strokeRoundedRect(16, 8, 68, 124, 15);
 
         // Side volume & power buttons
         gPhone.fillStyle(0x475569, 1);
-        gPhone.fillRect(17, 45, 3, 22); // Volume Up/Down
-        gPhone.fillRect(17, 72, 3, 16);
-        gPhone.fillRect(120, 52, 3, 24); // Power button
+        gPhone.fillRect(14, 34, 2, 16); // Volume Up
+        gPhone.fillRect(14, 54, 2, 12); // Volume Down
+        gPhone.fillRect(84, 38, 2, 18); // Power button
 
         // Ultra-thin Bezel OLED Screen (Deep Glass Midnight)
         gPhone.fillStyle(0x050814, 1);
-        gPhone.fillRoundedRect(24, 14, 92, 162, 16);
+        gPhone.fillRoundedRect(19, 11, 62, 118, 12);
 
         // Top Dynamic Island / Camera Pill Notch
         gPhone.fillStyle(0x020617, 1);
-        gPhone.fillRoundedRect(53, 18, 34, 10, 5);
+        gPhone.fillRoundedRect(39, 14, 22, 7, 3.5);
         gPhone.fillStyle(0x00e5ff, 0.9);
-        gPhone.fillCircle(59, 23, 2.5); // IR sensor
+        gPhone.fillCircle(44, 17.5, 1.8); // IR sensor
         gPhone.fillStyle(0x1e293b, 1);
-        gPhone.fillCircle(77, 23, 3); // Selfie lens
+        gPhone.fillCircle(55, 17.5, 2); // Selfie lens
 
         // Screen Wallpaper Gradient / Digital Mesh Background
         gPhone.fillStyle(0x0f172a, 0.9);
-        gPhone.fillRoundedRect(26, 32, 88, 126, 10);
+        gPhone.fillRoundedRect(21, 23, 58, 92, 8);
         gPhone.fillStyle(0x0284c7, 0.25);
-        gPhone.fillCircle(70, 85, 38);
+        gPhone.fillCircle(50, 62, 26);
 
         // Biometric Face ID Scan Visual
         // Holographic facial mesh outline
-        gPhone.lineStyle(2, 0x00e5ff, 0.95);
-        gPhone.strokeCircle(70, 78, 24); // Head oval
+        gPhone.lineStyle(1.5, 0x00e5ff, 0.95);
+        gPhone.strokeCircle(50, 56, 17); // Head oval
         gPhone.fillStyle(0x38bdf8, 0.9);
-        gPhone.fillCircle(62, 74, 3); // Eye L
-        gPhone.fillCircle(78, 74, 3); // Eye R
-        gPhone.lineStyle(2, 0x38bdf8, 0.9);
-        gPhone.beginPath(); gPhone.arc(70, 84, 8, 0, Math.PI, false); gPhone.strokePath(); // Smile
+        gPhone.fillCircle(44, 53, 2.2); // Eye L
+        gPhone.fillCircle(56, 53, 2.2); // Eye R
+        gPhone.lineStyle(1.5, 0x38bdf8, 0.9);
+        gPhone.beginPath(); gPhone.arc(50, 60, 5.5, 0, Math.PI, false); gPhone.strokePath(); // Smile
         // Nose bridge
-        gPhone.lineStyle(1.5, 0x00e5ff, 0.7);
-        gPhone.lineBetween(70, 72, 70, 80);
+        gPhone.lineStyle(1, 0x00e5ff, 0.7);
+        gPhone.lineBetween(50, 51, 50, 57);
 
         // 3D Laser Scan Grid Dots
         gPhone.fillStyle(0x00e676, 1);
         const scanDots = [
-            { x: 54, y: 64 }, { x: 86, y: 64 },
-            { x: 50, y: 78 }, { x: 90, y: 78 },
-            { x: 56, y: 92 }, { x: 84, y: 92 },
-            { x: 70, y: 60 }, { x: 70, y: 96 }
+            { x: 38, y: 46 }, { x: 62, y: 46 },
+            { x: 35, y: 56 }, { x: 65, y: 56 },
+            { x: 39, y: 66 }, { x: 61, y: 66 },
+            { x: 50, y: 43 }, { x: 50, y: 69 }
         ];
         scanDots.forEach(d => {
-            gPhone.fillCircle(d.x, d.y, 2);
+            gPhone.fillCircle(d.x, d.y, 1.5);
         });
 
         // Glowing Laser Scanning Horizon Line
-        gPhone.lineStyle(2, 0x00e676, 1);
-        gPhone.lineBetween(40, 80, 100, 80);
+        gPhone.lineStyle(1.5, 0x00e676, 1);
+        gPhone.lineBetween(28, 58, 72, 58);
         gPhone.fillStyle(0x00e676, 0.25);
-        gPhone.fillRect(40, 74, 60, 12);
+        gPhone.fillRect(28, 53, 44, 10);
 
         // Biometric Brackets [ ]
-        gPhone.lineStyle(2.5, 0x00e5ff, 1);
-        gPhone.beginPath(); gPhone.moveTo(42, 58); gPhone.lineTo(42, 50); gPhone.lineTo(50, 50); gPhone.strokePath();
-        gPhone.beginPath(); gPhone.moveTo(98, 58); gPhone.lineTo(98, 50); gPhone.lineTo(90, 50); gPhone.strokePath();
-        gPhone.beginPath(); gPhone.moveTo(42, 100); gPhone.lineTo(42, 108); gPhone.lineTo(50, 108); gPhone.strokePath();
-        gPhone.beginPath(); gPhone.moveTo(98, 100); gPhone.lineTo(98, 108); gPhone.lineTo(90, 108); gPhone.strokePath();
+        gPhone.lineStyle(2, 0x00e5ff, 1);
+        gPhone.beginPath(); gPhone.moveTo(30, 42); gPhone.lineTo(30, 36); gPhone.lineTo(36, 36); gPhone.strokePath();
+        gPhone.beginPath(); gPhone.moveTo(70, 42); gPhone.lineTo(70, 36); gPhone.lineTo(64, 36); gPhone.strokePath();
+        gPhone.beginPath(); gPhone.moveTo(30, 72); gPhone.lineTo(30, 78); gPhone.lineTo(36, 78); gPhone.strokePath();
+        gPhone.beginPath(); gPhone.moveTo(70, 72); gPhone.lineTo(70, 78); gPhone.lineTo(64, 78); gPhone.strokePath();
 
         // Lock Status Icon (Unlocked Green)
         gPhone.fillStyle(0x00e676, 1);
-        gPhone.fillRoundedRect(63, 122, 14, 11, 3);
-        gPhone.lineStyle(2, 0x00e676, 1);
-        gPhone.beginPath(); gPhone.arc(70, 120, 5, Math.PI, 0, false); gPhone.strokePath();
+        gPhone.fillRoundedRect(45, 88, 10, 8, 2);
+        gPhone.lineStyle(1.5, 0x00e676, 1);
+        gPhone.beginPath(); gPhone.arc(50, 86, 3.5, Math.PI, 0, false); gPhone.strokePath();
 
         // Diagonal Glass Specular Highlight
         gPhone.fillStyle(0xffffff, 0.12);
         gPhone.beginPath();
-        gPhone.moveTo(30, 16);
-        gPhone.lineTo(75, 16);
-        gPhone.lineTo(26, 110);
-        gPhone.lineTo(26, 60);
+        gPhone.moveTo(24, 13);
+        gPhone.lineTo(55, 13);
+        gPhone.lineTo(21, 80);
+        gPhone.lineTo(21, 45);
         gPhone.closePath();
         gPhone.fillPath();
 
         // Home Navigation Bar Pill
         gPhone.fillStyle(0xffffff, 0.85);
-        gPhone.fillRoundedRect(52, 165, 36, 4, 2);
-        gPhone.generateTexture('obj_phone_face', 140, 190);
+        gPhone.fillRoundedRect(37, 120, 26, 3, 1.5);
+        gPhone.generateTexture('obj_phone_face', 100, 140);
         gPhone.destroy();
 
         // 2. Smart Speaker (obj_smart_speaker: 140x180)
