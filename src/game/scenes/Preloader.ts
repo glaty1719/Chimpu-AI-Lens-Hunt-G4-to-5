@@ -102,6 +102,8 @@ export class Preloader extends Scene {
         this.load.image('gameBG', 'GameBG.png'); // Kept for LevelSelection
         this.load.image('game_over_bg', 'GameOverBG.png');
         this.load.image('game_completed_bg', 'GameCompletedBG.png');
+        this.load.image('obj_speech_app', 'speech_text_app.png');
+        this.load.image('obj_speech_tablet', 'speech_text_app.png');
 
         this.load.image('back_icon', 'globalUI/backBtn.png');
         this.load.image('settings_icon', 'globalUI/settingsBtn.png');

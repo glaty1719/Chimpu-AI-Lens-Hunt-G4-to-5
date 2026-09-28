@@ -228,13 +228,16 @@ export class DetectiveScanner {
 
         // Object Sprite
         if (this.scene.textures.exists(data.textureKey)) {
-            const spr = this.scene.add.image(0, -60, data.textureKey).setScale(1.8);
+            const spr = this.scene.add.image(0, -60, data.textureKey);
+            const maxDim = Math.max(spr.width, spr.height);
+            const targetScale = maxDim > 300 ? (300 / maxDim) : 1.8;
+            spr.setScale(targetScale);
             leftBox.add(spr);
 
             // Gentle pulsing animation on object
             this.scene.tweens.add({
                 targets: spr,
-                scale: 1.95,
+                scale: targetScale * 1.08,
                 duration: 900,
                 yoyo: true,
                 repeat: -1,
