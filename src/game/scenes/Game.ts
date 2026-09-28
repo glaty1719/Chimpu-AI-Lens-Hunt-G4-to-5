@@ -6,6 +6,7 @@ import { WorldParallaxView, WorldObjectItem } from '../features/WorldParallaxVie
 import { DetectiveScanner, ScanResult } from '../features/DetectiveScanner';
 import { AlbumActivity } from '../features/AlbumActivity';
 import { LensFusionFinale } from '../features/LensFusionFinale';
+import { LevelCompletionModal } from '../ui/LevelCompletionModal';
 
 export class Game extends Scene {
     private currentZoneId: number = 1;
@@ -16,6 +17,7 @@ export class Game extends Scene {
     private scanner: DetectiveScanner | null = null;
     private albumActivity: AlbumActivity | null = null;
     private finaleModal: LensFusionFinale | null = null;
+    private levelCompletionModal: LevelCompletionModal | null = null;
 
     // Gameplay Progress State
     private discoveredAIObjects: Set<string> = new Set();
@@ -98,7 +100,7 @@ export class Game extends Scene {
 
         // 7. Listen for clicks outside objects to deselect & remove reticle
         this.input.on('pointerdown', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
-            if (this.scanner?.isModalOpen() || this.albumActivity || this.finaleModal || this.isZoneFinished) {
+            if (this.scanner?.isModalOpen() || this.albumActivity || this.finaleModal || this.levelCompletionModal || this.isZoneFinished) {
                 return;
             }
 
@@ -238,26 +240,41 @@ export class Game extends Scene {
         const dataManager = GameDataManager.getInstance();
         dataManager.completeLevel(this.currentZoneId, 3, this.totalScore);
 
-        // Emit celebration banner
-        this.events.emit('show-zone-complete', {
-            zoneId: this.currentZoneId,
-            lensName: this.zoneConfig.lensName,
-            score: this.totalScore
-        });
-
-        this.time.delayedCall(2600, () => {
-            if (this.currentZoneId < 3) {
-                // Transition to Next Zone (School / Street)
-                AudioManager.getInstance().playSFX('zone_transition');
+        // Open Level Completion Modal
+        this.levelCompletionModal = new LevelCompletionModal(
+            this,
+            this.currentZoneId,
+            this.totalScore,
+            0,
+            () => {
+                this.levelCompletionModal = null;
+                if (this.currentZoneId < 3) {
+                    // Transition to Next Zone (School / Street)
+                    AudioManager.getInstance().playSFX('zone_transition');
+                    this.cleanup();
+                    this.scene.stop('UIScene');
+                    this.scene.restart({ zoneId: this.currentZoneId + 1 });
+                } else {
+                    // Finale Flow: All 3 Zones Cleared!
+                    // Open AI Detective Album Activity
+                    this.openAlbumActivity();
+                }
+            },
+            () => {
+                // Play Again (Restart current Zone)
+                this.levelCompletionModal = null;
                 this.cleanup();
                 this.scene.stop('UIScene');
-                this.scene.restart({ zoneId: this.currentZoneId + 1 });
-            } else {
-                // Finale Flow: All 3 Zones Cleared!
-                // Step 1: Open AI Detective Album Activity
-                this.openAlbumActivity();
+                this.scene.restart({ zoneId: this.currentZoneId });
+            },
+            () => {
+                // Home (Return to Main Menu)
+                this.levelCompletionModal = null;
+                this.cleanup();
+                this.scene.stop('UIScene');
+                this.scene.start('MainMenu');
             }
-        });
+        );
     }
 
     private openAlbumActivity() {
@@ -298,6 +315,7 @@ export class Game extends Scene {
         const isModalOpen = this.scanner?.isModalOpen() || false;
         const isScanning = this.scanner?.isScanningActive() || false;
         const isBusy = isModalOpen || isScanning;
+        const tutorialPos = this.worldView.getFirstUndiscoveredAIObjectScreenPos();
 
         this.events.emit('update-hunt-hud', {
             zoneId: this.currentZoneId,
@@ -311,7 +329,8 @@ export class Game extends Scene {
             hasTargetSelected: selected !== null && !isBusy,
             isScanning: isBusy,
             isTutorialActive: this.isTutorialActive && !isBusy,
-            tutorialStep: this.tutorialStep
+            tutorialStep: this.tutorialStep,
+            tutorialTargetPos: tutorialPos || undefined
         });
     }
 
@@ -321,6 +340,12 @@ export class Game extends Scene {
         }
         if (this.scanner && this.worldView) {
             this.scanner.updateReticlePosition(this.worldView.getScrollX());
+        }
+        if (this.isTutorialActive && this.worldView) {
+            const pos = this.worldView.getFirstUndiscoveredAIObjectScreenPos();
+            if (pos) {
+                this.events.emit('tutorial-pointer-pos', pos);
+            }
         }
     }
 
@@ -352,6 +377,7 @@ export class Game extends Scene {
     }
 
     private cleanup() {
+        this.totalScore = 0;
         if (this.worldView) {
             this.worldView.destroy();
             this.worldView = null;
@@ -367,6 +393,10 @@ export class Game extends Scene {
         if (this.finaleModal) {
             this.finaleModal.destroy();
             this.finaleModal = null;
+        }
+        if (this.levelCompletionModal) {
+            this.levelCompletionModal.destroy();
+            this.levelCompletionModal = null;
         }
 
         if (this.input.keyboard) {

@@ -1755,6 +1755,20 @@ export class WorldParallaxView {
         return this.maxUnlockedRoomIndex;
     }
 
+    public getFirstUndiscoveredAIObjectScreenPos(): { x: number; y: number } | null {
+        const roomMin = this.currentRoomIndex * this.roomWidth;
+        const roomMax = (this.currentRoomIndex + 1) * this.roomWidth;
+        const aiObj = this.worldObjects.find(
+            (obj) => obj.data.isAI && !obj.isDiscovered && obj.worldX >= roomMin && obj.worldX < roomMax
+        );
+        if (!aiObj) return null;
+        const halfH = aiObj.data.height ? aiObj.data.height / 2 : 70;
+        return {
+            x: aiObj.worldX - this.scrollX,
+            y: aiObj.worldY - halfH - 45
+        };
+    }
+
     public selectNextObject() {
         const roomMin = this.currentRoomIndex * this.roomWidth;
         const roomMax = (this.currentRoomIndex + 1) * this.roomWidth;

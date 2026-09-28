@@ -17,6 +17,7 @@ export interface HuntHUDState {
     isScanning: boolean;
     isTutorialActive: boolean;
     tutorialStep: number;
+    tutorialTargetPos?: { x: number; y: number };
 }
 
 export class UIScene extends Scene {
@@ -24,16 +25,12 @@ export class UIScene extends Scene {
     private gameEvents!: Phaser.Events.EventEmitter;
     private currentZoneId: number = 1;
 
-    // Top-Left HUD (Zone Badge & Discoveries)
-    private zoneBadgeCont!: GameObjects.Container;
-    private zoneTitleText!: GameObjects.Text;
-    private discoveriesText!: GameObjects.Text;
-
-    // Top-Right HUD (Battery Meter, Score, Sound, Pause)
+    // Top HUD Elements
+    private levelTitleText!: GameObjects.Text;
     private scoreText!: GameObjects.Text;
-    private batteryContainer!: GameObjects.Container;
-    private batteryCellsGraphics!: GameObjects.Graphics;
-    private batteryPercentText!: GameObjects.Text;
+    private teamSparkBar!: GameObjects.Graphics;
+    private teamSparkPercentText!: GameObjects.Text;
+    private currentLevel: number = 1;
     private pauseButton!: IconButton;
     private soundButton!: IconButton;
 
@@ -53,6 +50,8 @@ export class UIScene extends Scene {
     // Interactive Tutorial Finger Pointer
     private tutorialPointer!: GameObjects.Container;
     private tutorialPointerText!: GameObjects.Text;
+    private isTutorialActiveState: boolean = false;
+    private hasTargetSelectedState: boolean = false;
 
     constructor() {
         super({ key: 'UIScene' });
@@ -62,19 +61,24 @@ export class UIScene extends Scene {
         this.gameScene = data.gameScene;
         this.gameEvents = this.gameScene.events;
         this.currentZoneId = data.zoneId || 1;
+        this.currentLevel = this.currentZoneId;
     }
 
     create() {
         this.input.setTopOnly(true);
 
-        this.setupTopLeftHUD();
-        this.setupTopRightHUD();
+        this.setupTopHUD();
         this.setupBottomControlConsole();
         this.setupTutorialPointer();
 
         // Listen for HUD updates and events from Game Scene
         this.gameEvents.on('update-hunt-hud', this.onUpdateHuntHUD, this);
         this.gameEvents.on('show-zone-complete', this.onZoneCompleteBanner, this);
+        this.gameEvents.on('tutorial-pointer-pos', (pos: { x: number; y: number }) => {
+            if (this.isTutorialActiveState && !this.hasTargetSelectedState && this.tutorialPointer?.visible) {
+                this.tutorialPointer.setPosition(pos.x, pos.y);
+            }
+        }, this);
         this.gameEvents.on('scanner-modal-changed', (isOpen: boolean) => {
             if (isOpen) {
                 this.setScannerButtonEnabled(false);
@@ -88,114 +92,13 @@ export class UIScene extends Scene {
         this.events.on('shutdown', this.cleanup, this);
     }
 
-    private setupTopLeftHUD() {
-        this.zoneBadgeCont = this.add.container(275, 65).setDepth(UILayers.UI_BACKGROUND_PANELS);
-
-        const badgeG = this.add.graphics();
-        // Glassmorphic panel
-        badgeG.fillStyle(0x061526, 0.88);
-        badgeG.fillRoundedRect(-240, -44, 480, 88, 18);
-        badgeG.lineStyle(2.5, 0x00e5ff, 0.85);
-        badgeG.strokeRoundedRect(-240, -44, 480, 88, 18);
-
-        // Top subtle highlight line
-        badgeG.lineStyle(1.5, 0xffffff, 0.4);
-        badgeG.lineBetween(-220, -42, 220, -42);
-        this.zoneBadgeCont.add(badgeG);
-
-        // Zone Title
-        this.zoneTitleText = this.add.text(0, -16, `ZONE ${this.currentZoneId}: AI AT HOME`, {
-            fontFamily: 'Arial Black',
-            fontSize: '26px',
-            color: '#38bdf8',
-            stroke: '#05131e',
-            strokeThickness: 5
-        }).setOrigin(0.5);
-
-        // Discoveries Counter
-        this.discoveriesText = this.add.text(0, 16, '🔍 AI FEATURES: 0 / 4 FOUND', {
-            fontFamily: 'Arial Black',
-            fontSize: '24px',
-            color: '#00e676',
-            stroke: '#05131e',
-            strokeThickness: 5
-        }).setOrigin(0.5);
-
-        this.zoneBadgeCont.add([this.zoneTitleText, this.discoveriesText]);
-    }
-
-    private setupTopRightHUD() {
+    private setupTopHUD() {
         const { width } = this.scale;
 
-        // 1. Scanner Battery Meter
-        const batX = width - 650;
-        const batY = 65;
-        this.batteryContainer = this.add.container(batX, batY).setDepth(UILayers.UI_BACKGROUND_PANELS);
-
-        const batFrameG = this.add.graphics();
-        batFrameG.fillStyle(0x061526, 0.88);
-        batFrameG.fillRoundedRect(-130, -44, 260, 88, 18);
-        batFrameG.lineStyle(2.5, 0x00e5ff, 0.85);
-        batFrameG.strokeRoundedRect(-130, -44, 260, 88, 18);
-        this.batteryContainer.add(batFrameG);
-
-        const batLabel = this.add.text(0, -18, '⚡ SCANNER BATTERY', {
-            fontFamily: 'Arial Black',
-            fontSize: '18px',
-            color: '#fef08a'
-        }).setOrigin(0.5);
-        this.batteryContainer.add(batLabel);
-
-        // Battery cell frame & graphics
-        this.batteryCellsGraphics = this.add.graphics();
-        this.batteryContainer.add(this.batteryCellsGraphics);
-
-        this.batteryPercentText = this.add.text(0, 18, '0%', {
-            fontFamily: 'Arial Black',
-            fontSize: '24px',
-            color: '#ffffff',
-            stroke: '#05131e',
-            strokeThickness: 4
-        }).setOrigin(0.5);
-        this.batteryContainer.add(this.batteryPercentText);
-
-        // 2. Score Badge
-        const scoreX = width - 390;
-        const scoreY = 65;
-        const scoreCont = this.add.container(scoreX, scoreY).setDepth(UILayers.UI_BACKGROUND_PANELS);
-        const scG = this.add.graphics();
-        scG.fillStyle(0x061526, 0.88);
-        scG.fillRoundedRect(-90, -44, 180, 88, 18);
-        scG.lineStyle(2.5, 0x10b981, 0.85);
-        scG.strokeRoundedRect(-90, -44, 180, 88, 18);
-        scoreCont.add(scG);
-
-        const scLbl = this.add.text(0, -16, 'SCORE', {
-            fontFamily: 'Arial Black', fontSize: '18px', color: '#6ee7b7'
-        }).setOrigin(0.5);
-        this.scoreText = this.add.text(0, 18, '0', {
-            fontFamily: 'Arial Black', fontSize: '32px', color: '#ffffff', stroke: '#05131e', strokeThickness: 5
-        }).setOrigin(0.5);
-        scoreCont.add([scLbl, this.scoreText]);
-
-        // 3. Settings/Sound & Pause Top Buttons
-        const soundX = width - 190;
-        const pauseX = width - 85;
-        const btnY = 65;
-
-        this.soundButton = new IconButton(
-            this,
-            soundX,
-            btnY,
-            'settings_icon',
-            () => {
-                this.gameEvents.emit('pause-game');
-                new SettingsPanel(this, () => {
-                    this.gameEvents.emit('resume-game');
-                });
-            }
-        );
-        this.soundButton.setDepth(UILayers.UI_BUTTONS);
+        // Top Left: Pause & Settings Buttons
+        const pauseX = 105;
+        const soundX = 205;
+        const btnY = 70;
 
         this.pauseButton = new IconButton(
             this,
@@ -213,6 +116,93 @@ export class UIScene extends Scene {
             }
         );
         this.pauseButton.setDepth(UILayers.UI_BUTTONS);
+
+        this.soundButton = new IconButton(
+            this,
+            soundX,
+            btnY,
+            'settings_icon',
+            () => {
+                this.gameEvents.emit('pause-game');
+                new SettingsPanel(this, () => {
+                    this.gameEvents.emit('resume-game');
+                });
+            }
+        );
+        this.soundButton.setDepth(UILayers.UI_BUTTONS);
+
+        // Top Right: Zone & Score
+        const headerStartX = width - 250;
+        this.levelTitleText = this.add.text(headerStartX, 50, `Level: ${this.currentLevel}`, {
+            fontFamily: 'Arial Black',
+            fontSize: '40px',
+            color: '#38bdf8',
+            stroke: '#000000',
+            strokeThickness: 6,
+        }).setOrigin(0, 0.5).setDepth(UILayers.UI_TEXT);
+
+        this.scoreText = this.add.text(headerStartX, 105, 'SCORE: 0', {
+            fontFamily: 'Arial Black',
+            fontSize: '40px',
+            color: '#4ade80',
+            stroke: '#000000',
+            strokeThickness: 6,
+        }).setOrigin(0, 0.5).setDepth(UILayers.UI_TEXT);
+
+        // Top Center: Team Spark & Combo Meter Box
+        const centerBox = this.add.graphics().setDepth(UILayers.UI_BACKGROUND_PANELS);
+        centerBox.fillStyle(0x0f172a, 0.92);
+        centerBox.fillRoundedRect(width / 2 - 270, 24, 540, 106, 18);
+        centerBox.lineStyle(3, 0xa855f7, 0.9);
+        centerBox.strokeRoundedRect(width / 2 - 270, 24, 540, 106, 18);
+
+        this.add.text(width / 2, 36, '⚡ LENS HUNT', {
+            fontFamily: 'Arial Black',
+            fontSize: '26px',
+            color: '#c084fc'
+        }).setOrigin(0.5, 0).setDepth(UILayers.UI_TEXT);
+
+        this.teamSparkBar = this.add.graphics().setDepth(UILayers.UI_TEXT);
+        this.teamSparkPercentText = this.add.text(width / 2, 93, '0%', {
+            fontFamily: 'Arial Black',
+            fontSize: '24px',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(0.5).setDepth(UILayers.UI_TEXT + 1);
+        this.drawSparkBar(0);
+    }
+
+    private drawSparkBar(percent: number) {
+        this.teamSparkBar.clear();
+        const { width } = this.scale;
+        const clamped = Phaser.Math.Clamp(percent, 0, 100);
+
+        const barX = width / 2 - 235;
+        const barY = 74;
+        const barW = 470;
+        const barH = 38;
+
+        // Spark bar background slot
+        this.teamSparkBar.fillStyle(0x1e1b4b, 0.85);
+        this.teamSparkBar.fillRoundedRect(barX, barY, barW, barH, 10);
+        this.teamSparkBar.lineStyle(2, 0x6366f1, 0.5);
+        this.teamSparkBar.strokeRoundedRect(barX, barY, barW, barH, 10);
+
+        if (clamped > 0) {
+            const fillW = Math.max(12, (barW * clamped) / 100);
+            // Purple spark glow fill
+            this.teamSparkBar.fillStyle(0xa855f7, 1);
+            this.teamSparkBar.fillRoundedRect(barX, barY, fillW, barH, 10);
+
+            // Highlight glass reflection shine
+            this.teamSparkBar.fillStyle(0xffffff, 0.35);
+            this.teamSparkBar.fillRoundedRect(barX + 2, barY + 2, fillW - 4, barH / 2 - 2, 6);
+        }
+
+        if (this.teamSparkPercentText) {
+            this.teamSparkPercentText.setText(`${Math.round(clamped)}%`);
+        }
     }
 
     private setupBottomControlConsole() {
@@ -220,8 +210,8 @@ export class UIScene extends Scene {
         const centerX = width / 2;
         const centerY = height - 70;
 
-        // --- 2. Left Movement Button (Left of Scanner) ---
-        const leftX = centerX - 195;
+        // --- 1. Left Movement Button (Left of Scanner) ---
+        const leftX = centerX - 205;
         const btnRadius = 40;
         this.leftNavBtnCont = this.add.container(leftX, centerY).setDepth(UILayers.UI_BUTTONS);
 
@@ -262,16 +252,16 @@ export class UIScene extends Scene {
         leftHitZone.on('pointercancel', onLeftRelease);
         this.leftNavBtnCont.add(leftHitZone);
 
-        // --- 3. Center Scanner Button ---
+        // --- 2. Center Scanner Button ---
         const btnW = 300;
-        const btnH = 86;
+        const btnH = 84;
         this.scannerBtnContainer = this.add.container(centerX, centerY).setDepth(UILayers.UI_BUTTONS);
 
         this.scannerBtnBg = this.add.graphics();
         this.scannerBtnContainer.add(this.scannerBtnBg);
 
         if (this.textures.exists('lens_home')) {
-            this.scannerBtnIcon = this.add.image(-btnW / 2 + 50, 0, 'lens_home').setScale(0.44);
+            this.scannerBtnIcon = this.add.image(-btnW / 2 + 52, 0, 'lens_home').setScale(0.48);
             this.scannerBtnContainer.add(this.scannerBtnIcon);
         }
 
@@ -286,7 +276,7 @@ export class UIScene extends Scene {
         this.scannerBtnContainer.add(this.scannerBtnTitle);
 
         this.scanHitZone = this.add.zone(0, 0, btnW, btnH).setInteractive({ useHandCursor: true });
-        this.scanHitZone.on('pointerdown', (pointer: Phaser.Input.Pointer, _lx: number, _ly: number, event: Phaser.Types.Input.EventData) => {
+        this.scanHitZone.on('pointerdown', (_pointer: Phaser.Input.Pointer, _lx: number, _ly: number, event: Phaser.Types.Input.EventData) => {
             event?.stopPropagation();
             if (!this.isScannerBtnEnabled) return;
             this.animateButtonPress(this.scannerBtnContainer);
@@ -297,8 +287,8 @@ export class UIScene extends Scene {
         // Initially disabled until an object is selected
         this.setScannerButtonEnabled(false);
 
-        // --- 4. Right Movement Button (Right of Scanner) ---
-        const rightX = centerX + 210;
+        // --- 3. Right Movement Button (Right of Scanner) ---
+        const rightX = centerX + 205;
         this.rightNavBtnCont = this.add.container(rightX, centerY).setDepth(UILayers.UI_BUTTONS);
 
         const rightBg = this.add.graphics();
@@ -381,11 +371,18 @@ export class UIScene extends Scene {
     }
 
     private onUpdateHuntHUD(state: HuntHUDState) {
-        this.zoneTitleText.setText(`ZONE ${state.zoneId}: ${state.zoneSubtitle.toUpperCase()}`);
-        this.discoveriesText.setText(`🔍 AI FEATURES: ${state.aiDiscoveredCount} / ${state.totalRequiredAI} FOUND`);
-        this.scoreText.setText(`${state.score}`);
+        this.currentLevel = state.zoneId;
+        this.isTutorialActiveState = state.isTutorialActive;
+        this.hasTargetSelectedState = state.hasTargetSelected;
 
-        this.drawBattery(state.batteryPercent);
+        if (this.levelTitleText) {
+            this.levelTitleText.setText(`Level: ${state.zoneId}`);
+        }
+        if (this.scoreText) {
+            this.scoreText.setText(`SCORE: ${state.score}`);
+        }
+
+        this.drawSparkBar(state.batteryPercent);
 
         // Update Scanner Button enabled/disabled state
         const canScan = state.hasTargetSelected && !state.isScanning;
@@ -394,10 +391,12 @@ export class UIScene extends Scene {
         // Tutorial Guidance
         if (state.isTutorialActive) {
             if (!state.hasTargetSelected) {
-                // Whenever an object is not selected during tutorial, display at center of screen
+                // Whenever an object is not selected during tutorial, display directly over the AI object
                 this.tutorialPointer.setVisible(true);
                 this.tutorialPointerText.setText('👇 TAP OBJECT TO SELECT');
-                this.tutorialPointer.setPosition(this.scale.width / 2, this.scale.height / 2);
+                if (state.tutorialTargetPos) {
+                    this.tutorialPointer.setPosition(state.tutorialTargetPos.x, state.tutorialTargetPos.y);
+                }
             } else if (state.hasTargetSelected && !state.isScanning) {
                 // Point to Scanner Button when object is selected
                 this.tutorialPointer.setVisible(true);
@@ -411,59 +410,61 @@ export class UIScene extends Scene {
         }
     }
 
-    private drawBattery(percent: number) {
-        this.batteryCellsGraphics.clear();
-        const clamped = Phaser.Math.Clamp(percent, 0, 100);
-
-        const startX = -84;
-        const startY = 6;
-        const totalW = 160;
-        const cellH = 20;
-
-        if (clamped > 0) {
-            const fillW = (totalW * (clamped / 100));
-            // Mint green / cyan battery fluid
-            this.batteryCellsGraphics.fillStyle(0x00e676, 1);
-            this.batteryCellsGraphics.fillRoundedRect(startX, startY, fillW, cellH, 4);
-
-            this.batteryCellsGraphics.fillStyle(0xffffff, 0.6);
-            this.batteryCellsGraphics.fillRect(startX + 2, startY + 2, fillW - 4, 3);
-        }
-
-        this.batteryPercentText.setText(`${clamped}%`);
-    }
-
     private setScannerButtonEnabled(enabled: boolean) {
         this.isScannerBtnEnabled = enabled;
-        const btnW = 250;
-        const btnH = 74;
+        const btnW = 300;
+        const btnH = 84;
 
         this.scannerBtnBg.clear();
 
         if (enabled) {
-            this.scannerBtnBg.fillStyle(0x061e36, 0.95);
+            // Outer glow halo
+            this.scannerBtnBg.fillStyle(0x00e5ff, 0.25);
+            this.scannerBtnBg.fillRoundedRect(-btnW / 2 - 4, -btnH / 2 - 4, btnW + 8, btnH + 8, 22);
+
+            // Rich cyber navy gradient base
+            this.scannerBtnBg.fillStyle(0x061e38, 0.98);
             this.scannerBtnBg.fillRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 18);
-            this.scannerBtnBg.fillStyle(0x0284c7, 0.4);
+
+            // Glowing top cyan plate
+            this.scannerBtnBg.fillStyle(0x0284c7, 0.5);
             this.scannerBtnBg.fillRoundedRect(-btnW / 2 + 2, -btnH / 2 + 2, btnW - 4, btnH / 2 - 2, 14);
-            this.scannerBtnBg.lineStyle(2.5, 0x00e5ff, 1);
+
+            // Bright cyan outline
+            this.scannerBtnBg.lineStyle(3, 0x00e5ff, 1);
             this.scannerBtnBg.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 18);
 
+            // Subtle lens badge backing ring
+            this.scannerBtnBg.lineStyle(2, 0x38bdf8, 0.8);
+            this.scannerBtnBg.strokeCircle(-btnW / 2 + 52, 0, 28);
+
             this.scannerBtnTitle.setColor('#ffffff');
-            this.scannerBtnTitle.setAlpha(1);
+            this.scannerBtnTitle.setStroke('#021a36', 6);
             if (this.scannerBtnIcon) this.scannerBtnIcon.setAlpha(1);
             this.scannerBtnContainer.setAlpha(1);
 
             this.scanHitZone.setInteractive({ useHandCursor: true });
         } else {
-            this.scannerBtnBg.fillStyle(0x0a101d, 0.7);
+            // Sleek translucent standby plate (crisp and high contrast, not muddy)
+            this.scannerBtnBg.fillStyle(0x091424, 0.92);
             this.scannerBtnBg.fillRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 18);
-            this.scannerBtnBg.lineStyle(2, 0x334155, 0.6);
+
+            // Soft top bevel highlight
+            this.scannerBtnBg.fillStyle(0x1e293b, 0.45);
+            this.scannerBtnBg.fillRoundedRect(-btnW / 2 + 2, -btnH / 2 + 2, btnW - 4, btnH / 2 - 2, 14);
+
+            // Subtle tech cyan border
+            this.scannerBtnBg.lineStyle(2, 0x0284c7, 0.7);
             this.scannerBtnBg.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 18);
 
-            this.scannerBtnTitle.setColor('#94a3b8');
-            this.scannerBtnTitle.setAlpha(0.6);
-            if (this.scannerBtnIcon) this.scannerBtnIcon.setAlpha(0.4);
-            this.scannerBtnContainer.setAlpha(0.5);
+            // Circular standby badge
+            this.scannerBtnBg.lineStyle(1.5, 0x334155, 0.8);
+            this.scannerBtnBg.strokeCircle(-btnW / 2 + 52, 0, 26);
+
+            this.scannerBtnTitle.setColor('#cbd5e1');
+            this.scannerBtnTitle.setStroke('#05131e', 5);
+            if (this.scannerBtnIcon) this.scannerBtnIcon.setAlpha(0.75);
+            this.scannerBtnContainer.setAlpha(0.9);
 
             this.scanHitZone.disableInteractive();
         }
@@ -555,6 +556,7 @@ export class UIScene extends Scene {
         if (this.gameEvents) {
             this.gameEvents.off('update-hunt-hud', this.onUpdateHuntHUD, this);
             this.gameEvents.off('show-zone-complete', this.onZoneCompleteBanner, this);
+            this.gameEvents.off('tutorial-pointer-pos');
             this.gameEvents.off('scanner-modal-changed');
         }
     }
