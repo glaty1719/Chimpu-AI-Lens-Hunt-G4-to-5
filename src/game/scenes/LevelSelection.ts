@@ -92,8 +92,8 @@ export class LevelSelection extends Scene {
     private createHeaderPlaque(container: Phaser.GameObjects.Container, x: number, y: number) {
         const headerCont = this.add.container(x, y);
 
-        const pw = 680;
-        const ph = 90;
+        const pw = 720;
+        const ph = 96;
         const pr = 24;
         const g = this.add.graphics();
 
@@ -111,7 +111,7 @@ export class LevelSelection extends Scene {
 
         const title = this.add.text(0, 0, 'SELECT AI ZONE', {
             fontFamily: 'Arial Black',
-            fontSize: '44px',
+            fontSize: '50px',
             color: '#fef08a',
             stroke: '#3b0764',
             strokeThickness: 8
@@ -150,7 +150,7 @@ export class LevelSelection extends Scene {
 
             // 1. Collectible Lens Display on Card
             if (this.textures.exists(zoneConfig.lensKey)) {
-                const lensImg = this.add.image(0, -h / 2 + 105, zoneConfig.lensKey).setScale(0.85);
+                const lensImg = this.add.image(0, -h / 2 + 105, zoneConfig.lensKey).setScale(0.9);
                 cardCont.add(lensImg);
 
                 // Subtle float
@@ -165,26 +165,28 @@ export class LevelSelection extends Scene {
             }
 
             // 2. Zone Name & Lens Label
-            const nameTxt = this.add.text(0, 20, zoneConfig.subtitle, {
+            const nameTxt = this.add.text(0, 18, zoneConfig.subtitle, {
                 fontFamily: 'Arial Black',
-                fontSize: '26px',
+                fontSize: '36px',
                 color: '#ffffff',
                 stroke: '#000000',
-                strokeThickness: 5,
+                strokeThickness: 6,
                 align: 'center'
             }).setOrigin(0.5);
 
-            const lensTxt = this.add.text(0, 60, `Lens: ${zoneConfig.lensName}`, {
+            const lensTxt = this.add.text(0, 64, `Lens: ${zoneConfig.lensName}`, {
                 fontFamily: 'Arial Black',
-                fontSize: '18px',
-                color: '#38bdf8'
+                fontSize: '26px',
+                color: '#38bdf8',
+                stroke: '#000000',
+                strokeThickness: 4
             }).setOrigin(0.5);
 
             cardCont.add([nameTxt, lensTxt]);
 
             // 3. Play Button
-            const btnW = 210;
-            const btnH = 58;
+            const btnW = 240;
+            const btnH = 68;
             const btnCont = this.add.container(0, h / 2 - 48);
 
             const btnG = this.add.graphics();
@@ -196,10 +198,10 @@ export class LevelSelection extends Scene {
 
             const btnTxt = this.add.text(0, 0, 'PLAY', {
                 fontFamily: 'Arial Black',
-                fontSize: '22px',
+                fontSize: '32px',
                 color: '#ffffff',
                 stroke: '#064e3b',
-                strokeThickness: 5
+                strokeThickness: 6
             }).setOrigin(0.5);
             btnCont.add(btnTxt);
             cardCont.add(btnCont);
@@ -238,17 +240,20 @@ export class LevelSelection extends Scene {
             cardG.strokeRoundedRect(-w / 2, -h / 2, w, h, r);
             cardCont.add(cardG);
 
-            const lockLabel = this.add.text(0, -30, '🔒 LOCKED', {
+            const lockLabel = this.add.text(0, -32, '🔒 LOCKED', {
                 fontFamily: 'Arial Black',
-                fontSize: '32px',
-                color: '#94a3b8'
+                fontSize: '40px',
+                color: '#94a3b8',
+                stroke: '#000000',
+                strokeThickness: 5
             }).setOrigin(0.5);
 
-            const unlockHint = this.add.text(0, 30, `Find all AI features in\nZone ${zoneId - 1} to unlock`, {
+            const unlockHint = this.add.text(0, 32, `Find all AI features in\nZone ${zoneId - 1} to unlock`, {
                 fontFamily: 'Arial Black',
-                fontSize: '18px',
+                fontSize: '26px',
                 color: '#64748b',
-                align: 'center'
+                align: 'center',
+                lineSpacing: 8
             }).setOrigin(0.5);
 
             cardCont.add([lockLabel, unlockHint]);

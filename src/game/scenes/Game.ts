@@ -89,6 +89,10 @@ export class Game extends Scene {
             this.onScanCompleted(result);
         });
 
+        this.events.on('scanner-modal-changed', () => {
+            this.broadcastHUDState();
+        });
+
         // 6. Setup Keyboard Controls (Space/Enter: Scan, Tab/Q/E: Cycle Targets, Arrow Keys & WASD: Skate Move)
         this.setupKeyboardControls();
 
@@ -291,6 +295,9 @@ export class Game extends Scene {
     private broadcastHUDState() {
         if (!this.worldView) return;
         const selected = this.worldView.getSelectedObject();
+        const isModalOpen = this.scanner?.isModalOpen() || false;
+        const isScanning = this.scanner?.isScanningActive() || false;
+        const isBusy = isModalOpen || isScanning;
 
         this.events.emit('update-hunt-hud', {
             zoneId: this.currentZoneId,
@@ -301,9 +308,9 @@ export class Game extends Scene {
             totalRequiredAI: this.zoneConfig.requiredAIDiscoveries,
             batteryPercent: this.batteryPercent,
             score: this.totalScore,
-            hasTargetSelected: selected !== null,
-            isScanning: this.scanner?.isModalOpen() || false,
-            isTutorialActive: this.isTutorialActive,
+            hasTargetSelected: selected !== null && !isBusy,
+            isScanning: isBusy,
+            isTutorialActive: this.isTutorialActive && !isBusy,
             tutorialStep: this.tutorialStep
         });
     }

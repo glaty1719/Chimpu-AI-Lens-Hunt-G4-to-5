@@ -30,7 +30,6 @@ export class WorldParallaxView {
     // Camera & Scroll State
     private scrollX: number = 0;
     private targetScrollX: number = 0;
-    private isAutoScrolling: boolean = true;
     private isUserInteracting: boolean = false;
     private isPaused: boolean = false;
 
@@ -204,67 +203,277 @@ export class WorldParallaxView {
         roomG.fillStyle(0x1a382e, 0.7);
         roomG.fillRect(0, 0, roomW, 380);
 
-        // Solid Grand Entry Door on the Left Wall (X: 0 to 130, Y: 80 to 720)
-        roomG.fillStyle(0x3b1807, 1); // Rich dark mahogany door frame
-        roomG.fillRect(0, 80, 130, 640);
-        roomG.lineStyle(4, 0x5c2c16, 1);
-        roomG.strokeRect(0, 80, 130, 640);
-        // Beveled door panels
-        roomG.fillStyle(0x240e04, 1);
-        roomG.fillRoundedRect(16, 110, 98, 180, 6);
-        roomG.fillRoundedRect(16, 320, 98, 180, 6);
-        roomG.fillRoundedRect(16, 530, 98, 170, 6);
-        // Brushed Brass Lever Handle & Keyhole Plate
-        roomG.fillStyle(0xd97706, 1);
-        roomG.fillRoundedRect(100, 410, 16, 46, 4);
-        roomG.fillCircle(108, 422, 6);
-        roomG.fillStyle(0xfde68a, 1);
-        roomG.fillRect(106, 444, 4, 22); // Handle lever
-        // Entry Welcome Runner on Floor
-        roomG.fillStyle(0x1e293b, 0.85);
-        roomG.fillRoundedRect(30, 740, 140, 50, 10);
-        roomG.lineStyle(2, 0xd97706, 0.6);
-        roomG.strokeRoundedRect(30, 740, 140, 50, 10);
+        // Solid Grand Entry Door on the Left Wall (X: 0 to 260, Y: 60 to 720) - Extra Wide Grand Entrance
+        roomG.fillStyle(0x240e04, 1); // Dark rich mahogany door casing
+        roomG.fillRect(0, 60, 260, 660);
+        roomG.lineStyle(5, 0x451a03, 1);
+        roomG.strokeRect(0, 60, 260, 660);
+        roomG.lineStyle(2, 0xd97706, 0.9); // Gold decorative architrave accent
+        roomG.strokeRect(4, 64, 252, 652);
 
-        // Fluted Acoustic Walnut Timber Feature Wall (X: 200 to 780)
+        // Transom Frosted Glass Window Header
+        roomG.fillStyle(0x0f172a, 0.9);
+        roomG.fillRoundedRect(16, 74, 228, 22, 4);
+        roomG.fillStyle(0xfde68a, 0.65);
+        roomG.fillRect(20, 78, 220, 14);
+        roomG.lineStyle(1.5, 0xd97706, 0.8);
+        roomG.strokeRoundedRect(16, 74, 228, 22, 4);
+
+        // 6 Large Beveled Recessed Door Panels (2 Columns x 3 Rows)
+        const doorPanels = [
+            { x: 22, y: 110, w: 98, h: 175 },
+            { x: 22, y: 305, w: 98, h: 185 },
+            { x: 22, y: 510, w: 98, h: 190 },
+            { x: 136, y: 110, w: 98, h: 175 },
+            { x: 136, y: 305, w: 98, h: 185 },
+            { x: 136, y: 510, w: 98, h: 190 }
+        ];
+
+        doorPanels.forEach(p => {
+            roomG.fillStyle(0x150702, 1);
+            roomG.fillRoundedRect(p.x, p.y, p.w, p.h, 6);
+            roomG.fillStyle(0x3b1807, 1);
+            roomG.fillRoundedRect(p.x + 4, p.y + 4, p.w - 8, p.h - 8, 4);
+            roomG.lineStyle(1.5, 0xd97706, 0.6);
+            roomG.strokeRoundedRect(p.x + 7, p.y + 7, p.w - 14, p.h - 14, 3);
+        });
+
+        // Designer Brushed Brass Handle & Digital Smart Lock Unit
+        roomG.fillStyle(0x1a1a24, 0.95);
+        roomG.fillRoundedRect(220, 370, 28, 90, 6);
+        roomG.lineStyle(2, 0xd97706, 1);
+        roomG.strokeRoundedRect(220, 370, 28, 90, 6);
+        roomG.fillStyle(0x0284c7, 0.9);
+        roomG.fillRoundedRect(226, 380, 16, 22, 3);
+        roomG.fillStyle(0x00e5ff, 1);
+        roomG.fillCircle(234, 391, 4); // Glowing cyan status light
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillCircle(234, 424, 7);
+        roomG.fillStyle(0xfde68a, 1);
+        roomG.fillRoundedRect(205, 421, 32, 6, 3); // Ergonomic brass lever
+
+        // Entry Welcome Runner on Floor
+        roomG.fillStyle(0x1e293b, 0.92);
+        roomG.fillRoundedRect(20, 735, 240, 55, 10);
+        roomG.lineStyle(3, 0xd97706, 0.85);
+        roomG.strokeRoundedRect(20, 735, 240, 55, 10);
+        roomG.lineStyle(1.5, 0xfde68a, 0.5);
+        roomG.strokeRoundedRect(28, 742, 224, 41, 6);
+
+        // Fluted Acoustic Walnut Timber Feature Wall (X: 380 to 940) - Positioned with generous padding from door
         roomG.fillStyle(0x0a1410, 1); // Dark acoustic backing
-        roomG.fillRect(200, 70, 580, 650);
-        for (let x = 208; x < 772; x += 22) {
+        roomG.fillRect(380, 70, 560, 650);
+        for (let x = 388; x < 932; x += 22) {
             roomG.fillStyle(0x78350f, 1); // Solid wood slat face
             roomG.fillRoundedRect(x, 70, 15, 650, 3);
             roomG.fillStyle(0x92400e, 0.6); // Highlight
             roomG.fillRect(x + 2, 70, 4, 650);
         }
 
-        // Executive Study Bookshelf Unit (X: 280 to 700, Y: 150 to 640)
-        roomG.fillStyle(0x451a03, 0.95);
-        roomG.fillRoundedRect(280, 150, 420, 490, 10);
+        // =========================================================================
+        // IMPROVISED EXECUTIVE DESIGNER BOOKSHELF UNIT (X: 400 to 920, Y: 110 to 660)
+        // =========================================================================
+        const bsX = 400;
+        const bsY = 110;
+        const bsW = 520;
+        const bsH = 550;
+
+        // Drop shadow behind bookshelf
+        roomG.fillStyle(0x000000, 0.45);
+        roomG.fillRoundedRect(bsX + 6, bsY + 8, bsW, bsH, 12);
+
+        // Bookshelf Outer Solid Walnut Casing
+        roomG.fillStyle(0x240e04, 0.98);
+        roomG.fillRoundedRect(bsX, bsY, bsW, bsH, 10);
         roomG.lineStyle(4, 0x78350f, 1);
-        roomG.strokeRoundedRect(280, 150, 420, 490, 10);
-        // Horizontal Shelves
-        [270, 390, 510].forEach(sy => {
+        roomG.strokeRoundedRect(bsX, bsY, bsW, bsH, 10);
+        roomG.lineStyle(2, 0xd97706, 0.85); // Brass inlay trim
+        roomG.strokeRoundedRect(bsX + 4, bsY + 4, bsW - 8, bsH - 8, 8);
+
+        // Horizontal Shelf Levels (Y: 230, Y: 350, Y: 470, Y: 575)
+        const shelfLevels = [230, 350, 470, 575];
+        shelfLevels.forEach(sy => {
+            roomG.fillStyle(0x5c2c16, 1);
+            roomG.fillRect(bsX + 8, sy, bsW - 16, 16);
             roomG.fillStyle(0x78350f, 1);
-            roomG.fillRect(286, sy, 408, 16);
+            roomG.fillRect(bsX + 8, sy, bsW - 16, 4); // Top edge highlight
+
+            // Warm LED Under-Shelf Ambient Glow Strip
+            roomG.fillStyle(0xfef08a, 0.28);
+            roomG.fillRect(bsX + 12, sy + 16, bsW - 24, 6);
+            roomG.fillStyle(0xf59e0b, 0.12);
+            roomG.fillRect(bsX + 10, sy + 22, bsW - 20, 18);
         });
-        // Books & Decor on Shelves
-        const shelfBooks1 = [0xef4444, 0x3b82f6, 0x10b981, 0xf59e0b, 0x8b5cf6, 0x06b6d4, 0xec4899, 0x14b8a6];
-        shelfBooks1.forEach((bc, idx) => {
-            roomG.fillStyle(bc, 1);
-            roomG.fillRoundedRect(300 + idx * 24, 190, 18, 80, 3);
-            roomG.fillRoundedRect(420 + idx * 22, 430, 16, 80, 3);
+
+        // Vertical Structural Dividers (Asymmetrical Architectural Grid)
+        roomG.fillStyle(0x451a03, 1);
+        roomG.fillRect(bsX + 260, 110, 12, 120);
+        roomG.fillRect(bsX + 160, 246, 12, 104);
+        roomG.fillRect(bsX + 350, 246, 12, 104);
+        roomG.fillRect(bsX + 230, 366, 12, 104);
+
+        // --- SHELF CONTENT 1: TOP TIER (Y: 110 to 230) ---
+        // Left Bay: Leather-Bound Detective Encyclopedias with Gold Foil Spines
+        const topBooks = [
+            { c: 0x991b1b, w: 22, h: 90 },
+            { c: 0x1e3a8a, w: 24, h: 95 },
+            { c: 0x065f46, w: 20, h: 86 },
+            { c: 0x78350f, w: 26, h: 98 },
+            { c: 0x581c87, w: 22, h: 88 },
+            { c: 0x0f766e, w: 20, h: 92 },
+            { c: 0xb45309, w: 24, h: 96 },
+            { c: 0x1e293b, w: 22, h: 84 },
+            { c: 0x831843, w: 20, h: 90 }
+        ];
+        let curBookX = bsX + 20;
+        topBooks.forEach(b => {
+            roomG.fillStyle(b.c, 1);
+            roomG.fillRoundedRect(curBookX, 230 - b.h, b.w, b.h, 3);
+            roomG.fillStyle(0xfde68a, 0.9);
+            roomG.fillRect(curBookX + 2, 230 - b.h + 12, b.w - 4, 2);
+            roomG.fillRect(curBookX + 2, 230 - b.h + 20, b.w - 4, 2);
+            roomG.fillRect(curBookX + 2, 230 - 18, b.w - 4, 2);
+            curBookX += b.w + 3;
         });
-        // Decorative Gold Globe on Shelf 2
+        // Right Bay: White Marble Bookends & Modern Tech Manuals
+        roomG.fillStyle(0xf8fafc, 0.95);
+        roomG.beginPath();
+        roomG.moveTo(bsX + 280, 230);
+        roomG.lineTo(bsX + 315, 230);
+        roomG.lineTo(bsX + 315, 160);
+        roomG.closePath();
+        roomG.fillPath();
+        const techBooks = [
+            { c: 0x0284c7, w: 24, h: 80 },
+            { c: 0x6366f1, w: 22, h: 84 },
+            { c: 0x10b981, w: 26, h: 76 },
+            { c: 0xec4899, w: 20, h: 82 },
+            { c: 0xf59e0b, w: 22, h: 78 }
+        ];
+        let techX = bsX + 322;
+        techBooks.forEach(tb => {
+            roomG.fillStyle(tb.c, 1);
+            roomG.fillRoundedRect(techX, 230 - tb.h, tb.w, tb.h, 3);
+            roomG.fillStyle(0xffffff, 0.8);
+            roomG.fillRect(techX + 3, 230 - tb.h + 10, tb.w - 6, 3);
+            techX += tb.w + 4;
+        });
         roomG.fillStyle(0xd97706, 1);
-        roomG.fillCircle(350, 340, 26);
+        roomG.fillRoundedRect(techX + 2, 175, 14, 55, 3);
+
+        // --- SHELF CONTENT 2: MID TIER 1 (Y: 246 to 350) ---
+        // Bay 1: Armillary Celestial Globe with Brass Rings
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRect(bsX + 65, 336, 30, 14);
+        roomG.fillRect(bsX + 77, 305, 6, 32);
+        roomG.fillCircle(bsX + 80, 290, 22);
         roomG.lineStyle(3, 0xfde68a, 1);
-        roomG.strokeCircle(350, 340, 34);
-        // Potted trailing plant on Shelf 3
+        roomG.strokeCircle(bsX + 80, 290, 32);
+        roomG.lineStyle(2, 0xd97706, 0.85);
+        roomG.strokeEllipse(bsX + 80, 290, 34, 14);
+        // Bay 2: Modern Ceramic Vases & Hourglass
+        roomG.fillStyle(0x0284c7, 1);
+        roomG.fillRoundedRect(bsX + 185, 275, 26, 75, 6);
+        roomG.fillStyle(0xf8fafc, 1);
+        roomG.fillCircle(bsX + 230, 310, 20);
+        roomG.fillRect(bsX + 223, 280, 14, 25);
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRect(bsX + 275, 275, 34, 6);
+        roomG.fillRect(bsX + 275, 344, 34, 6);
+        roomG.fillStyle(0xfef08a, 0.7);
+        roomG.beginPath();
+        roomG.moveTo(bsX + 280, 281);
+        roomG.lineTo(bsX + 304, 281);
+        roomG.lineTo(bsX + 292, 312);
+        roomG.closePath();
+        roomG.fillPath();
+        roomG.beginPath();
+        roomG.moveTo(bsX + 292, 312);
+        roomG.lineTo(bsX + 304, 344);
+        roomG.lineTo(bsX + 280, 344);
+        roomG.closePath();
+        roomG.fillPath();
+        // Bay 3: Framed Detective Certificate
+        roomG.fillStyle(0x451a03, 1);
+        roomG.fillRoundedRect(bsX + 380, 265, 80, 85, 4);
+        roomG.lineStyle(2, 0xd97706, 1);
+        roomG.strokeRoundedRect(bsX + 380, 265, 80, 85, 4);
+        roomG.fillStyle(0xfef3c7, 0.95);
+        roomG.fillRect(bsX + 386, 271, 68, 73);
+        roomG.fillStyle(0x991b1b, 1);
+        roomG.fillCircle(bsX + 420, 325, 7);
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillCircle(bsX + 420, 325, 4);
+
+        // --- SHELF CONTENT 3: MID TIER 2 (Y: 366 to 470) ---
+        // Left Bay: Stacked Detective Case Dossiers + Gold Magnifying Glass
+        const dossierColors = [0x78350f, 0x1e3a8a, 0x991b1b, 0x065f46];
+        dossierColors.forEach((dc, i) => {
+            roomG.fillStyle(dc, 1);
+            roomG.fillRoundedRect(bsX + 30, 448 - i * 18, 120, 16, 3);
+            roomG.fillStyle(0xfde68a, 0.8);
+            roomG.fillRect(bsX + 32, 452 - i * 18, 116, 2);
+        });
+        roomG.lineStyle(3, 0xd97706, 1);
+        roomG.strokeCircle(bsX + 110, 385, 18);
+        roomG.fillStyle(0x00e5ff, 0.35);
+        roomG.fillCircle(bsX + 110, 385, 17);
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRoundedRect(bsX + 122, 395, 26, 6, 2);
+        // Right Bay: Terracotta Planter with Cascading Emerald Pothos Leaves
         roomG.fillStyle(0xb45309, 1);
-        roomG.fillRect(630, 470, 32, 34);
+        roomG.beginPath();
+        roomG.moveTo(bsX + 400, 420);
+        roomG.lineTo(bsX + 445, 420);
+        roomG.lineTo(bsX + 438, 470);
+        roomG.lineTo(bsX + 407, 470);
+        roomG.closePath();
+        roomG.fillPath();
+        roomG.fillStyle(0x065f46, 1);
+        roomG.fillCircle(bsX + 422, 412, 18);
+        roomG.fillCircle(bsX + 408, 422, 14);
+        roomG.fillCircle(bsX + 438, 422, 15);
         roomG.fillStyle(0x10b981, 1);
-        roomG.fillCircle(646, 455, 22);
-        roomG.fillCircle(632, 480, 14);
-        roomG.fillCircle(660, 485, 16);
+        roomG.fillCircle(bsX + 402, 442, 12);
+        roomG.fillCircle(bsX + 446, 440, 13);
+        roomG.fillCircle(bsX + 410, 465, 11);
+        roomG.fillCircle(bsX + 430, 480, 12);
+        roomG.fillCircle(bsX + 418, 500, 10);
+        roomG.fillStyle(0x34d399, 0.85);
+        roomG.fillCircle(bsX + 422, 515, 8);
+
+        // --- SHELF CONTENT 4: LOWER TIER (Y: 486 to 575) ---
+        // Archive binders with spine labels
+        const binders = [0x1e293b, 0x334155, 0x1e3a8a, 0x065f46, 0x78350f, 0x991b1b, 0x475569];
+        let binX = bsX + 22;
+        binders.forEach(bc => {
+            roomG.fillStyle(bc, 1);
+            roomG.fillRoundedRect(binX, 492, 26, 83, 3);
+            roomG.fillStyle(0xf8fafc, 0.95);
+            roomG.fillRect(binX + 4, 506, 18, 22);
+            roomG.fillStyle(0xd97706, 1);
+            roomG.fillCircle(binX + 13, 552, 4);
+            binX += 30;
+        });
+
+        // --- SHELF CONTENT 5: BOTTOM CABINETS (Y: 591 to 650) ---
+        roomG.fillStyle(0x3b1807, 1);
+        roomG.fillRoundedRect(bsX + 14, 591, (bsW - 36) / 2, 59, 4);
+        roomG.fillRoundedRect(bsX + 22 + (bsW - 36) / 2, 591, (bsW - 36) / 2, 59, 4);
+        roomG.lineStyle(2, 0x5c2c16, 1);
+        roomG.strokeRoundedRect(bsX + 14, 591, (bsW - 36) / 2, 59, 4);
+        roomG.strokeRoundedRect(bsX + 22 + (bsW - 36) / 2, 591, (bsW - 36) / 2, 59, 4);
+        for (let fx = bsX + 24; fx < bsX + 14 + (bsW - 36) / 2 - 10; fx += 14) {
+            roomG.fillStyle(0x240e04, 0.6);
+            roomG.fillRect(fx, 597, 6, 47);
+        }
+        for (let fx = bsX + 32 + (bsW - 36) / 2; fx < bsX + bsW - 30; fx += 14) {
+            roomG.fillStyle(0x240e04, 0.6);
+            roomG.fillRect(fx, 597, 6, 47);
+        }
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRoundedRect(bsX + 14 + (bsW - 36) / 2 - 18, 614, 6, 20, 2);
+        roomG.fillRoundedRect(bsX + 22 + (bsW - 36) / 2 + 12, 614, 6, 20, 2);
 
 
 
@@ -647,6 +856,15 @@ export class WorldParallaxView {
         }
 
         // =========================================================================
+        // FRAMED WALL ART PAINTINGS ('bg.png')
+        // =========================================================================
+        // Room 1 (Entry & Study): Centered grand gallery wall art directly above the executive marble console table
+        this.createFramedPainting(1300, 250, 340, 210, this.midLayerCont);
+
+        // Room 4 (Patio Sunroom): Japandi botanical gallery art centered on open wall between French doors and Shoji screen
+        this.createFramedPainting(7235, 270, 250, 160, this.midLayerCont);
+
+        // =========================================================================
         // 4. NEAR LAYER (1.0x Ratio): Foreground Vignette & Runner
         // =========================================================================
         const nearG = this.scene.add.graphics();
@@ -687,6 +905,10 @@ export class WorldParallaxView {
         }
         this.midLayerCont.add(bgG);
 
+        // Framed Paintings in School Classrooms
+        this.createFramedPainting(1650, 260, 240, 150, this.midLayerCont);
+        this.createFramedPainting(3250, 260, 240, 150, this.midLayerCont);
+
         // Chalkboards & School Banners
         if (this.scene.textures.exists('prop_chalkboard')) {
             const board1 = this.scene.add.image(850, 260, 'prop_chalkboard').setScale(1.2);
@@ -695,10 +917,10 @@ export class WorldParallaxView {
 
             // Chalkboard science equations & AI Lens banner text
             const txt1 = this.scene.add.text(850, 260, 'AI DETECTIVE LAB\nPattern Recognition 💡', {
-                fontFamily: 'Arial Black', fontSize: '24px', color: '#ffffff', align: 'center'
+                fontFamily: 'Arial Black', fontSize: '34px', color: '#ffffff', align: 'center', lineSpacing: 8
             }).setOrigin(0.5);
             const txt2 = this.scene.add.text(2450, 260, 'MACHINE LEARNING 🔬\nTraining Data -> Predictions', {
-                fontFamily: 'Arial Black', fontSize: '24px', color: '#6ee7b7', align: 'center'
+                fontFamily: 'Arial Black', fontSize: '34px', color: '#6ee7b7', align: 'center', lineSpacing: 8
             }).setOrigin(0.5);
             this.midLayerCont.add([txt1, txt2]);
         }
@@ -735,6 +957,10 @@ export class WorldParallaxView {
                 this.farLayerCont.add(skyTile);
             }
         }
+
+        // Framed Gallery Displays on Street
+        this.createFramedPainting(1800, 240, 250, 155, this.midLayerCont);
+        this.createFramedPainting(4200, 240, 250, 155, this.midLayerCont);
 
         // Neighborhood Stores & Buildings
         const streetG = this.scene.add.graphics();
@@ -989,6 +1215,9 @@ export class WorldParallaxView {
         );
         this.currentRoomIndex = activeRoom;
 
+        // Active user interaction state
+        this.isUserInteracting = (moveX !== 0);
+
         // Turnaround points for current room patrol
         const minPatrolX = this.currentRoomIndex * this.roomWidth + 240;
         const maxPatrolX = Math.min(this.worldWidth, (this.currentRoomIndex + 1) * this.roomWidth) - 240;
@@ -1011,22 +1240,16 @@ export class WorldParallaxView {
             // Accelerate forward with skate thrust & turbo responsiveness
             const accelRate = 8.5 + (holdProgress * 4.5);
             this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, maxForwardSpeed, dt * accelRate);
-            this.isUserInteracting = true;
             this.patrolDir = 1;
         } else if (moveX < 0) {
             // Skate backward into previous rooms
             const accelRate = 9.0 + (holdProgress * 4.5);
             this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, maxReverseSpeed, dt * accelRate);
-            this.isUserInteracting = true;
             this.patrolDir = -1;
         } else {
-            // Smoothly glide towards patrol speed in current room
+            // Smoothly glide towards patrol speed in current room and skate continuously
             const targetCruiseVx = this.patrolDir * baseCruiseSpeed;
-            if (this.isAutoScrolling && !this.isUserInteracting) {
-                this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, targetCruiseVx, dt * 3.5);
-            } else {
-                this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, targetCruiseVx, dt * 2.5);
-            }
+            this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, targetCruiseVx, dt * 3.5);
         }
 
         // 3. Update Vertical Position (Lane riding & Jump)
@@ -1051,7 +1274,15 @@ export class WorldParallaxView {
 
         // 4. Update Chimpu World Position clamped within Unlocked Space
         this.chimpuWorldX += this.chimpuVx * dt;
-        this.chimpuWorldX = Phaser.Math.Clamp(this.chimpuWorldX, minRoomX, maxRoomX);
+        if (this.chimpuWorldX >= maxRoomX) {
+            this.chimpuWorldX = maxRoomX;
+            if (this.chimpuVx > 0) this.chimpuVx = 0;
+            if (!this.isUserInteracting) this.patrolDir = -1;
+        } else if (this.chimpuWorldX <= minRoomX) {
+            this.chimpuWorldX = minRoomX;
+            if (this.chimpuVx < 0) this.chimpuVx = 0;
+            if (!this.isUserInteracting) this.patrolDir = 1;
+        }
 
         // 5. Camera stays locked and framed on whichever Room Chimpu is currently visiting
         const roomBaseScroll = this.currentRoomIndex * this.roomWidth;
@@ -1103,9 +1334,9 @@ export class WorldParallaxView {
             this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -55 : 55, 38, glowLength, 20);
             // Inner hot core plasma
             this.chimpuThrusterGlow.fillStyle(0xfde047, 0.9);
-            this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -48 : 48, glowLength * 0.6, 10);
+            this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -48 : 48, 38, glowLength * 0.6, 10);
             this.chimpuThrusterGlow.fillStyle(0xffffff, 1);
-            this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -42 : 42, glowLength * 0.3, 6);
+            this.chimpuThrusterGlow.fillEllipse(this.patrolDir > 0 ? -42 : 42, 38, glowLength * 0.3, 6);
         } else if (isMovingFast) {
             const glowLength = Math.min(85, (Math.abs(this.chimpuVx) / 500) * 85);
             this.chimpuThrusterGlow.fillStyle(0x00f2fe, 0.45);
@@ -1175,11 +1406,7 @@ export class WorldParallaxView {
             this.isUserInteracting = true;
             this.patrolDir = dir > 0 ? 1 : -1;
         } else {
-            this.scene.time.delayedCall(1200, () => {
-                if (this.touchMoveDir === 0) {
-                    this.isUserInteracting = false;
-                }
-            });
+            this.isUserInteracting = false;
         }
     }
 
@@ -1367,7 +1594,7 @@ export class WorldParallaxView {
             duration: 1800,
             ease: 'Cubic.easeInOut',
             onUpdate: (tween) => {
-                const val = tween.getValue();
+                const val = tween.getValue() ?? 0;
                 this.scrollX = Phaser.Math.Linear(startScrollX, nextRoomScrollX, val);
                 this.chimpuWorldX = Phaser.Math.Linear(startChimpuX, targetChimpuX, val);
 
@@ -1393,25 +1620,28 @@ export class WorldParallaxView {
 
     private showRoomClearBanner(nextRoomNum: number) {
         const bannerCont = this.scene.add.container(this.screenWidth / 2, this.screenHeight / 2 - 120)
-            .setDepth(UILayers.UI_MODAL_OVERLAY);
+            .setDepth(UILayers.MODAL_PANEL);
 
         const bg = this.scene.add.graphics();
         bg.fillStyle(0x0f172a, 0.94);
-        bg.fillRoundedRect(-320, -55, 640, 110, 22);
-        bg.lineStyle(3, 0x10b981, 1);
-        bg.strokeRoundedRect(-320, -55, 640, 110, 22);
+        bg.fillRoundedRect(-410, -75, 820, 150, 26);
+        bg.lineStyle(4, 0x10b981, 1);
+        bg.strokeRoundedRect(-410, -75, 820, 150, 26);
 
-        const text1 = this.scene.add.text(0, -20, '🎉 ROOM CLEARED!', {
-            fontSize: '28px',
-            fontFamily: 'Inter, Outfit, sans-serif',
-            fontStyle: 'bold',
-            color: '#10b981'
+        const text1 = this.scene.add.text(0, -26, '🎉 ROOM CLEARED!', {
+            fontSize: '44px',
+            fontFamily: 'Arial Black, Outfit, sans-serif',
+            color: '#10b981',
+            stroke: '#000000',
+            strokeThickness: 7
         }).setOrigin(0.5);
 
-        const text2 = this.scene.add.text(0, 18, `Rolling into Room ${nextRoomNum} ➡️`, {
-            fontSize: '20px',
-            fontFamily: 'Inter, Outfit, sans-serif',
-            color: '#f8fafc'
+        const text2 = this.scene.add.text(0, 26, `Rolling into Room ${nextRoomNum} ➡️`, {
+            fontSize: '32px',
+            fontFamily: 'Arial Black, Outfit, sans-serif',
+            color: '#f8fafc',
+            stroke: '#000000',
+            strokeThickness: 5
         }).setOrigin(0.5);
 
         bannerCont.add([bg, text1, text2]);
@@ -1555,6 +1785,40 @@ export class WorldParallaxView {
         const currentPos = roomIndices.indexOf(this.selectedObjectIndex);
         const prevPos = (currentPos - 1 + roomIndices.length) % roomIndices.length;
         this.selectObject(roomIndices[prevPos]);
+    }
+
+    private createFramedPainting(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        container: Phaser.GameObjects.Container,
+    ) {
+        const frameG = this.scene.add.graphics();
+
+        // 3. Ornate Gold Filigree Inset Border
+        frameG.lineStyle(2, 0xd97706, 0.95);
+        frameG.strokeRoundedRect(x - width / 2 + 6, y - height / 2 + 6, width - 12, height - 12, 5);
+
+        // 4. Fine Gallery Passe-Partout (Ivory Matte Border)
+        frameG.fillStyle(0xf8fafc, 1);
+        frameG.fillRect(x - width / 2 + 10, y - height / 2 + 10, width - 20, height - 20);
+
+        // 5. Canvas Aperture Inner Shadow / Bevel
+        frameG.lineStyle(1.5, 0x94a3b8, 0.8);
+        frameG.strokeRect(x - width / 2 + 18, y - height / 2 + 18, width - 36, height - 36);
+
+        container.add(frameG);
+
+        // 6. Canvas Painting Image ('bg')
+        if (this.scene.textures.exists('bg')) {
+            const canvasW = width - 38;
+            const canvasH = height - 38;
+            const paintingImg = this.scene.add.image(x, y, 'bg')
+                .setDisplaySize(canvasW, canvasH);
+            container.add(paintingImg);
+        }
+
     }
 
     public destroy() {

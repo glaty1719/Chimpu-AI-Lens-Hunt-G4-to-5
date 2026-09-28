@@ -40,12 +40,12 @@ export class MainMenu extends Scene {
         ).setDepth(UILayers.UI_BUTTONS).setScale(0.38);
 
         // 'Play Now' text styled to blend with the orange & gold button theme
-        const playText = this.add.text(playBtnX, playBtnY + 105, 'Play Now', {
+        const playText = this.add.text(playBtnX, playBtnY + 112, 'Play Now', {
             fontFamily: 'Arial Black, Impact, sans-serif',
-            fontSize: '34px',
+            fontSize: '48px',
             color: '#FFB800',
             stroke: '#1A0B02',
-            strokeThickness: 6,
+            strokeThickness: 8,
             shadow: {
                 offsetX: 0,
                 offsetY: 4,

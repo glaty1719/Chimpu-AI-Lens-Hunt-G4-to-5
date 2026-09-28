@@ -76,9 +76,9 @@ export class LensFusionFinale {
 
     private revealGoldenScanner() {
         if (!this.modalContainer) return;
-        const mw = 1080;
-        const mh = 660;
-        const r = 28;
+        const mw = 1320;
+        const mh = 750;
+        const r = 32;
 
         AudioManager.getInstance().playSFX('badge_earned');
 
@@ -93,39 +93,39 @@ export class LensFusionFinale {
 
         // Header Plaque
         frameG.fillStyle(0x78350f, 1);
-        frameG.fillRoundedRect(-mw / 2 + 20, -mh / 2 + 16, mw - 40, 85, 18);
+        frameG.fillRoundedRect(-mw / 2 + 20, -mh / 2 + 16, mw - 40, 95, 20);
         frameG.lineStyle(3, 0xfef08a, 1);
-        frameG.strokeRoundedRect(-mw / 2 + 20, -mh / 2 + 16, mw - 40, 85, 18);
+        frameG.strokeRoundedRect(-mw / 2 + 20, -mh / 2 + 16, mw - 40, 95, 20);
         this.modalContainer.add(frameG);
 
         // Header Title
-        const title = this.scene.add.text(0, -mh / 2 + 58, '🏆 MASTER AI DETECTIVE BADGE EARNED! 🏆', {
+        const title = this.scene.add.text(0, -mh / 2 + 62, '🏆 MASTER AI DETECTIVE BADGE EARNED! 🏆', {
             fontFamily: 'Arial Black',
-            fontSize: '32px',
+            fontSize: '44px',
             color: '#fef08a',
             stroke: '#451a03',
-            strokeThickness: 6
+            strokeThickness: 8
         }).setOrigin(0.5);
         this.modalContainer.add(title);
 
         // Radiant Golden Detective Badge
-        const badge = this.scene.add.image(0, -110, 'badge_detective').setScale(0.1);
+        const badge = this.scene.add.image(0, -115, 'badge_detective').setScale(0.1);
         this.modalContainer.add(badge);
 
         this.scene.tweens.add({
             targets: badge,
-            scale: 1.1,
+            scale: 1.25,
             duration: 600,
             ease: 'Back.easeOut'
         });
 
         // Golden Scanner Subtitle
-        const sub = this.scene.add.text(0, 30, 'All 3 AI Lenses Successfully Unified into the Golden Scanner!', {
+        const sub = this.scene.add.text(0, 34, 'All 3 AI Lenses Successfully Unified into the Golden Scanner!', {
             fontFamily: 'Arial Black',
-            fontSize: '24px',
+            fontSize: '32px',
             color: '#38bdf8',
             stroke: '#000000',
-            strokeThickness: 4,
+            strokeThickness: 5,
             align: 'center'
         }).setOrigin(0.5);
         this.modalContainer.add(sub);
@@ -133,23 +133,25 @@ export class LensFusionFinale {
         // Score Card Box
         const scoreBox = this.scene.add.graphics();
         scoreBox.fillStyle(0x1e293b, 0.95);
-        scoreBox.fillRoundedRect(-320, 70, 640, 110, 18);
-        scoreBox.lineStyle(2, 0x00e676, 0.8);
-        scoreBox.strokeRoundedRect(-320, 70, 640, 110, 18);
+        scoreBox.fillRoundedRect(-380, 80, 760, 130, 22);
+        scoreBox.lineStyle(2.5, 0x00e676, 0.9);
+        scoreBox.strokeRoundedRect(-380, 80, 760, 130, 22);
         this.modalContainer.add(scoreBox);
 
-        const scoreTxt = this.scene.add.text(0, 105, `TOTAL SCORE: ${this.totalScore} POINTS`, {
+        const scoreTxt = this.scene.add.text(0, 120, `TOTAL SCORE: ${this.totalScore} POINTS`, {
             fontFamily: 'Arial Black',
-            fontSize: '32px',
+            fontSize: '42px',
             color: '#4ade80',
             stroke: '#000000',
-            strokeThickness: 5
+            strokeThickness: 7
         }).setOrigin(0.5);
 
-        const rankTxt = this.scene.add.text(0, 150, '⭐ ⭐ ⭐ MASTER DETECTIVE RATING ⭐ ⭐ ⭐', {
+        const rankTxt = this.scene.add.text(0, 172, '⭐ ⭐ ⭐ MASTER DETECTIVE RATING ⭐ ⭐ ⭐', {
             fontFamily: 'Arial Black',
-            fontSize: '20px',
-            color: '#fef08a'
+            fontSize: '28px',
+            color: '#fef08a',
+            stroke: '#000000',
+            strokeThickness: 4
         }).setOrigin(0.5);
         this.modalContainer.add([scoreTxt, rankTxt]);
 
@@ -159,10 +161,10 @@ export class LensFusionFinale {
 
     private createBottomButtons(mh: number) {
         if (!this.modalContainer) return;
-        const btnY = mh / 2 - 50;
+        const btnY = mh / 2 - 55;
 
         // 1. Play Again Button
-        this.createSingleButton(-240, btnY, '🔄 PLAY AGAIN', 0x0284c7, () => {
+        this.createSingleButton(-290, btnY, '🔄 PLAY AGAIN', 0x0284c7, () => {
             this.destroy();
             this.onPlayAgainCallback();
         });
@@ -174,7 +176,7 @@ export class LensFusionFinale {
         });
 
         // 3. Main Menu Home Button
-        this.createSingleButton(240, btnY, '🏠 HOME', 0x059669, () => {
+        this.createSingleButton(290, btnY, '🏠 HOME', 0x059669, () => {
             this.destroy();
             this.onHomeCallback();
         });
@@ -182,23 +184,23 @@ export class LensFusionFinale {
 
     private createSingleButton(x: number, y: number, text: string, color: number, onClick: () => void) {
         if (!this.modalContainer) return;
-        const btnW = 210;
-        const btnH = 62;
+        const btnW = 260;
+        const btnH = 76;
         const cont = this.scene.add.container(x, y);
 
         const g = this.scene.add.graphics();
         g.fillStyle(color, 1);
-        g.fillRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 16);
-        g.lineStyle(2.5, 0xffffff, 0.9);
-        g.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 16);
+        g.fillRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 20);
+        g.lineStyle(2.5, 0xffffff, 0.95);
+        g.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 20);
         cont.add(g);
 
         const txt = this.scene.add.text(0, 0, text, {
             fontFamily: 'Arial Black',
-            fontSize: '20px',
+            fontSize: '28px',
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 4
+            strokeThickness: 6
         }).setOrigin(0.5);
         cont.add(txt);
 

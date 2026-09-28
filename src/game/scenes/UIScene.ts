@@ -75,6 +75,12 @@ export class UIScene extends Scene {
         // Listen for HUD updates and events from Game Scene
         this.gameEvents.on('update-hunt-hud', this.onUpdateHuntHUD, this);
         this.gameEvents.on('show-zone-complete', this.onZoneCompleteBanner, this);
+        this.gameEvents.on('scanner-modal-changed', (isOpen: boolean) => {
+            if (isOpen) {
+                this.setScannerButtonEnabled(false);
+                this.tutorialPointer?.setVisible(false);
+            }
+        }, this);
 
         // Request initial HUD state synchronization from Game Scene
         this.gameEvents.emit('request-hud-sync');
@@ -83,36 +89,36 @@ export class UIScene extends Scene {
     }
 
     private setupTopLeftHUD() {
-        this.zoneBadgeCont = this.add.container(230, 62).setDepth(UILayers.UI_BACKGROUND_PANELS);
+        this.zoneBadgeCont = this.add.container(275, 65).setDepth(UILayers.UI_BACKGROUND_PANELS);
 
         const badgeG = this.add.graphics();
         // Glassmorphic panel
         badgeG.fillStyle(0x061526, 0.88);
-        badgeG.fillRoundedRect(-190, -36, 380, 72, 16);
-        badgeG.lineStyle(2, 0x00e5ff, 0.85);
-        badgeG.strokeRoundedRect(-190, -36, 380, 72, 16);
+        badgeG.fillRoundedRect(-240, -44, 480, 88, 18);
+        badgeG.lineStyle(2.5, 0x00e5ff, 0.85);
+        badgeG.strokeRoundedRect(-240, -44, 480, 88, 18);
 
         // Top subtle highlight line
         badgeG.lineStyle(1.5, 0xffffff, 0.4);
-        badgeG.lineBetween(-175, -34, 175, -34);
+        badgeG.lineBetween(-220, -42, 220, -42);
         this.zoneBadgeCont.add(badgeG);
 
         // Zone Title
-        this.zoneTitleText = this.add.text(0, -14, `ZONE ${this.currentZoneId}: AI AT HOME`, {
+        this.zoneTitleText = this.add.text(0, -16, `ZONE ${this.currentZoneId}: AI AT HOME`, {
             fontFamily: 'Arial Black',
-            fontSize: '17px',
+            fontSize: '26px',
             color: '#38bdf8',
             stroke: '#05131e',
-            strokeThickness: 3
+            strokeThickness: 5
         }).setOrigin(0.5);
 
         // Discoveries Counter
-        this.discoveriesText = this.add.text(0, 14, '🔍 AI FEATURES: 0 / 4 FOUND', {
+        this.discoveriesText = this.add.text(0, 16, '🔍 AI FEATURES: 0 / 4 FOUND', {
             fontFamily: 'Arial Black',
-            fontSize: '16px',
+            fontSize: '24px',
             color: '#00e676',
             stroke: '#05131e',
-            strokeThickness: 3
+            strokeThickness: 5
         }).setOrigin(0.5);
 
         this.zoneBadgeCont.add([this.zoneTitleText, this.discoveriesText]);
@@ -122,20 +128,20 @@ export class UIScene extends Scene {
         const { width } = this.scale;
 
         // 1. Scanner Battery Meter
-        const batX = width - 580;
-        const batY = 62;
+        const batX = width - 650;
+        const batY = 65;
         this.batteryContainer = this.add.container(batX, batY).setDepth(UILayers.UI_BACKGROUND_PANELS);
 
         const batFrameG = this.add.graphics();
         batFrameG.fillStyle(0x061526, 0.88);
-        batFrameG.fillRoundedRect(-110, -36, 220, 72, 16);
-        batFrameG.lineStyle(2, 0x00e5ff, 0.85);
-        batFrameG.strokeRoundedRect(-110, -36, 220, 72, 16);
+        batFrameG.fillRoundedRect(-130, -44, 260, 88, 18);
+        batFrameG.lineStyle(2.5, 0x00e5ff, 0.85);
+        batFrameG.strokeRoundedRect(-130, -44, 260, 88, 18);
         this.batteryContainer.add(batFrameG);
 
-        const batLabel = this.add.text(0, -16, '⚡ SCANNER BATTERY', {
+        const batLabel = this.add.text(0, -18, '⚡ SCANNER BATTERY', {
             fontFamily: 'Arial Black',
-            fontSize: '14px',
+            fontSize: '18px',
             color: '#fef08a'
         }).setOrigin(0.5);
         this.batteryContainer.add(batLabel);
@@ -144,38 +150,38 @@ export class UIScene extends Scene {
         this.batteryCellsGraphics = this.add.graphics();
         this.batteryContainer.add(this.batteryCellsGraphics);
 
-        this.batteryPercentText = this.add.text(0, 14, '0%', {
+        this.batteryPercentText = this.add.text(0, 18, '0%', {
             fontFamily: 'Arial Black',
-            fontSize: '15px',
+            fontSize: '24px',
             color: '#ffffff',
             stroke: '#05131e',
-            strokeThickness: 3
+            strokeThickness: 4
         }).setOrigin(0.5);
         this.batteryContainer.add(this.batteryPercentText);
 
         // 2. Score Badge
-        const scoreX = width - 360;
-        const scoreY = 62;
+        const scoreX = width - 390;
+        const scoreY = 65;
         const scoreCont = this.add.container(scoreX, scoreY).setDepth(UILayers.UI_BACKGROUND_PANELS);
         const scG = this.add.graphics();
         scG.fillStyle(0x061526, 0.88);
-        scG.fillRoundedRect(-70, -36, 140, 72, 16);
-        scG.lineStyle(2, 0x10b981, 0.85);
-        scG.strokeRoundedRect(-70, -36, 140, 72, 16);
+        scG.fillRoundedRect(-90, -44, 180, 88, 18);
+        scG.lineStyle(2.5, 0x10b981, 0.85);
+        scG.strokeRoundedRect(-90, -44, 180, 88, 18);
         scoreCont.add(scG);
 
-        const scLbl = this.add.text(0, -14, 'SCORE', {
-            fontFamily: 'Arial Black', fontSize: '13px', color: '#6ee7b7'
+        const scLbl = this.add.text(0, -16, 'SCORE', {
+            fontFamily: 'Arial Black', fontSize: '18px', color: '#6ee7b7'
         }).setOrigin(0.5);
-        this.scoreText = this.add.text(0, 14, '0', {
-            fontFamily: 'Arial Black', fontSize: '22px', color: '#ffffff', stroke: '#05131e', strokeThickness: 3
+        this.scoreText = this.add.text(0, 18, '0', {
+            fontFamily: 'Arial Black', fontSize: '32px', color: '#ffffff', stroke: '#05131e', strokeThickness: 5
         }).setOrigin(0.5);
         scoreCont.add([scLbl, this.scoreText]);
 
         // 3. Settings/Sound & Pause Top Buttons
         const soundX = width - 190;
         const pauseX = width - 85;
-        const btnY = 62;
+        const btnY = 65;
 
         this.soundButton = new IconButton(
             this,
@@ -215,25 +221,25 @@ export class UIScene extends Scene {
         const centerY = height - 70;
 
         // --- 2. Left Movement Button (Left of Scanner) ---
-        const leftX = centerX - 182;
-        const btnRadius = 37;
+        const leftX = centerX - 195;
+        const btnRadius = 40;
         this.leftNavBtnCont = this.add.container(leftX, centerY).setDepth(UILayers.UI_BUTTONS);
 
         const leftBg = this.add.graphics();
         leftBg.fillStyle(0x061e36, 0.95);
-        leftBg.fillRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 18);
+        leftBg.fillRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 20);
         leftBg.fillStyle(0x0284c7, 0.35);
-        leftBg.fillRoundedRect(-btnRadius + 2, -btnRadius + 2, btnRadius * 2 - 4, btnRadius - 2, 14);
+        leftBg.fillRoundedRect(-btnRadius + 2, -btnRadius + 2, btnRadius * 2 - 4, btnRadius - 2, 16);
         leftBg.lineStyle(2.5, 0x00e5ff, 0.95);
-        leftBg.strokeRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 18);
+        leftBg.strokeRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 20);
         this.leftNavBtnCont.add(leftBg);
 
         const leftIcon = this.add.text(0, 0, '◀', {
             fontFamily: 'Arial Black',
-            fontSize: '30px',
+            fontSize: '34px',
             color: '#38bdf8',
             stroke: '#05131e',
-            strokeThickness: 3
+            strokeThickness: 4
         }).setOrigin(0.5);
 
         this.leftNavBtnCont.add(leftIcon);
@@ -257,24 +263,24 @@ export class UIScene extends Scene {
         this.leftNavBtnCont.add(leftHitZone);
 
         // --- 3. Center Scanner Button ---
-        const btnW = 250;
-        const btnH = 74;
+        const btnW = 300;
+        const btnH = 86;
         this.scannerBtnContainer = this.add.container(centerX, centerY).setDepth(UILayers.UI_BUTTONS);
 
         this.scannerBtnBg = this.add.graphics();
         this.scannerBtnContainer.add(this.scannerBtnBg);
 
         if (this.textures.exists('lens_home')) {
-            this.scannerBtnIcon = this.add.image(-btnW / 2 + 42, 0, 'lens_home').setScale(0.36);
+            this.scannerBtnIcon = this.add.image(-btnW / 2 + 50, 0, 'lens_home').setScale(0.44);
             this.scannerBtnContainer.add(this.scannerBtnIcon);
         }
 
-        this.scannerBtnTitle = this.add.text(24, 0, 'SCAN OBJECT', {
+        this.scannerBtnTitle = this.add.text(28, 0, 'SCAN OBJECT', {
             fontFamily: 'Arial Black',
-            fontSize: '21px',
+            fontSize: '28px',
             color: '#ffffff',
             stroke: '#05131e',
-            strokeThickness: 4
+            strokeThickness: 6
         }).setOrigin(0.5);
 
         this.scannerBtnContainer.add(this.scannerBtnTitle);
@@ -292,24 +298,24 @@ export class UIScene extends Scene {
         this.setScannerButtonEnabled(false);
 
         // --- 4. Right Movement Button (Right of Scanner) ---
-        const rightX = centerX + 182;
+        const rightX = centerX + 210;
         this.rightNavBtnCont = this.add.container(rightX, centerY).setDepth(UILayers.UI_BUTTONS);
 
         const rightBg = this.add.graphics();
         rightBg.fillStyle(0x061e36, 0.95);
-        rightBg.fillRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 18);
+        rightBg.fillRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 20);
         rightBg.fillStyle(0x0284c7, 0.35);
-        rightBg.fillRoundedRect(-btnRadius + 2, -btnRadius + 2, btnRadius * 2 - 4, btnRadius - 2, 14);
+        rightBg.fillRoundedRect(-btnRadius + 2, -btnRadius + 2, btnRadius * 2 - 4, btnRadius - 2, 16);
         rightBg.lineStyle(2.5, 0x00e5ff, 0.95);
-        rightBg.strokeRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 18);
+        rightBg.strokeRoundedRect(-btnRadius, -btnRadius, btnRadius * 2, btnRadius * 2, 20);
         this.rightNavBtnCont.add(rightBg);
 
         const rightIcon = this.add.text(0, 0, '▶', {
             fontFamily: 'Arial Black',
-            fontSize: '30px',
+            fontSize: '34px',
             color: '#38bdf8',
             stroke: '#05131e',
-            strokeThickness: 3
+            strokeThickness: 4
         }).setOrigin(0.5);
 
         this.rightNavBtnCont.add(rightIcon);
@@ -342,22 +348,22 @@ export class UIScene extends Scene {
         const ptrBody = this.add.container(0, 0);
         const ptrG = this.add.graphics();
         ptrG.fillStyle(0xfbbf24, 1);
-        ptrG.fillRoundedRect(-140, -42, 280, 56, 16);
-        ptrG.lineStyle(3, 0xffffff, 1);
-        ptrG.strokeRoundedRect(-140, -42, 280, 56, 16);
+        ptrG.fillRoundedRect(-190, -48, 380, 68, 20);
+        ptrG.lineStyle(3.5, 0xffffff, 1);
+        ptrG.strokeRoundedRect(-190, -48, 380, 68, 20);
 
         // Downward Triangle
         ptrG.fillStyle(0xfbbf24, 1);
         ptrG.beginPath();
-        ptrG.moveTo(-16, 14);
-        ptrG.lineTo(16, 14);
-        ptrG.lineTo(0, 30);
+        ptrG.moveTo(-20, 20);
+        ptrG.lineTo(20, 20);
+        ptrG.lineTo(0, 40);
         ptrG.closePath();
         ptrG.fillPath();
 
         this.tutorialPointerText = this.add.text(0, -14, '👇 TAP OBJECT TO SELECT', {
             fontFamily: 'Arial Black',
-            fontSize: '17px',
+            fontSize: '24px',
             color: '#0f172a'
         }).setOrigin(0.5);
 
@@ -505,21 +511,21 @@ export class UIScene extends Scene {
 
         const bG = this.add.graphics();
         bG.fillStyle(0x0a1128, 0.96);
-        bG.fillRoundedRect(-420, -160, 840, 320, 24);
+        bG.fillRoundedRect(-480, -190, 960, 380, 28);
         bG.lineStyle(4, 0x10b981, 1);
-        bG.strokeRoundedRect(-420, -160, 840, 320, 24);
+        bG.strokeRoundedRect(-480, -190, 960, 380, 28);
         banner.add(bG);
 
-        const title = this.add.text(0, -90, `🎉 ZONE ${data.zoneId} CLEARED!`, {
-            fontFamily: 'Arial Black', fontSize: '36px', color: '#fef08a', stroke: '#000000', strokeThickness: 6
+        const title = this.add.text(0, -105, `🎉 ZONE ${data.zoneId} CLEARED!`, {
+            fontFamily: 'Arial Black', fontSize: '52px', color: '#fef08a', stroke: '#000000', strokeThickness: 8
         }).setOrigin(0.5);
 
         const lensText = this.add.text(0, -25, `Collected: ${data.lensName.toUpperCase()} ✨`, {
-            fontFamily: 'Arial Black', fontSize: '26px', color: '#00e5ff'
+            fontFamily: 'Arial Black', fontSize: '38px', color: '#00e5ff', stroke: '#000000', strokeThickness: 5
         }).setOrigin(0.5);
 
-        const subText = this.add.text(0, 35, 'Scanner Battery 100% Charged! Preparing next zone...', {
-            fontFamily: 'Arial Black', fontSize: '20px', color: '#ffffff'
+        const subText = this.add.text(0, 50, 'Scanner Battery 100% Charged! Preparing next zone...', {
+            fontFamily: 'Arial Black', fontSize: '30px', color: '#ffffff', stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5);
 
         banner.add([title, lensText, subText]);
@@ -549,6 +555,7 @@ export class UIScene extends Scene {
         if (this.gameEvents) {
             this.gameEvents.off('update-hunt-hud', this.onUpdateHuntHUD, this);
             this.gameEvents.off('show-zone-complete', this.onZoneCompleteBanner, this);
+            this.gameEvents.off('scanner-modal-changed');
         }
     }
 }

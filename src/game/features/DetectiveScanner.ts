@@ -117,6 +117,7 @@ export class DetectiveScanner {
     public performScan(scrollX: number, onDone?: () => void) {
         if (!this.currentTarget || this.isScanning) return;
         this.isScanning = true;
+        this.scene.events.emit('scanner-modal-changed', true);
 
         const target = this.currentTarget;
         const screenX = target.worldX - scrollX;
@@ -179,15 +180,18 @@ export class DetectiveScanner {
             AudioManager.getInstance().playSFX('fixed_step');
         }
 
+        // Notify scene that modal is open (disabling scanner button)
+        this.scene.events.emit('scanner-modal-changed', true);
+
         // 1. Modal Container
         this.modalContainer = this.scene.add.container(this.screenWidth / 2, this.screenHeight / 2)
             .setDepth(UILayers.MODAL_PANEL)
             .setScale(0.8)
             .setAlpha(0);
 
-        const mw = 1180;
-        const mh = 700;
-        const r = 28;
+        const mw = 1380;
+        const mh = 720;
+        const r = 32;
 
         // Dark Backdrop Blocker
         const blocker = this.scene.add.rectangle(0, 0, this.screenWidth * 2, this.screenHeight * 2, 0x000000, 0.75)
@@ -211,144 +215,104 @@ export class DetectiveScanner {
         frameG.lineStyle(5, primaryColor, 1);
         frameG.strokeRoundedRect(-mw / 2, -mh / 2, mw, mh, r);
 
-        // Top Header Banner
-        const bannerColor = isAI ? 0x047857 : 0xb45309;
-        frameG.fillStyle(bannerColor, 1);
-        frameG.fillRoundedRect(-mw / 2 + 16, -mh / 2 + 16, mw - 32, 90, 18);
-        frameG.lineStyle(3, 0xffffff, 0.8);
-        frameG.strokeRoundedRect(-mw / 2 + 16, -mh / 2 + 16, mw - 32, 90, 18);
-
         this.modalContainer.add(frameG);
 
-        // Header Title
-        const headerText = isAI ? `✨ AI FEATURE DETECTED: ${data.name.toUpperCase()}` : `⚙️ FIXED AUTOMATION / DECOY: ${data.name.toUpperCase()}`;
-        const headerTitle = this.scene.add.text(0, -mh / 2 + 60, headerText, {
-            fontFamily: 'Arial Black',
-            fontSize: '34px',
-            color: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 6,
-            align: 'center'
-        }).setOrigin(0.5);
-        this.modalContainer.add(headerTitle);
-
-        // 2. Left Visual Simulation Diagram Box (460x440)
-        const leftBox = this.scene.add.container(-mw / 2 + 270, 40);
+        // 2. Left Object Display Box (480x520)
+        const leftBox = this.scene.add.container(-395, -50);
         const leftBg = this.scene.add.graphics();
         leftBg.fillStyle(0x0f172a, 0.95);
-        leftBg.fillRoundedRect(-230, -210, 460, 420, 20);
-        leftBg.lineStyle(3, primaryColor, 0.7);
-        leftBg.strokeRoundedRect(-230, -210, 460, 420, 20);
+        leftBg.fillRoundedRect(-240, -260, 480, 520, 24);
+        leftBg.lineStyle(3, primaryColor, 0.85);
+        leftBg.strokeRoundedRect(-240, -260, 480, 520, 24);
         leftBox.add(leftBg);
 
-        // Render animated visual diagram inside left box
-        this.renderVisualDiagram(leftBox, data);
-        this.modalContainer.add(leftBox);
+        // Object Sprite
+        if (this.scene.textures.exists(data.textureKey)) {
+            const spr = this.scene.add.image(0, -60, data.textureKey).setScale(1.8);
+            leftBox.add(spr);
 
-        // 3. Right Educational Breakdown Panel (580x440)
-        const rightBox = this.scene.add.container(mw / 2 - 310, 40);
-        const rightBg = this.scene.add.graphics();
-        rightBg.fillStyle(0x0f172a, 0.95);
-        rightBg.fillRoundedRect(-280, -210, 560, 420, 20);
-        rightBg.lineStyle(3, 0x38bdf8, 0.7);
-        rightBg.strokeRoundedRect(-280, -210, 560, 420, 20);
-        rightBox.add(rightBg);
-
-        // AI Verb Badge or Decoy Mechanism Badge
-        const badgeCont = this.scene.add.container(0, -145);
-        const bG = this.scene.add.graphics();
-        const bColor = isAI ? 0x059669 : 0xd97706;
-        bG.fillStyle(bColor, 1);
-        bG.fillRoundedRect(-240, -32, 480, 64, 16);
-        bG.lineStyle(3, 0xffffff, 1);
-        bG.strokeRoundedRect(-240, -32, 480, 64, 16);
-        badgeCont.add(bG);
-
-        const badgeIconKey = isAI
-            ? (data.aiAction === 'RECOGNIZES' ? 'icon_recognizes' :
-                data.aiAction === 'LISTENS' ? 'icon_listens' :
-                    data.aiAction === 'PREDICTS' ? 'icon_predicts' :
-                        data.aiAction === 'RECOMMENDS' ? 'icon_recommends' : 'icon_learns')
-            : (data.mechanismType === 'MECHANICAL' ? 'icon_gear' :
-                data.mechanismType === 'FIXED TIMER' ? 'icon_timer' :
-                    data.mechanismType === 'BUTTON ACTION' ? 'icon_button_arrow' : 'icon_fixed_calc');
-
-        if (this.scene.textures.exists(badgeIconKey)) {
-            const bIcon = this.scene.add.image(-190, 0, badgeIconKey).setScale(0.42);
-            badgeCont.add(bIcon);
+            // Gentle pulsing animation on object
+            this.scene.tweens.add({
+                targets: spr,
+                scale: 1.95,
+                duration: 900,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
         }
 
-        const badgeLabel = isAI ? `AI ACTION: ${data.shortLabel}` : `MECHANISM: ${data.shortLabel}`;
-        const bTxt = this.scene.add.text(-140, 0, badgeLabel, {
+        // Object Name
+        const nameTitle = this.scene.add.text(0, 160, data.name.toUpperCase(), {
             fontFamily: 'Arial Black',
-            fontSize: '26px',
+            fontSize: '42px',
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 5
-        }).setOrigin(0, 0.5);
-        badgeCont.add(bTxt);
-        rightBox.add(badgeCont);
+            strokeThickness: 8,
+            align: 'center',
+            wordWrap: { width: 440 }
+        }).setOrigin(0.5);
+        leftBox.add(nameTitle);
+
+        this.modalContainer.add(leftBox);
+
+        // 3. Right Educational Breakdown Panel (760x520)
+        const rightBox = this.scene.add.container(255, -50);
+        const rightBg = this.scene.add.graphics();
+        rightBg.fillStyle(0x0f172a, 0.95);
+        rightBg.fillRoundedRect(-380, -260, 760, 520, 24);
+        rightBg.lineStyle(3, 0x38bdf8, 0.85);
+        rightBg.strokeRoundedRect(-380, -260, 760, 520, 24);
+        rightBox.add(rightBg);
 
         // Educational Tagline
-        const taglineTxt = this.scene.add.text(0, -75, `"${data.tagline}"`, {
+        const taglineTxt = this.scene.add.text(0, -140, `"${data.tagline}"`, {
             fontFamily: 'Arial Black',
-            fontSize: '24px',
+            fontSize: '48px',
             color: isAI ? '#69f0ae' : '#fef08a',
             stroke: '#000000',
-            strokeThickness: 4,
-            align: 'center'
+            strokeThickness: 8,
+            align: 'center',
+            wordWrap: { width: 700 },
+            lineSpacing: 10
         }).setOrigin(0.5);
         rightBox.add(taglineTxt);
 
         // Detailed Educational Explanation (Kid-Friendly & Clear)
-        const expTxt = this.scene.add.text(0, 20, data.detailedExplanation, {
+        const expTxt = this.scene.add.text(0, 50, data.detailedExplanation, {
             fontFamily: 'Arial Black',
-            fontSize: '22px',
+            fontSize: '42px',
             color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 5,
             align: 'center',
-            wordWrap: { width: 500 },
-            lineSpacing: 10
+            wordWrap: { width: 700 },
+            lineSpacing: 18
         }).setOrigin(0.5);
         rightBox.add(expTxt);
 
-        // Score & Battery Bonus Indicator
-        const bonusCont = this.scene.add.container(0, 140);
-        const bonusTxt = isAI
-            ? '🔋 SCANNER BATTERY +25%  |  ⭐ SCORE +100'
-            : '💡 DETECTIVE INSIGHT: Understood Fixed Mechanics!';
-        const bonusColor = isAI ? '#00e5ff' : '#ffd600';
-        const bInfo = this.scene.add.text(0, 0, bonusTxt, {
-            fontFamily: 'Arial Black',
-            fontSize: '20px',
-            color: bonusColor,
-            stroke: '#000000',
-            strokeThickness: 4
-        }).setOrigin(0.5);
-        bonusCont.add(bInfo);
-        rightBox.add(bonusCont);
-
         this.modalContainer.add(rightBox);
 
-        // 4. "CONTINUE DETECTIVE HUNT" Button at Bottom
-        const btnW = 420;
-        const btnH = 68;
-        const btnCont = this.scene.add.container(0, mh / 2 - 50);
+        // 4. "CONTINUE" Button at Bottom
+        const btnW = 520;
+        const btnH = 82;
+        const btnCont = this.scene.add.container(0, 285);
 
         const btnG = this.scene.add.graphics();
         btnG.fillStyle(0x059669, 1);
-        btnG.fillRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 20);
+        btnG.fillRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 22);
         btnG.fillStyle(0x34d399, 0.5);
-        btnG.fillRoundedRect(-btnW / 2 + 4, -btnH / 2 + 4, btnW - 8, btnH / 2 - 4, 16);
+        btnG.fillRoundedRect(-btnW / 2 + 4, -btnH / 2 + 4, btnW - 8, btnH / 2 - 4, 18);
         btnG.lineStyle(4, 0xffffff, 1);
-        btnG.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 20);
+        btnG.strokeRoundedRect(-btnW / 2, -btnH / 2, btnW, btnH, 22);
         btnCont.add(btnG);
 
-        const btnTxt = this.scene.add.text(0, 0, 'CONTINUE HUNT  ➜', {
+        const btnTxt = this.scene.add.text(0, 0, 'CONTINUE', {
             fontFamily: 'Arial Black',
-            fontSize: '28px',
+            fontSize: '40px',
             color: '#ffffff',
             stroke: '#064e3b',
-            strokeThickness: 6
+            strokeThickness: 8
         }).setOrigin(0.5);
         btnCont.add(btnTxt);
 
@@ -376,76 +340,6 @@ export class DetectiveScanner {
         });
     }
 
-    private renderVisualDiagram(container: GameObjects.Container, data: HuntObjectData) {
-        // Large Object Vector Sprite in Top of Diagram Box
-        if (this.scene.textures.exists(data.textureKey)) {
-            const spr = this.scene.add.image(0, -60, data.textureKey).setScale(1.2);
-            container.add(spr);
-
-            // Pulse animation on object
-            this.scene.tweens.add({
-                targets: spr,
-                scale: 1.3,
-                duration: 900,
-                yoyo: true,
-                repeat: -1,
-                ease: 'Sine.easeInOut'
-            });
-        }
-
-        // Bottom Animated Visual Diagram Simulation based on visualDiagramType
-        const simG = this.scene.add.graphics();
-        const simY = 100;
-
-        if (data.visualDiagramType === 'face_match') {
-            // Face Matching Scanning Particles
-            simG.lineStyle(3, 0x00e676, 1);
-            simG.strokeCircle(0, simY, 40);
-            simG.fillStyle(0x00e5ff, 1);
-            simG.fillCircle(-12, simY - 10, 4);
-            simG.fillCircle(12, simY - 10, 4);
-            simG.beginPath(); simG.arc(0, simY + 10, 14, 0, Math.PI, false); simG.strokePath();
-
-            const matchTxt = this.scene.add.text(0, simY + 60, '100% FACE MATCH VALIDATED', {
-                fontFamily: 'Arial Black', fontSize: '18px', color: '#00e676'
-            }).setOrigin(0.5);
-            container.add(matchTxt);
-        } else if (data.visualDiagramType === 'soundwave_listen') {
-            // Soundwave listening waves
-            simG.lineStyle(4, 0x00e5ff, 0.9);
-            simG.beginPath(); simG.arc(-40, simY, 20, -Math.PI * 0.4, Math.PI * 0.4, false); simG.strokePath();
-            simG.beginPath(); simG.arc(-40, simY, 35, -Math.PI * 0.4, Math.PI * 0.4, false); simG.strokePath();
-            simG.beginPath(); simG.arc(-40, simY, 50, -Math.PI * 0.4, Math.PI * 0.4, false); simG.strokePath();
-
-            const bubbleTxt = this.scene.add.text(45, simY, '💬 "Playing Music!"', {
-                fontFamily: 'Arial Black', fontSize: '18px', color: '#fef08a'
-            }).setOrigin(0.5);
-            container.add(bubbleTxt);
-        } else if (data.visualDiagramType === 'gear_spin') {
-            // Turning Mechanical Gear
-            simG.lineStyle(4, 0xffd600, 1);
-            simG.strokeCircle(0, simY, 35);
-            simG.lineStyle(2, 0xffffff, 0.8);
-            simG.lineBetween(-35, simY, 35, simY);
-            simG.lineBetween(0, simY - 35, 0, simY + 35);
-
-            const mechTxt = this.scene.add.text(0, simY + 60, 'Mechanical Gear & Spring Mechanism', {
-                fontFamily: 'Arial Black', fontSize: '16px', color: '#ffd600'
-            }).setOrigin(0.5);
-            container.add(mechTxt);
-        } else {
-            // Generic AI / Mechanism data indicator
-            simG.lineStyle(3, 0x00e5ff, 1);
-            simG.strokeRoundedRect(-140, simY - 30, 280, 60, 12);
-            const statusTxt = this.scene.add.text(0, simY, data.tagline, {
-                fontFamily: 'Arial Black', fontSize: '18px', color: '#ffffff'
-            }).setOrigin(0.5);
-            container.add(statusTxt);
-        }
-
-        container.add(simG);
-    }
-
     private closeBreakdownModal(onClose: () => void, result: ScanResult) {
         if (!this.modalContainer) return;
 
@@ -458,6 +352,7 @@ export class DetectiveScanner {
             onComplete: () => {
                 this.modalContainer?.destroy();
                 this.modalContainer = null;
+                this.scene.events.emit('scanner-modal-changed', false);
                 this.onScanCompletedCallback(result);
                 onClose();
             }
@@ -466,6 +361,10 @@ export class DetectiveScanner {
 
     public isModalOpen(): boolean {
         return this.modalContainer !== null;
+    }
+
+    public isScanningActive(): boolean {
+        return this.isScanning;
     }
 
     public destroy() {

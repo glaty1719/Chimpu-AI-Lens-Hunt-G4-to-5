@@ -47,8 +47,8 @@ export class Preloader extends Scene {
             // Error loading asset
         });
 
-        const statusText = this.add.text(width / 2, height / 2 + 50, 'Loading Assets...', {
-            fontFamily: 'Arial Black', fontSize: '24px', color: '#ffffff'
+        const statusText = this.add.text(width / 2, height / 2 + 55, 'Loading Assets...', {
+            fontFamily: 'Arial Black', fontSize: '30px', color: '#ffffff', stroke: '#000000', strokeThickness: 5
         }).setOrigin(0.5);
 
         // API Status Handling

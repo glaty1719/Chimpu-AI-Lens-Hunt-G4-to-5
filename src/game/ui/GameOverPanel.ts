@@ -48,10 +48,10 @@ export class GameOverPanel {
             const levelStr = level === 0 ? 'Tutorial' : `Level ${level}`;
             const levelText = scene.add.text(0, levelTextPos, levelStr, {
                 fontFamily: 'Arial Black',
-                fontSize: '40px',
+                fontSize: '44px',
                 color: '#FFFFFF',
                 stroke: '#4D240E',
-                strokeThickness: 7
+                strokeThickness: 8
             }).setOrigin(0.5);
             this.contentLayer.add(levelText);
         }
@@ -85,12 +85,12 @@ export class GameOverPanel {
 
     private addLabeledButton(scene: Scene, x: number, y: number, texture: string, labelText: string, callback: () => void) {
         const btn = new IconButton(scene, x, y, texture, callback);
-        const label = scene.add.text(x, y + 70, labelText, {
+        const label = scene.add.text(x, y + 74, labelText, {
             fontFamily: 'Arial Black',
-            fontSize: '28px',
+            fontSize: '32px',
             color: '#FFFFFF',
             stroke: '#4D240E',
-            strokeThickness: 5
+            strokeThickness: 6
         }).setOrigin(0.5);
 
         this.buttons.push(btn);

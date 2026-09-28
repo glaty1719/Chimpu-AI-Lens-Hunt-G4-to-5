@@ -181,8 +181,8 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Gear-Driven Quartz Motion',
                 detailedExplanation: 'Tick-tock! Escapement gears turn the hands at a fixed constant speed without learning or pattern adjustments.',
                 visualDiagramType: 'timer_tick',
-                worldX: 1300,
-                worldY: 240,
+                worldX: 1675,
+                worldY: 250,
                 width: 140,
                 height: 140,
                 hintText: 'Check the wall in the foyer/study for the mechanical ticking clock!'
