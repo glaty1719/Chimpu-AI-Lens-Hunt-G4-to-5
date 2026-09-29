@@ -109,7 +109,7 @@ export class LevelSelection extends Scene {
         g.strokeRoundedRect(-pw / 2, -ph / 2, pw, ph, pr);
         headerCont.add(g);
 
-        const title = this.add.text(0, 0, 'SELECT AI ZONE', {
+        const title = this.add.text(0, 0, 'SELECT LEVEL', {
             fontFamily: 'Arial Black',
             fontSize: '50px',
             color: '#fef08a',

@@ -182,9 +182,9 @@ export class Game extends Scene {
         const selected = this.worldView.getSelectedObject();
         if (!selected) return;
 
-        this.worldView.setChimpuScanPose(true);
+        //this.worldView.setChimpuScanPose(true);
         this.scanner.performScan(this.worldView.getScrollX(), () => {
-            this.worldView?.setChimpuScanPose(false);
+            //this.worldView?.setChimpuScanPose(false);
         });
 
         if (this.isTutorialActive) {
@@ -215,11 +215,12 @@ export class Game extends Scene {
             this.batteryPercent = Math.min(100, this.batteryPercent + result.batteryChargedPercent);
             this.totalScore += result.scoreAdded;
 
-            // Chimpu celebration skateboard trick
-            this.worldView.playChimpuTrick();
-
             // Check if all AI targets in current room are discovered to roll into next room
             this.worldView.checkRoomProgression();
+            // Chimpu celebration skateboard trick
+            // this.worldView.playChimpuTrick(() => {
+            //     this.worldView!.checkRoomProgression();
+            // });
         } else {
             this.totalScore += result.scoreAdded;
         }

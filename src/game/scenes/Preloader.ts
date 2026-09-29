@@ -105,6 +105,32 @@ export class Preloader extends Scene {
         this.load.image('obj_speech_app', 'speech_text_app.png');
         this.load.image('obj_speech_tablet', 'speech_text_app.png');
 
+        // Zone 1: Home Objects
+        this.load.image('obj_phone_face', 'obj_phone_face.png');
+        this.load.image('obj_smart_speaker', 'obj_smart_speaker.png');
+        this.load.image('obj_streaming_tv', 'obj_streaming_tv.png');
+        this.load.image('obj_robot_vacuum', 'obj_robot_vacuum.png');
+        this.load.image('obj_toaster', 'obj_toaster.png');
+        this.load.image('obj_lamp_switch', 'obj_lamp_switch.png');
+        this.load.image('obj_analog_clock', 'obj_analog_clock.png');
+        this.load.image('obj_blender', 'obj_blender.png');
+        this.load.image('obj_smart_fridge', 'obj_smart_fridge.png');
+        this.load.image('prop_fridge', 'prop_fridge.png');
+        this.load.image('obj_smart_thermostat', 'obj_smart_thermostat.png');
+        this.load.image('obj_fan', 'obj_fan.png');
+        this.load.image('obj_flashlight', 'obj_flashlight.png');
+        this.load.image('obj_windup_toy', 'obj_windup_toy.png');
+
+        // Zone 3: Street Objects
+        this.load.image('obj_map_app', 'obj_map_app.png');
+        this.load.image('obj_delivery_robot', 'obj_delivery_robot.png');
+        this.load.image('obj_traffic_cam', 'obj_traffic_cam.png');
+        this.load.image('obj_visual_search', 'obj_visual_search.png');
+        this.load.image('obj_bicycle', 'obj_bicycle.png');
+        this.load.image('obj_crossing_timer', 'obj_crossing_timer.png');
+        this.load.image('obj_vending_machine', 'obj_vending_machine.png');
+        this.load.image('obj_streetlight', 'obj_streetlight.png');
+
         this.load.image('back_icon', 'globalUI/backBtn.png');
         this.load.image('settings_icon', 'globalUI/settingsBtn.png');
         this.load.image('pause_icon', 'globalUI/pauseBtn.png');

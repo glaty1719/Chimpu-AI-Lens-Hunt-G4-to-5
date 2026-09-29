@@ -133,59 +133,136 @@ export class WorldParallaxView {
         // 1. FAR LAYER (0.35x Parallax): Distant Outdoor Scenery Through Windows
         // =========================================================================
         const farG = this.scene.add.graphics();
+        const farWidth = 5400;
 
-        // --- Outdoor Night Sky & Moonlit Garden behind Living Room Window (X: 4800 to 5650) ---
+        // --- Continuous Night Sky & Sunset Twilight Gradient (X: 0 to 5400) ---
+        // Base Deep Space / Midnight Sky
         farG.fillStyle(0x020617, 1);
-        farG.fillRect(4800, 80, 850, 520);
-        // Distant illuminated skyline
-        farG.fillStyle(0x0f172a, 0.9);
-        farG.fillRect(4840, 340, 100, 220);
-        farG.fillRect(4980, 290, 130, 270);
-        farG.fillRect(5160, 320, 110, 240);
-        farG.fillRect(5320, 270, 140, 290);
-        farG.fillRect(5500, 330, 100, 230);
-        // Distant glowing city windows
-        farG.fillStyle(0xfde047, 0.7);
-        for (let bx = 5000; bx < 5100; bx += 16) {
-            for (let by = 310; by < 460; by += 22) {
-                farG.fillRect(bx, by, 7, 9);
-            }
-        }
-        for (let bx = 5340; bx < 5440; bx += 16) {
-            for (let by = 290; by < 450; by += 20) {
-                farG.fillRect(bx, by, 6, 8);
-            }
-        }
-        // Night garden trees & foliage silhouettes
-        farG.fillStyle(0x064e3b, 0.95);
-        farG.fillCircle(4900, 500, 95);
-        farG.fillCircle(5100, 520, 120);
-        farG.fillCircle(5320, 490, 105);
-        farG.fillCircle(5520, 510, 115);
-        // Glowing Crescent Moon & Stars
+        farG.fillRect(0, 0, farWidth, 720);
+        // Midnight Navy & Indigo Sky Glow
+        farG.fillStyle(0x0f172a, 0.85);
+        farG.fillRect(0, 100, farWidth, 420);
+        farG.fillStyle(0x1e1b4b, 0.5);
+        farG.fillRect(0, 240, farWidth, 300);
+
+        // Sunset Glow on Far Right (X: 2800 to 5400 - behind Sunroom & Patio)
+        farG.fillStyle(0xf59e0b, 0.45);
+        farG.fillRect(2800, 60, 2600, 420);
+        farG.fillStyle(0xf43f5e, 0.35);
+        farG.fillRect(2800, 220, 2600, 260);
+        farG.fillStyle(0x7c2d12, 0.6);
+        farG.fillRect(2800, 420, 2600, 220);
+
+        // --- Celestial Moon & Stars ---
+        // Radiant Crescent Moon & Lunar Aura (X: 1950, Y: 150 - visible in living room window)
+        farG.fillStyle(0xfef08a, 0.15);
+        farG.fillCircle(1950, 150, 65);
+        farG.fillStyle(0xfef08a, 0.35);
+        farG.fillCircle(1950, 150, 42);
         farG.fillStyle(0xfef08a, 0.95);
-        farG.fillCircle(5380, 160, 28);
+        farG.fillCircle(1950, 150, 26);
         farG.fillStyle(0x020617, 1);
-        farG.fillCircle(5390, 154, 24);
-        farG.fillStyle(0xffffff, 0.85);
-        [[4880, 130], [4980, 180], [5120, 120], [5240, 190], [5480, 140], [5580, 170]].forEach(([sx, sy]) => {
+        farG.fillCircle(1960, 144, 22);
+
+        // Star Constellations across Night Sky
+        const starCoords = [
+            [120, 90], [240, 140], [380, 80], [520, 160], [680, 110], [820, 170],
+            [1050, 80], [1220, 150], [1380, 90], [1520, 180], [1680, 120], [1820, 90],
+            [2050, 110], [2180, 160], [2320, 85], [2480, 140], [2620, 100], [2780, 160],
+            [3050, 90], [3220, 140], [3380, 80], [3540, 130], [3720, 95], [3920, 150],
+            [4150, 80], [4320, 130], [4500, 90], [4720, 140], [4950, 100], [5200, 130]
+        ];
+        farG.fillStyle(0xffffff, 0.9);
+        starCoords.forEach(([sx, sy]) => {
             farG.fillCircle(sx, sy, 2.5);
+            farG.fillStyle(0x38bdf8, 0.4);
+            farG.fillCircle(sx, sy, 5.5);
+            farG.fillStyle(0xffffff, 0.9);
         });
 
-        // --- Outdoor Terrace Sunset Sky behind Patio French Doors (X: 5850 to 7150) ---
-        farG.fillStyle(0x1c1917, 1);
-        farG.fillRect(5850, 60, 1300, 680);
-        // Golden hour gradient & sunset glow
-        farG.fillStyle(0xf59e0b, 0.5);
-        farG.fillRect(5850, 60, 1300, 360);
-        farG.fillStyle(0xfb7185, 0.35);
-        farG.fillRect(5850, 240, 1300, 180);
-        // Distant terrace palms & cypress garden silhouettes
-        farG.fillStyle(0x064e3b, 0.95);
-        farG.fillCircle(6050, 580, 120);
-        farG.fillCircle(6350, 610, 150);
-        farG.fillCircle(6650, 570, 130);
-        farG.fillCircle(6950, 600, 140);
+        // --- Distant Rolling Mountains & Horizon Ridges ---
+        farG.fillStyle(0x0a192f, 0.95);
+        for (let mx = 0; mx < farWidth; mx += 360) {
+            farG.beginPath();
+            farG.moveTo(mx, 560);
+            farG.lineTo(mx + 180, 360 + (mx % 80));
+            farG.lineTo(mx + 360, 560);
+            farG.closePath();
+            farG.fillPath();
+        }
+
+        // --- Distant Illuminated Modern City Skyline (X: 800 to 4200) ---
+        const skylineBuildings = [
+            { x: 840, y: 320, w: 90, h: 260, color: 0x0f172a },
+            { x: 960, y: 260, w: 120, h: 320, color: 0x1e293b },
+            { x: 1110, y: 300, w: 100, h: 280, color: 0x0f172a },
+            { x: 1240, y: 230, w: 140, h: 350, color: 0x1e293b },
+            { x: 1410, y: 280, w: 110, h: 300, color: 0x0f172a },
+            { x: 1550, y: 250, w: 130, h: 330, color: 0x1e293b },
+            { x: 1710, y: 310, w: 95, h: 270, color: 0x0f172a },
+            { x: 1830, y: 220, w: 150, h: 360, color: 0x1e293b },
+            { x: 2010, y: 270, w: 120, h: 310, color: 0x0f172a },
+            { x: 2160, y: 240, w: 135, h: 340, color: 0x1e293b },
+            { x: 2320, y: 290, w: 110, h: 290, color: 0x0f172a },
+            { x: 2460, y: 230, w: 145, h: 350, color: 0x1e293b },
+            { x: 2630, y: 270, w: 120, h: 310, color: 0x0f172a },
+            { x: 2780, y: 240, w: 140, h: 340, color: 0x1e293b },
+            { x: 2950, y: 290, w: 115, h: 290, color: 0x0f172a },
+            { x: 3100, y: 250, w: 130, h: 330, color: 0x1e293b },
+            { x: 3260, y: 300, w: 105, h: 280, color: 0x0f172a },
+            { x: 3400, y: 260, w: 125, h: 320, color: 0x1e293b },
+            { x: 3550, y: 280, w: 120, h: 300, color: 0x0f172a },
+            { x: 3700, y: 240, w: 140, h: 340, color: 0x1e293b },
+            { x: 3870, y: 300, w: 110, h: 280, color: 0x0f172a }
+        ];
+
+        skylineBuildings.forEach(b => {
+            farG.fillStyle(b.color, 0.95);
+            farG.fillRect(b.x, b.y, b.w, b.h);
+            // Roof Antenna / Spire
+            farG.fillStyle(0x64748b, 1);
+            farG.fillRect(b.x + b.w / 2 - 2, b.y - 30, 4, 30);
+            farG.fillStyle(0xef4444, 0.9);
+            farG.fillCircle(b.x + b.w / 2, b.y - 30, 3); // Red aviation beacon
+
+            // Illuminated Windows Matrix
+            farG.fillStyle(0xfde047, 0.75);
+            for (let wx = b.x + 10; wx < b.x + b.w - 10; wx += 16) {
+                for (let wy = b.y + 16; wy < b.y + b.h - 20; wy += 22) {
+                    if ((wx * 7 + wy * 13) % 4 !== 0) { // Organic lit windows
+                        farG.fillRect(wx, wy, 8, 11);
+                    }
+                }
+            }
+        });
+
+        // --- Outdoor Night Garden & Terrace Tree Foliage ---
+        const outdoorTrees = [
+            { x: 350, y: 520, r: 85, c: 0x064e3b },
+            { x: 620, y: 540, r: 95, c: 0x065f46 },
+            { x: 920, y: 510, r: 90, c: 0x064e3b },
+            { x: 1250, y: 530, r: 105, c: 0x065f46 },
+            { x: 1550, y: 500, r: 95, c: 0x064e3b },
+            { x: 1820, y: 525, r: 115, c: 0x065f46 },
+            { x: 2150, y: 510, r: 100, c: 0x064e3b },
+            { x: 2450, y: 535, r: 110, c: 0x065f46 },
+            { x: 2750, y: 505, r: 95, c: 0x064e3b },
+            { x: 3050, y: 530, r: 115, c: 0x065f46 },
+            { x: 3350, y: 515, r: 100, c: 0x064e3b },
+            { x: 3650, y: 540, r: 110, c: 0x065f46 },
+            { x: 3950, y: 510, r: 105, c: 0x064e3b },
+            { x: 4250, y: 530, r: 115, c: 0x065f46 },
+            { x: 4550, y: 515, r: 100, c: 0x064e3b },
+            { x: 4850, y: 535, r: 110, c: 0x065f46 },
+            { x: 5150, y: 520, r: 105, c: 0x064e3b }
+        ];
+
+        outdoorTrees.forEach(t => {
+            farG.fillStyle(t.c, 0.95);
+            farG.fillCircle(t.x, t.y, t.r);
+            farG.fillStyle(0x10b981, 0.25);
+            farG.fillCircle(t.x - 12, t.y - 16, t.r * 0.65);
+        });
 
         this.farLayerCont.add(farG);
 
@@ -509,12 +586,12 @@ export class WorldParallaxView {
         roomG.fillStyle(0x111f3d, 0.7);
         roomG.fillRect(roomW, 0, roomW, 360);
 
-        // White Subway Tile Backsplash Wall (X: 1960 to 3800, Y: 280 to 720)
+        // White Subway Tile Backsplash Wall (X: 1960 to 3800, Y: 270 to 720)
         roomG.fillStyle(0xf8fafc, 0.98);
-        roomG.fillRect(1960, 280, 1840, 440);
+        roomG.fillRect(1960, 270, 1840, 450);
         roomG.lineStyle(1.5, 0x94a3b8, 0.7);
         let rowIdx = 0;
-        for (let y = 280; y < 720; y += 22) {
+        for (let y = 270; y < 720; y += 22) {
             const xOffset = (rowIdx % 2 === 0) ? 0 : 25;
             for (let x = 1960 - 50; x < 3800; x += 50) {
                 roomG.strokeRect(Math.max(1960, x + xOffset), y, Math.min(50, 3800 - (x + xOffset)), 22);
@@ -522,52 +599,253 @@ export class WorldParallaxView {
             rowIdx++;
         }
 
-        // Full-Height Built-in Smart Refrigerator (X: 1990 to 2250, Y: 90 to 720)
-        roomG.fillStyle(0x1e293b, 1);
-        roomG.fillRoundedRect(1990, 90, 260, 630, 10);
-        roomG.lineStyle(4, 0x64748b, 1);
-        roomG.strokeRoundedRect(1990, 90, 260, 630, 10);
-        roomG.lineBetween(2120, 90, 2120, 520);
-        roomG.lineBetween(1990, 520, 2250, 520);
-        roomG.fillStyle(0xd97706, 1);
-        roomG.fillRoundedRect(2110, 280, 8, 140, 3);
-        roomG.fillRoundedRect(2122, 280, 8, 140, 3);
-        roomG.fillRoundedRect(2070, 540, 100, 8, 3);
-        // Interactive Glowing Smart Touchscreen
-        roomG.fillStyle(0x0284c7, 0.95);
-        roomG.fillRoundedRect(2020, 230, 65, 105, 6);
-        roomG.fillStyle(0x38bdf8, 1);
-        roomG.fillRect(2028, 244, 49, 5);
-        roomG.fillStyle(0xffffff, 0.9);
-        roomG.fillCircle(2052, 275, 11);
-        roomG.fillRect(2028, 300, 49, 20);
-        roomG.lineStyle(2, 0x00e5ff, 1);
-        roomG.strokeRoundedRect(2020, 230, 65, 105, 6);
+        // Warm LED Under-Cabinet Ambient Light Wash on Subway Tile Backsplash
+        roomG.fillStyle(0xfef08a, 0.22);
+        roomG.fillRect(2280, 275, 1500, 14);
+        roomG.fillStyle(0xf59e0b, 0.10);
+        roomG.fillRect(2280, 289, 1500, 28);
 
-        // Modern Kitchen Upper Wall Cabinets (X: 2290 to 3780, Y: 70 to 280)
-        roomG.fillStyle(0x0f172a, 1);
-        roomG.fillRoundedRect(2290, 70, 1490, 210, 10);
-        roomG.lineStyle(3, 0x334155, 1);
-        roomG.strokeRoundedRect(2290, 70, 1490, 210, 10);
-        for (let x = 2290; x < 3760; x += 186) {
-            roomG.lineStyle(2, 0x1e293b, 1);
-            roomG.lineBetween(x, 70, x, 280);
+        // =========================================================================
+        // 1. CHEF'S FLOATING SOLID OAK SPICE & HERB SHELVES WITH BRASS UTENSIL RAILS
+        // =========================================================================
+        // Left Spice Shelf (X: 2330 to 2760, Y: 360)
+        const leftShX = 2330;
+        roomG.fillStyle(0x000000, 0.25);
+        roomG.fillRect(leftShX + 4, 372, 430, 8);
+        roomG.fillStyle(0x78350f, 1); // Solid oak shelf
+        roomG.fillRoundedRect(leftShX, 360, 430, 14, 3);
+        roomG.fillStyle(0xd97706, 1); // Brass edge trim
+        roomG.fillRect(leftShX, 372, 430, 2);
+        // Brass Wall Brackets
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRect(leftShX + 40, 374, 10, 22);
+        roomG.fillRect(leftShX + 380, 374, 10, 22);
+
+        // Left Shelf Items: Spice Jars & Potted Basil
+        const spiceColors = [0xd97706, 0xb91c1c, 0x15803d, 0x78350f, 0xca8a04];
+        spiceColors.forEach((sc, i) => {
+            const jx = leftShX + 25 + i * 36;
+            // Glass Jar
+            roomG.fillStyle(0xf8fafc, 0.9);
+            roomG.fillRoundedRect(jx, 325, 24, 35, 3);
+            roomG.fillStyle(sc, 0.85); // Spice powder fill
+            roomG.fillRect(jx + 2, 335, 20, 23);
+            roomG.fillStyle(0xd97706, 1); // Brass screw lid
+            roomG.fillRect(jx + 2, 321, 20, 5);
+        });
+        // Glass Olive Oil Cruet with Golden Liquid
+        roomG.fillStyle(0xfde047, 0.75);
+        roomG.fillRoundedRect(leftShX + 225, 310, 26, 50, 4);
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRect(leftShX + 233, 298, 10, 12);
+        // Potted Kitchen Herbs (Basil & Rosemary)
+        roomG.fillStyle(0xb45309, 1); // Terracotta pot
+        roomG.fillRoundedRect(leftShX + 310, 325, 38, 35, 3);
+        roomG.fillStyle(0x15803d, 1); // Herb leaves
+        roomG.fillCircle(leftShX + 325, 312, 14);
+        roomG.fillCircle(leftShX + 338, 316, 12);
+        roomG.fillStyle(0x22c55e, 0.9);
+        roomG.fillCircle(leftShX + 330, 305, 10);
+
+        // Brass Hanging Utensil Rail beneath Left Shelf
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRect(leftShX + 20, 395, 390, 4);
+        // Hanging Utensils: Ladle, Whisk, Slotted Turner, Copper Measuring Cup
+        const utensils = [
+            { x: leftShX + 60, type: 'ladle' },
+            { x: leftShX + 130, type: 'whisk' },
+            { x: leftShX + 200, type: 'turner' },
+            { x: leftShX + 270, type: 'cup' }
+        ];
+        utensils.forEach(u => {
             roomG.fillStyle(0xd97706, 1);
-            roomG.fillRoundedRect(x + 168, 230, 7, 34, 3);
+            roomG.fillRect(u.x + 3, 388, 3, 8); // S-hook
+            if (u.type === 'ladle') {
+                roomG.fillRect(u.x + 4, 396, 2, 42);
+                roomG.fillCircle(u.x + 5, 442, 9);
+            } else if (u.type === 'whisk') {
+                roomG.fillRect(u.x + 4, 396, 2, 28);
+                roomG.lineStyle(1.5, 0xd97706, 1);
+                roomG.strokeEllipse(u.x + 5, 436, 7, 14);
+            } else if (u.type === 'turner') {
+                roomG.fillRect(u.x + 4, 396, 2, 34);
+                roomG.fillRoundedRect(u.x - 2, 430, 14, 20, 2);
+            } else {
+                roomG.fillStyle(0xb45309, 1);
+                roomG.fillRect(u.x + 4, 396, 2, 24);
+                roomG.fillCircle(u.x + 5, 430, 11);
+            }
+        });
+
+        // Right Spice Shelf (X: 3360 to 3760, Y: 360)
+        const rightShX = 3360;
+        roomG.fillStyle(0x000000, 0.25);
+        roomG.fillRect(rightShX + 4, 372, 400, 8);
+        roomG.fillStyle(0x78350f, 1);
+        roomG.fillRoundedRect(rightShX, 360, 400, 14, 3);
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRect(rightShX, 372, 400, 2);
+        // Ceramic Coffee Cannister & Tea Tins
+        roomG.fillStyle(0x1e293b, 1);
+        roomG.fillRoundedRect(rightShX + 30, 305, 42, 55, 4);
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRect(rightShX + 35, 298, 32, 8);
+        roomG.fillStyle(0x065f46, 1);
+        roomG.fillRoundedRect(rightShX + 90, 315, 38, 45, 4);
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillRect(rightShX + 94, 309, 30, 7);
+        // Salt & Pepper Wooden Grinders
+        roomG.fillStyle(0x3b1807, 1);
+        roomG.fillRoundedRect(rightShX + 160, 300, 22, 60, 4);
+        roomG.fillStyle(0xf8fafc, 1);
+        roomG.fillRoundedRect(rightShX + 195, 300, 22, 60, 4);
+        roomG.fillStyle(0xd97706, 1);
+        roomG.fillCircle(rightShX + 171, 296, 6);
+        roomG.fillCircle(rightShX + 206, 296, 6);
+
+        // =========================================================================
+        // 2. FULL-HEIGHT SMART REFRIGERATOR ALCOVE (X: 1980 to 2260, Y: 70 to 720)
+        // =========================================================================
+        const frX = 1980;
+        const frY = 70;
+        const frW = 280;
+        const frH = 650;
+
+        // Refrigerator Alcove Drop Shadow & Floor Contact Shadow
+        roomG.fillStyle(0x000000, 0.45);
+        roomG.fillRoundedRect(frX - 6, frY - 4, frW + 12, frH + 8, 12);
+        roomG.fillStyle(0x000000, 0.5);
+        roomG.fillEllipse(frX + frW / 2, frY + frH + 4, frW + 30, 24);
+
+        // =========================================================================
+        // 3. ARCHITECTURAL MODERN UPPER WALL CABINETS (X: 2280 to 3780, Y: 60 to 275)
+        // =========================================================================
+        const cabX = 2280;
+        const cabY = 60;
+        const cabW = 1500;
+        const cabH = 215;
+
+        // Outer Cabinet Casing (Deep Midnight Navy with Gold Reveal Inlay)
+        roomG.fillStyle(0x0a1020, 1);
+        roomG.fillRoundedRect(cabX, cabY, cabW, cabH, 8);
+        roomG.lineStyle(3, 0x1e293b, 1);
+        roomG.strokeRoundedRect(cabX, cabY, cabW, cabH, 8);
+        roomG.lineStyle(1.5, 0xd97706, 0.9); // Gold reveal inlay
+        roomG.strokeRoundedRect(cabX + 3, cabY + 3, cabW - 6, cabH - 6, 6);
+
+        // Individual Cabinet Door Modules (Left & Right Wings with Center Extraction Unit)
+        // Module Left: 3 Doors (X: 2285 to 2900)
+        const leftDoorW = 198;
+        for (let i = 0; i < 3; i++) {
+            const dx = cabX + 8 + i * (leftDoorW + 6);
+            roomG.fillStyle(0x0f172a, 1);
+            roomG.fillRoundedRect(dx, cabY + 8, leftDoorW, cabH - 16, 4);
+            roomG.lineStyle(1.5, 0x1e293b, 1);
+            roomG.strokeRoundedRect(dx, cabY + 8, leftDoorW, cabH - 16, 4);
+            // Shaker Bevel Inset
+            roomG.fillStyle(0x152238, 0.85);
+            roomG.fillRoundedRect(dx + 12, cabY + 18, leftDoorW - 24, cabH - 36, 3);
+            // Brushed Brass Vertical Handle
+            roomG.fillStyle(0xd97706, 1);
+            roomG.fillRoundedRect(dx + leftDoorW - 16, cabY + cabH - 65, 6, 36, 2);
+            roomG.fillStyle(0xfde68a, 0.9);
+            roomG.fillRect(dx + leftDoorW - 15, cabY + cabH - 63, 2, 32);
         }
 
+        // Module Right: 3 Doors (Fluted Glass Display in Center, X: 3220 to 3770)
+        const rightDoorW = 176;
+        for (let i = 0; i < 3; i++) {
+            const dx = cabX + 935 + i * (rightDoorW + 6);
+            roomG.fillStyle(0x0f172a, 1);
+            roomG.fillRoundedRect(dx, cabY + 8, rightDoorW, cabH - 16, 4);
+            roomG.lineStyle(1.5, 0x1e293b, 1);
+            roomG.strokeRoundedRect(dx, cabY + 8, rightDoorW, cabH - 16, 4);
 
-        // Stainless Steel Range Hood (X: 2950 to 3170, Y: 140 to 280)
+            if (i === 1) {
+                // Fluted Glass Display Cabinet with Backlit Crystal Stemware
+                roomG.fillStyle(0x020617, 1);
+                roomG.fillRoundedRect(dx + 10, cabY + 16, rightDoorW - 20, cabH - 32, 4);
+                roomG.fillStyle(0xfde68a, 0.22); // Warm interior LED backlight
+                roomG.fillRect(dx + 12, cabY + 18, rightDoorW - 24, cabH - 36);
+                // Wine Glass & Decanter Silhouettes
+                roomG.lineStyle(1.5, 0xf8fafc, 0.7);
+                for (let gx = dx + 28; gx < dx + rightDoorW - 20; gx += 32) {
+                    roomG.strokeCircle(gx, cabY + 65, 10);
+                    roomG.lineBetween(gx, cabY + 75, gx, cabY + 110);
+                    roomG.lineBetween(gx - 8, cabY + 110, gx + 8, cabY + 110);
+                }
+            } else {
+                roomG.fillStyle(0x152238, 0.85);
+                roomG.fillRoundedRect(dx + 12, cabY + 18, rightDoorW - 24, cabH - 36, 3);
+            }
+            // Brushed Brass Handle
+            roomG.fillStyle(0xd97706, 1);
+            roomG.fillRoundedRect(dx + 12, cabY + cabH - 65, 6, 36, 2);
+            roomG.fillStyle(0xfde68a, 0.9);
+            roomG.fillRect(dx + 13, cabY + cabH - 63, 2, 32);
+        }
+
+        // =========================================================================
+        // 4. COMMERCIAL-GRADE STAINLESS STEEL & SMOKED GLASS RANGE HOOD (X: 2905 to 3205)
+        // =========================================================================
+        const rhX = 2905;
+        const rhW = 300;
+
+        // Stainless Chimney Flue Column
         roomG.fillStyle(0x334155, 1);
+        roomG.fillRect(rhX + 75, cabY - 10, 150, 140);
+        roomG.lineStyle(2, 0x64748b, 1);
+        roomG.strokeRect(rhX + 75, cabY - 10, 150, 140);
+        roomG.fillStyle(0x475569, 1);
+        roomG.fillRect(rhX + 85, cabY - 10, 20, 140); // Highlight gradient stripe
+
+        // Angled Smoked Glass & Steel Extraction Canopy
+        roomG.fillStyle(0x1e293b, 1);
         roomG.beginPath();
-        roomG.moveTo(3020, 140);
-        roomG.lineTo(3100, 140);
-        roomG.lineTo(3170, 280);
-        roomG.lineTo(2950, 280);
+        roomG.moveTo(rhX + 50, 190);
+        roomG.lineTo(rhX + rhW - 50, 190);
+        roomG.lineTo(rhX + rhW, 268);
+        roomG.lineTo(rhX, 268);
         roomG.closePath();
         roomG.fillPath();
-        roomG.fillStyle(0x00e5ff, 0.8);
-        roomG.fillCircle(3060, 270, 5);
+        roomG.lineStyle(3, 0x64748b, 1);
+        roomG.strokePath();
+
+        // High-Tech Capacitive Touch Control Panel on Hood Bevel
+        roomG.fillStyle(0x020617, 1);
+        roomG.fillRoundedRect(rhX + 60, 240, rhW - 120, 22, 4);
+        roomG.lineStyle(1, 0x00e5ff, 0.8);
+        roomG.strokeRoundedRect(rhX + 60, 240, rhW - 120, 22, 4);
+        // Illuminated Buttons: Power (Green), Fan Speeds 1-2-3-Boost (Cyan), Spotlights (Amber)
+        roomG.fillStyle(0x10b981, 1);
+        roomG.fillCircle(rhX + 80, 251, 3.5); // Power
+        for (let sp = 0; sp < 4; sp++) {
+            roomG.fillStyle(sp < 2 ? 0x00e5ff : 0x334155, 1);
+            roomG.fillRect(rhX + 105 + sp * 18, 248, 12, 6);
+        }
+        roomG.fillStyle(0xfde047, 1);
+        roomG.fillCircle(rhX + rhW - 80, 251, 3.5); // Light On
+
+        // Downward Dual LED Cooktop Spotlights
+        roomG.fillStyle(0xfef08a, 0.85);
+        roomG.fillCircle(rhX + 45, 266, 6);
+        roomG.fillCircle(rhX + rhW - 45, 266, 6);
+        // Spotlight Light Cones
+        roomG.fillStyle(0xfef08a, 0.08);
+        roomG.beginPath();
+        roomG.moveTo(rhX + 35, 268);
+        roomG.lineTo(rhX + 55, 268);
+        roomG.lineTo(rhX + 100, 674);
+        roomG.lineTo(rhX - 10, 674);
+        roomG.closePath();
+        roomG.fillPath();
+        roomG.beginPath();
+        roomG.moveTo(rhX + rhW - 55, 268);
+        roomG.lineTo(rhX + rhW - 35, 268);
+        roomG.lineTo(rhX + rhW + 10, 674);
+        roomG.lineTo(rhX + rhW - 100, 674);
+        roomG.closePath();
+        roomG.fillPath();
 
         // Floor 2: Charcoal Slate Stone Tiles (1920 to 3840)
         roomG.fillStyle(0x1e293b, 1);
@@ -595,10 +873,39 @@ export class WorldParallaxView {
         // =========================================================================
         // ROOM 3: LUXURY LIVING & HOME THEATER (X: 3840 to 5760)
         // =========================================================================
+        // Wall Left of Window (X: 3840 to 4900):
         roomG.fillStyle(0x042f2e, 1); // Deep royal emerald
-        roomG.fillRect(roomW * 2, 0, roomW, 720);
+        roomG.fillRect(3840, 0, 4900 - 3840, 720);
         roomG.fillStyle(0x064e3b, 0.8);
-        roomG.fillRect(roomW * 2, 0, roomW, 380);
+        roomG.fillRect(3840, 0, 4900 - 3840, 380);
+
+        // Wall Right of Window (X: 5550 to 5760):
+        roomG.fillStyle(0x042f2e, 1);
+        roomG.fillRect(5550, 0, 5760 - 5550, 720);
+        roomG.fillStyle(0x064e3b, 0.8);
+        roomG.fillRect(5550, 0, 5760 - 5550, 380);
+
+        // Wall Top of Window (X: 4900 to 5550, Y: 0 to 110):
+        roomG.fillStyle(0x042f2e, 1);
+        roomG.fillRect(4900, 0, 650, 110);
+        roomG.fillStyle(0x064e3b, 0.8);
+        roomG.fillRect(4900, 0, 650, 110);
+
+        // Wall Bottom of Window (X: 4900 to 5550, Y: 540 to 720):
+        roomG.fillStyle(0x042f2e, 1);
+        roomG.fillRect(4900, 540, 650, 180);
+
+        // Window Glass Subtle Atmospheric Sheen (Transparent - reveals Far Layer)
+        roomG.fillStyle(0x38bdf8, 0.06);
+        roomG.fillRect(4900, 110, 650, 430);
+        roomG.fillStyle(0xffffff, 0.05);
+        roomG.beginPath();
+        roomG.moveTo(4980, 110);
+        roomG.lineTo(5140, 110);
+        roomG.lineTo(5020, 540);
+        roomG.lineTo(4860, 540);
+        roomG.closePath();
+        roomG.fillPath();
 
         // Acoustic Dark Walnut Slat Media Wall behind TV (X: 3950 to 4750)
         roomG.fillStyle(0x021f1d, 1);
@@ -607,8 +914,6 @@ export class WorldParallaxView {
             roomG.fillStyle(0x451a03, 1);
             roomG.fillRoundedRect(x, 50, 12, 670, 3);
         }
-
-
 
         // Large Panoramic Garden Window Frame & Drapes (X: 4900 to 5550, Y: 110 to 540)
         roomG.lineStyle(8, 0xffffff, 0.95);
@@ -626,8 +931,6 @@ export class WorldParallaxView {
         roomG.fillRect(4850, 80, 750, 16);
         roomG.fillCircle(4850, 88, 12);
         roomG.fillCircle(5600, 88, 12);
-
-
 
         // Floor 3: Dark Walnut Hardwood Planks (3840 to 5760)
         roomG.fillStyle(0x3b1807, 1);
@@ -656,10 +959,35 @@ export class WorldParallaxView {
         // =========================================================================
         // ROOM 4: JAPANDI PATIO SUNROOM LOUNGE (X: 5760 to 7680)
         // =========================================================================
+        // Wall Left of French Doors (X: 5760 to 5880):
         roomG.fillStyle(0x431407, 1); // Warm terracotta wall
-        roomG.fillRect(roomW * 3, 0, roomW, 720);
+        roomG.fillRect(5760, 0, 5880 - 5760, 720);
         roomG.fillStyle(0x7c2d12, 0.7);
-        roomG.fillRect(roomW * 3, 0, roomW, 380);
+        roomG.fillRect(5760, 0, 5880 - 5760, 380);
+
+        // Wall Right of French Doors (X: 7050 to 7680):
+        roomG.fillStyle(0x431407, 1);
+        roomG.fillRect(7050, 0, 7680 - 7050, 720);
+        roomG.fillStyle(0x7c2d12, 0.7);
+        roomG.fillRect(7050, 0, 7680 - 7050, 380);
+
+        // Wall Top of French Doors (X: 5880 to 7050, Y: 0 to 80):
+        roomG.fillStyle(0x431407, 1);
+        roomG.fillRect(5880, 0, 1170, 80);
+        roomG.fillStyle(0x7c2d12, 0.7);
+        roomG.fillRect(5880, 0, 1170, 80);
+
+        // Translucent French Doors Glass Sheen (reveals Far Layer Sunset Terrace):
+        roomG.fillStyle(0xfde68a, 0.06);
+        roomG.fillRect(5880, 80, 1170, 640);
+        roomG.fillStyle(0xffffff, 0.04);
+        roomG.beginPath();
+        roomG.moveTo(6000, 80);
+        roomG.lineTo(6250, 80);
+        roomG.lineTo(6050, 720);
+        roomG.lineTo(5800, 720);
+        roomG.closePath();
+        roomG.fillPath();
 
         // Floor-to-Ceiling Panoramic Patio French Doors Grid (X: 5880 to 7050, Y: 80 to 720)
         roomG.lineStyle(6, 0x1e293b, 1);
@@ -733,38 +1061,123 @@ export class WorldParallaxView {
         furnG.fillStyle(0xef4444, 1);
         furnG.fillRoundedRect(1105, 642, 45, 18, 3);
 
-        // --- ROOM 2: Chef's Quartz Kitchen Island Counter (X: 2320 to 3760) ---
+        // --- ROOM 2: Chef's Gourmet Quartz Island Counter & Smart Appliances (X: 2300 to 3780) ---
         furnG.fillStyle(0x000000, 0.45);
-        furnG.fillRect(2320, 770, 1440, 22);
+        furnG.fillRect(2300, 770, 1480, 22);
+
+        // Lower Cabinet Base (Midnight Navy with Shaker Panels & Brass Inlays)
         furnG.fillStyle(0x0f172a, 1);
-        furnG.fillRect(2320, 704, 1440, 76);
-        for (let kx = 2320; kx < 3700; kx += 180) {
+        furnG.fillRect(2310, 704, 1460, 76);
+        for (let kx = 2310; kx < 3750; kx += 182) {
             furnG.lineStyle(2, 0x1e293b, 1);
-            furnG.strokeRect(kx, 704, 180, 76);
+            furnG.strokeRect(kx, 704, 182, 76);
             furnG.fillStyle(0xd97706, 1);
-            furnG.fillRoundedRect(kx + 75, 714, 35, 7, 2);
+            furnG.fillRoundedRect(kx + 75, 714, 35, 6, 2);
         }
-        // Solid Quartz Island Countertop Slab
-        furnG.fillStyle(0xe2e8f0, 1);
-        furnG.fillRoundedRect(2300, 678, 1480, 28, 8);
-        furnG.lineStyle(2, 0x94a3b8, 1);
-        furnG.strokeRoundedRect(2300, 678, 1480, 28, 8);
-        // Integrated Induction Cooktop (X: 2950 to 3170)
+
+        // Built-in Smart Convection Oven & Warming Drawer (X: 2950 to 3170, Y: 704 to 776)
         furnG.fillStyle(0x020617, 1);
-        furnG.fillRoundedRect(2950, 674, 220, 8, 2);
-        furnG.lineStyle(2, 0x00e5ff, 0.8);
-        furnG.strokeCircle(3005, 678, 14);
-        furnG.strokeCircle(3115, 678, 14);
-        // Brass Gooseneck Faucet & Sink (X: 2680)
-        furnG.fillStyle(0x334155, 1);
-        furnG.fillRect(2630, 674, 110, 6);
+        furnG.fillRoundedRect(2950, 704, 220, 76, 4);
+        furnG.lineStyle(2, 0x334155, 1);
+        furnG.strokeRoundedRect(2950, 704, 220, 76, 4);
+        // Oven Window with Golden Internal Glow
+        furnG.fillStyle(0xf59e0b, 0.25);
+        furnG.fillRoundedRect(2970, 722, 180, 48, 4);
+        furnG.fillStyle(0x000000, 0.6);
+        furnG.fillRect(2980, 730, 160, 32);
+        // Digital Oven Status Display: 375°F PREHEAT
+        furnG.fillStyle(0x38bdf8, 1);
+        furnG.fillRect(2970, 710, 48, 5);
+        furnG.fillStyle(0x10b981, 1);
+        furnG.fillCircle(3150, 712, 3); // Preheated Ready LED
+        furnG.fillStyle(0xd97706, 1);
+        furnG.fillRoundedRect(2990, 718, 140, 4, 2); // Brass handle
+
+        // Built-in Under-Counter Wine Cellar Cooler (X: 2320 to 2480, Y: 704 to 776)
+        furnG.fillStyle(0x020617, 1);
+        furnG.fillRoundedRect(2320, 704, 160, 76, 4);
+        furnG.lineStyle(2, 0x38bdf8, 0.7);
+        furnG.strokeRoundedRect(2320, 704, 160, 76, 4);
+        // Cool Blue LED Interior Lighting & Beechwood Racks
+        furnG.fillStyle(0x0284c7, 0.2);
+        furnG.fillRect(2326, 710, 148, 64);
+        for (let wy = 720; wy < 770; wy += 14) {
+            furnG.fillStyle(0x78350f, 1);
+            furnG.fillRect(2330, wy, 140, 4);
+            // Wine bottle necks
+            furnG.fillStyle(0x065f46, 0.9);
+            furnG.fillCircle(2345, wy - 2, 4);
+            furnG.fillCircle(2375, wy - 2, 4);
+            furnG.fillCircle(2405, wy - 2, 4);
+            furnG.fillCircle(2435, wy - 2, 4);
+        }
+
+        // Solid Calacatta Gold Quartz Waterfall Island Slab (X: 2290 to 3780, Y: 676 to 704)
+        furnG.fillStyle(0xf8fafc, 1);
+        furnG.fillRoundedRect(2290, 676, 1490, 28, 8);
+        furnG.lineStyle(2, 0xcfd8dc, 1);
+        furnG.strokeRoundedRect(2290, 676, 1490, 28, 8);
+        // Subtle Gold & Slate Marble Veining
+        furnG.lineStyle(1.5, 0xd97706, 0.35);
+        furnG.beginPath();
+        furnG.moveTo(2380, 678);
+        furnG.lineTo(2460, 700);
+        furnG.lineTo(2520, 692);
+        furnG.strokePath();
+        furnG.beginPath();
+        furnG.moveTo(3300, 680);
+        furnG.lineTo(3390, 702);
+        furnG.lineTo(3450, 695);
+        furnG.strokePath();
+
+        // High-Tech Induction Cooktop (X: 2940 to 3180, Y: 672 to 684)
+        furnG.fillStyle(0x020617, 1);
+        furnG.fillRoundedRect(2940, 672, 240, 12, 3);
+        furnG.lineStyle(1.5, 0x334155, 1);
+        furnG.strokeRoundedRect(2940, 672, 240, 12, 3);
+        // Active Induction Burner Rings with Glowing Red/Amber Elements
+        furnG.lineStyle(2, 0xef4444, 0.9); // Active Front Burner
+        furnG.strokeCircle(2985, 678, 14);
+        furnG.fillStyle(0xef4444, 0.4);
+        furnG.fillCircle(2985, 678, 10);
+        furnG.lineStyle(2, 0xf59e0b, 0.85); // Simmer Back Burner
+        furnG.strokeCircle(3055, 678, 12);
+        furnG.lineStyle(1.5, 0x00e5ff, 0.7); // Standby Burners
+        furnG.strokeCircle(3125, 678, 14);
+        // Touch Heat Slider UI on Cooktop
+        furnG.fillStyle(0x00e5ff, 1);
+        furnG.fillRect(3015, 676, 25, 3);
+
+        // Undermount Granite Composite Sink & Spring Gooseneck Brass Faucet (X: 2630 to 2750)
+        furnG.fillStyle(0x1e293b, 1);
+        furnG.fillRoundedRect(2630, 672, 120, 10, 2);
+        furnG.fillStyle(0x38bdf8, 0.5); // Water basin sheen
+        furnG.fillRect(2640, 674, 100, 6);
+        // Brass Spring Gooseneck Faucet with Pull-Down Sprayer
         furnG.lineStyle(4, 0xd97706, 1);
         furnG.beginPath();
-        furnG.moveTo(2685, 674);
-        furnG.lineTo(2685, 610);
-        furnG.lineTo(2660, 610);
-        furnG.lineTo(2660, 628);
+        furnG.moveTo(2690, 672);
+        furnG.lineTo(2690, 600);
+        furnG.lineTo(2662, 600);
+        furnG.lineTo(2662, 624);
         furnG.strokePath();
+        furnG.fillStyle(0xfde68a, 1); // Sprayer Head
+        furnG.fillRoundedRect(2658, 624, 8, 12, 2);
+        furnG.fillStyle(0x00e5ff, 1); // LED Water Temp Indicator
+        furnG.fillCircle(2690, 635, 3);
+
+        // Smart Robot Vacuum Wall Charging Base Station at Refrigerator Base (X: 2040, Y: 710)
+        furnG.fillStyle(0x000000, 0.35);
+        furnG.fillEllipse(2040, 755, 70, 18);
+        furnG.fillStyle(0x0f172a, 1);
+        furnG.fillRoundedRect(2015, 700, 60, 44, 6);
+        furnG.lineStyle(2, 0x00e676, 1);
+        furnG.strokeRoundedRect(2015, 700, 60, 44, 6);
+        furnG.fillStyle(0x00e676, 1);
+        furnG.fillCircle(2045, 712, 4); // Glowing Green Status LED
+        furnG.fillStyle(0xd97706, 1); // Charging Contact Pins
+        furnG.fillRect(2028, 734, 8, 4);
+        furnG.fillRect(2052, 734, 8, 4);
 
 
 
@@ -794,6 +1207,18 @@ export class WorldParallaxView {
         furnG.fillStyle(0x00e5ff, 1);
         furnG.fillCircle(4380, 668, 3);
 
+        // Designer Walnut & Brass End Table beside Sofa for Lamp (X: 5480, Y: 675)
+        furnG.fillStyle(0x000000, 0.35);
+        furnG.fillEllipse(5480, 765, 110, 20);
+        furnG.fillStyle(0x240e04, 1);
+        furnG.fillRoundedRect(5420, 675, 120, 18, 6);
+        furnG.lineStyle(2, 0xd97706, 1);
+        furnG.strokeRoundedRect(5420, 675, 120, 18, 6);
+        furnG.fillStyle(0xd97706, 1);
+        furnG.fillRect(5440, 693, 8, 70);
+        furnG.fillRect(5512, 693, 8, 70);
+        furnG.fillRect(5436, 755, 88, 8);
+
 
 
         // --- ROOM 4: Sunroom Breakfast Bar & Planters (X: 5760 to 7680) ---
@@ -815,16 +1240,6 @@ export class WorldParallaxView {
             furnG.lineBetween(bx + 18, 739, bx + 26, 820);
             furnG.lineBetween(bx - 22, 780, bx + 22, 780);
         });
-
-        // Smart Robot Vacuum Wall Charging Base Station (X: 6050, Y: 710)
-        furnG.fillStyle(0x000000, 0.35);
-        furnG.fillEllipse(6060, 755, 70, 18);
-        furnG.fillStyle(0x0f172a, 1);
-        furnG.fillRoundedRect(6035, 700, 60, 44, 6);
-        furnG.lineStyle(2, 0x00e676, 1);
-        furnG.strokeRoundedRect(6035, 700, 60, 44, 6);
-        furnG.fillStyle(0x00e676, 1);
-        furnG.fillCircle(6065, 712, 4);
 
         // Large Potted Indoor Urban Plants (X: 5850, 7350)
         [5850, 7350].forEach((px, i) => {
@@ -848,6 +1263,16 @@ export class WorldParallaxView {
         });
 
         this.midLayerCont.add(furnG);
+
+        // Room 2 Kitchen Smart Refrigerator (AI Generated Cartoonish Asset)
+        const fridgeKey = this.scene.textures.exists('prop_fridge')
+            ? 'prop_fridge'
+            : (this.scene.textures.exists('obj_smart_fridge') ? 'obj_smart_fridge' : null);
+        if (fridgeKey) {
+            const fridge = this.scene.add.image(2120, 395, fridgeKey);
+            fridge.setDisplaySize(340, 650);
+            this.midLayerCont.add(fridge);
+        }
 
         // Living Room Designer Velvet Sofa in Mid Layer
         if (this.scene.textures.exists('prop_sofa')) {
@@ -2330,64 +2755,468 @@ export class WorldParallaxView {
 
     // --- ZONE 3: NEIGHBORHOOD STREET ---
     private buildStreetEnvironment() {
-        const ww = this.worldWidth;
-        const sh = this.screenHeight;
+        const ww = this.worldWidth; // 7680px (4 Sectors * 1920px)
+        const sh = this.screenHeight; // 1080px
 
-        // Sky gradient
-        const bgG = this.scene.add.graphics();
-        bgG.fillStyle(0x0c4a6e, 1);
-        bgG.fillRect(0, 0, ww, sh);
-        bgG.fillStyle(0x0369a1, 0.7);
-        bgG.fillRect(0, 0, ww, 400);
-        this.farLayerCont.add(bgG);
+        // =========================================================================
+        // 1. FAR LAYER (0.35x Parallax): Twilight Sky, Skyscraper Skyline, Stars & Moon
+        // =========================================================================
+        const farG = this.scene.add.graphics();
 
-        // Distant City Skyline (Parallax backdrop)
+        // Atmospheric Twilight / Sunset Sky Gradient (Deep Indigo to Warm Sunset Glow)
+        farG.fillStyle(0x0a0f29, 1);
+        farG.fillRect(0, 0, ww, sh);
+        farG.fillStyle(0x1e1b4b, 0.85);
+        farG.fillRect(0, 150, ww, 300);
+        farG.fillStyle(0x4c1d95, 0.55);
+        farG.fillRect(0, 320, ww, 220);
+        farG.fillStyle(0xd97706, 0.25);
+        farG.fillRect(0, 480, ww, 120);
+
+        // Glowing Crescent Moon with Soft Ambient Aura
+        farG.fillStyle(0xfef08a, 0.15);
+        farG.fillCircle(1450, 140, 65);
+        farG.fillStyle(0xfef08a, 0.95);
+        farG.fillCircle(1450, 140, 32);
+        farG.fillStyle(0x0a0f29, 1);
+        farG.fillCircle(1464, 134, 28);
+
+        // Twinkling Star Field
+        farG.fillStyle(0xffffff, 0.9);
+        const starCoordinates = [
+            [220, 90], [540, 140], [880, 70], [1200, 180], [1750, 95],
+            [2150, 110], [2600, 80], [3100, 160], [3580, 90], [4120, 130],
+            [4650, 75], [5180, 150], [5720, 85], [6240, 140], [6780, 95], [7320, 130]
+        ];
+        starCoordinates.forEach(([sx, sy]) => {
+            farG.fillCircle(sx, sy, 2.5);
+            farG.fillStyle(0x38bdf8, 0.4);
+            farG.fillCircle(sx, sy, 5);
+            farG.fillStyle(0xffffff, 0.9);
+        });
+
+        // Distant Illuminated City Skyscraper Skyline Silhouettes (Every 240px across 7680px)
+        const buildingTypes = [
+            { w: 140, h: 360, roof: 'flat' },
+            { w: 180, h: 440, roof: 'spire' },
+            { w: 120, h: 310, roof: 'slant' },
+            { w: 160, h: 480, roof: 'steps' },
+            { w: 200, h: 390, roof: 'flat' },
+            { w: 130, h: 420, roof: 'spire' }
+        ];
+
+        for (let bx = 0, idx = 0; bx < ww; bx += 170, idx++) {
+            const b = buildingTypes[idx % buildingTypes.length];
+            const by = 550 - b.h;
+
+            // Skyscraper Dark Silhouette Body
+            farG.fillStyle(0x0f172a, 0.94);
+            farG.fillRect(bx, by, b.w, b.h);
+
+            // Roof Architecture
+            if (b.roof === 'spire') {
+                farG.fillStyle(0x1e293b, 1);
+                farG.fillTriangle(bx + b.w / 2 - 12, by, bx + b.w / 2 + 12, by, bx + b.w / 2, by - 55);
+                // Red Warning Aviation Beacon Strobe
+                farG.fillStyle(0xef4444, 0.9);
+                farG.fillCircle(bx + b.w / 2, by - 55, 3.5);
+            } else if (b.roof === 'slant') {
+                farG.fillStyle(0x1e293b, 1);
+                farG.fillTriangle(bx, by, bx + b.w, by, bx + b.w, by - 30);
+            } else if (b.roof === 'steps') {
+                farG.fillStyle(0x1e293b, 1);
+                farG.fillRect(bx + 20, by - 25, b.w - 40, 25);
+                farG.fillRect(bx + 40, by - 45, b.w - 80, 20);
+            }
+
+            // Distant Illuminated Window Matrix (Warm Yellow / Cyan Glows)
+            farG.fillStyle(idx % 2 === 0 ? 0xfef08a : 0x38bdf8, 0.65);
+            for (let wx = bx + 16; wx < bx + b.w - 16; wx += 18) {
+                for (let wy = by + 25; wy < 530; wy += 26) {
+                    if ((wx * 7 + wy * 13) % 5 !== 0) { // random lit windows
+                        farG.fillRect(wx, wy, 8, 12);
+                    }
+                }
+            }
+        }
+
+        // Parallax Skyline Tile Overlay (if available in textures)
         if (this.scene.textures.exists('prop_city_skyline')) {
             for (let x = 0; x < ww; x += 512) {
-                const skyTile = this.scene.add.image(x + 256, 360, 'prop_city_skyline').setScale(1.2).setAlpha(0.6);
+                const skyTile = this.scene.add.image(x + 256, 420, 'prop_city_skyline').setScale(1.2).setAlpha(0.45);
                 this.farLayerCont.add(skyTile);
             }
         }
 
-        // Framed Gallery Displays on Street
-        this.createFramedPainting(1800, 240, 250, 155, this.midLayerCont);
-        this.createFramedPainting(4200, 240, 250, 155, this.midLayerCont);
+        this.farLayerCont.add(farG);
 
-        // Neighborhood Stores & Buildings
-        const streetG = this.scene.add.graphics();
-        for (let x = 100; x < ww; x += 750) {
-            // Modern Storefront facade
-            streetG.fillStyle(0x1e293b, 0.95);
-            streetG.fillRoundedRect(x, 320, 620, 410, 16);
-            streetG.lineStyle(4, 0x38bdf8, 0.8);
-            streetG.strokeRoundedRect(x, 320, 620, 410, 16);
+        // =========================================================================
+        // 2. MID LAYER (1.0x Ratio): 4 Distinct 1920px Street Sectors
+        // =========================================================================
+        const midG = this.scene.add.graphics();
 
-            // Store Awning Canopy
-            streetG.fillStyle(0xe11d48, 1);
-            streetG.fillRoundedRect(x + 10, 420, 600, 35, 8);
-            streetG.fillStyle(0xffffff, 0.8);
-            for (let a = x + 30; a < x + 600; a += 80) {
-                streetG.fillRect(a, 420, 40, 35);
+        // -------------------------------------------------------------------------
+        // SECTOR 1: METRO TRANSIT PLAZA & HIGH-TECH CONCOURSE (X: 0 to 1920)
+        // -------------------------------------------------------------------------
+        // Modern Steel & Glass Metro Terminal Facade
+        midG.fillStyle(0x1e293b, 1);
+        midG.fillRect(0, 180, 1920, 560);
+        midG.fillStyle(0x0f172a, 0.95);
+        midG.fillRect(40, 240, 1840, 480);
+
+        // Structural Glass Canopy Arch & Columns
+        midG.lineStyle(6, 0x0284c7, 0.9);
+        for (let colX = 120; colX < 1900; colX += 320) {
+            midG.strokeRect(colX, 260, 260, 440);
+            midG.fillStyle(0x0c4a6e, 0.4);
+            midG.fillRect(colX + 4, 264, 252, 432);
+
+            // Interior Terminal Floor Silhouettes & Concourse Lights
+            midG.fillStyle(0x38bdf8, 0.85);
+            midG.fillRect(colX + 30, 320, 200, 14);
+            midG.fillStyle(0x00e676, 0.7);
+            midG.fillRect(colX + 40, 460, 180, 8); // Digital train timetable screen
+        }
+
+        // Glowing High-Tech Canopy Neon Header: [ 🚆 METRO TECH PLAZA • SMART TRANSIT HUB ]
+        midG.fillStyle(0x0369a1, 1);
+        midG.fillRoundedRect(620, 200, 680, 52, 12);
+        midG.lineStyle(3, 0x00e5ff, 1);
+        midG.strokeRoundedRect(620, 200, 680, 52, 12);
+        midG.fillStyle(0x00e5ff, 0.95);
+        midG.fillRect(660, 218, 600, 16); // Header text glow bar
+
+        // Modern Stainless Steel Bicycle Parking Racks (at X: 1550 - 1750)
+        midG.lineStyle(4, 0x94a3b8, 1);
+        for (let rx = 1560; rx < 1780; rx += 45) {
+            midG.strokeCircle(rx, 690, 22);
+            midG.fillRect(rx - 2, 690, 4, 45);
+        }
+
+        // Architectural Concrete Planters & Lush Manicured Hedges
+        midG.fillStyle(0x475569, 1);
+        midG.fillRoundedRect(220, 680, 240, 55, 8);
+        midG.fillStyle(0x065f46, 1);
+        midG.fillCircle(280, 675, 38);
+        midG.fillCircle(340, 665, 46);
+        midG.fillCircle(400, 675, 38);
+
+        // -------------------------------------------------------------------------
+        // SECTOR 2: CYBER BOULEVARD & AUTONOMOUS DELIVERY LANE (X: 1920 to 3840)
+        // -------------------------------------------------------------------------
+        // Boutique Urban Retail Stores (Coffee Roaster, Bakery, Smart Tech Shop)
+        const stores = [
+            { x: 1980, w: 540, color: 0x312e81, canopy: 0xef4444, name: 'CYBER ROAST CAFE' },
+            { x: 2580, w: 580, color: 0x1e293b, canopy: 0x059669, name: 'URBAN ARTISAN BAKERY' },
+            { x: 3220, w: 560, color: 0x431407, canopy: 0xd97706, name: 'FUTURE GADGETS LAB' }
+        ];
+
+        stores.forEach(st => {
+            // Storefront Facade
+            midG.fillStyle(st.color, 1);
+            midG.fillRoundedRect(st.x, 260, st.w, 475, 14);
+            midG.lineStyle(3.5, 0x94a3b8, 0.8);
+            midG.strokeRoundedRect(st.x, 260, st.w, 475, 14);
+
+            // Store Name Marquee Sign
+            midG.fillStyle(0x0f172a, 1);
+            midG.fillRoundedRect(st.x + 30, 290, st.w - 60, 44, 8);
+            midG.fillStyle(0xfde047, 1);
+            midG.fillRect(st.x + 60, 306, st.w - 120, 12);
+
+            // Striped Parisian Canopy Awning
+            midG.fillStyle(st.canopy, 1);
+            midG.fillRoundedRect(st.x + 15, 360, st.w - 30, 42, 8);
+            midG.fillStyle(0xffffff, 0.9);
+            for (let ax = st.x + 30; ax < st.x + st.w - 30; ax += 50) {
+                midG.fillRect(ax, 360, 25, 42);
+            }
+
+            // Warm Glowing Showcase Display Windows
+            midG.fillStyle(0x090d16, 1);
+            midG.fillRoundedRect(st.x + 35, 430, st.w - 70, 280, 10);
+            midG.lineStyle(2, 0xfde047, 0.6);
+            midG.strokeRoundedRect(st.x + 35, 430, st.w - 70, 280, 10);
+
+            // Interior Warm Ambient Lighting & Display Shelves
+            midG.fillStyle(0xfef08a, 0.25);
+            midG.fillRect(st.x + 45, 440, st.w - 90, 260);
+            midG.fillStyle(0x78350f, 0.9);
+            midG.fillRect(st.x + 55, 540, st.w - 110, 12);
+            midG.fillRect(st.x + 55, 620, st.w - 110, 12);
+        });
+
+        // Sidewalk Bistro Tables & Chairs outside Cafe
+        midG.fillStyle(0x334155, 1);
+        midG.fillRect(2120, 660, 60, 60); // Tabletop
+        midG.fillRect(2145, 680, 10, 50); // Leg
+        midG.fillStyle(0xd97706, 1);
+        midG.fillCircle(2150, 655, 6); // Coffee mug
+
+        // -------------------------------------------------------------------------
+        // SECTOR 3: SMART TRAFFIC INTERSECTION & PEDESTRIAN CROSSING (X: 3840 to 5760)
+        // -------------------------------------------------------------------------
+        // Modern Commercial Glass Corporate Towers
+        midG.fillStyle(0x0f172a, 1);
+        midG.fillRect(3880, 200, 1800, 535);
+
+        for (let bx = 3920; bx < 5640; bx += 420) {
+            midG.fillStyle(0x1e293b, 1);
+            midG.fillRoundedRect(bx, 220, 380, 505, 12);
+            midG.lineStyle(3, 0x38bdf8, 0.7);
+            midG.strokeRoundedRect(bx, 220, 380, 505, 12);
+
+            // Commercial Office Window Grids
+            midG.fillStyle(0x38bdf8, 0.35);
+            for (let wx = bx + 24; wx < bx + 350; wx += 55) {
+                for (let wy = 260; wy < 680; wy += 60) {
+                    midG.fillRect(wx, wy, 42, 44);
+                }
             }
         }
-        this.midLayerCont.add(streetG);
 
-        // Sidewalk Pavement & Road
-        const roadG = this.scene.add.graphics();
-        // Sidewalk curb
-        roadG.fillStyle(0x475569, 1);
-        roadG.fillRect(0, 730, ww, 40);
+        // -------------------------------------------------------------------------
+        // SMART TRAFFIC INTERSECTION GANTRY & CAMERA MAST (X: 4740 to 5250)
+        // Provides physical mounting post & structural support for adaptive_traffic_camera (X: 4850, Y: 385)
+        // -------------------------------------------------------------------------
+        // 1. Sidewalk Foundation Concrete Pedestal & Anchor Bolts
+        midG.fillStyle(0x1e293b, 1);
+        midG.fillRoundedRect(4756, 700, 36, 30, 4);
+        midG.fillStyle(0x64748b, 1);
+        midG.fillRect(4752, 722, 44, 8); // Steel base plate
+        midG.fillStyle(0xf1f5f9, 1);
+        midG.fillCircle(4758, 726, 2.5); // Bolt 1
+        midG.fillCircle(4790, 726, 2.5); // Bolt 2
 
-        // Asphalt Road
-        roadG.fillStyle(0x0f172a, 1);
-        roadG.fillRect(0, 770, ww, sh - 770);
+        // 2. Heavy-Duty Galvanized Steel Vertical Mast Pole (X: 4768, Y: 250 to 720)
+        midG.fillStyle(0x334155, 1);
+        midG.fillRect(4768, 260, 16, 445);
+        midG.fillStyle(0x475569, 1);
+        midG.fillRect(4770, 260, 4, 445); // Metallic specular line
 
-        // White Road Lane Dashes
-        roadG.fillStyle(0xffffff, 0.8);
-        for (let x = 0; x < ww; x += 180) {
-            roadG.fillRoundedRect(x, 880, 100, 16, 6);
+        // 3. Camera Mounting Stanchion Clamp & Articulated Extension Arm
+        midG.fillStyle(0x1e293b, 1);
+        midG.fillRoundedRect(4762, 335, 26, 60, 4);
+        midG.lineStyle(2, 0x64748b, 1);
+        midG.strokeRoundedRect(4762, 335, 26, 60, 4);
+        // Heavy clamping collar bands around vertical pole
+        midG.fillStyle(0x64748b, 1);
+        midG.fillRect(4760, 342, 30, 8);
+        midG.fillRect(4760, 380, 30, 8);
+        midG.fillStyle(0x94a3b8, 1);
+        midG.fillCircle(4765, 346, 2.5);
+        midG.fillCircle(4785, 346, 2.5);
+        midG.fillCircle(4765, 384, 2.5);
+        midG.fillCircle(4785, 384, 2.5);
+
+        // Horizontal articulated mounting bracket connecting mast directly to camera backplate
+        midG.fillStyle(0x334155, 1);
+        midG.fillRect(4784, 348, 56, 14);
+        midG.fillStyle(0x64748b, 1);
+        midG.fillRect(4784, 350, 56, 4); // Specular highlight on bracket
+        // Top vertical support drop bracket from overhead gantry (Y: 290)
+        midG.fillStyle(0x334155, 1);
+        midG.fillRect(4836, 290, 8, 30);
+
+        // 4. Weatherproof AI Edge Compute & Telemetry Controller Box on Pole (X: 4744, Y: 460)
+        midG.fillStyle(0x1e293b, 1);
+        midG.fillRoundedRect(4744, 460, 32, 60, 4);
+        midG.lineStyle(2, 0x475569, 1);
+        midG.strokeRoundedRect(4744, 460, 32, 60, 4);
+        // Louvered heat-sink vents
+        midG.fillStyle(0x0f172a, 1);
+        for (let vy = 470; vy <= 500; vy += 6) {
+            midG.fillRect(4748, vy, 16, 2.5);
         }
-        this.nearLayerCont.add(roadG);
+        // Warning Electrical AI Symbol
+        midG.fillStyle(0xf59e0b, 1);
+        midG.fillTriangle(4764, 472, 4772, 486, 4756, 486);
+        // Flexible black power & data conduit cable connecting controller to camera clamp
+        midG.lineStyle(3, 0x0f172a, 1);
+        midG.beginPath();
+        midG.moveTo(4760, 460);
+        midG.lineTo(4756, 430);
+        midG.lineTo(4766, 395);
+        midG.strokePath();
+
+        // 5. Overhead Cantilever Arm Gantry across Road (X: 4768 to 5220, Y: 260 to 290)
+        midG.fillStyle(0x334155, 1);
+        midG.fillRect(4768, 260, 450, 18); // Main overhead tubular arm
+        midG.fillRect(4768, 290, 450, 12); // Lower reinforcement rail
+        // Diagonal Webbing Truss Struts
+        midG.lineStyle(2, 0x64748b, 0.9);
+        for (let gx = 4780; gx < 5200; gx += 40) {
+            midG.lineBetween(gx, 260, gx + 20, 290);
+            midG.lineBetween(gx + 20, 290, gx + 40, 260);
+        }
+        // Curved gusset corner bracket connecting mast to overhead arm
+        midG.fillStyle(0x475569, 1);
+        midG.fillTriangle(4768, 260, 4768, 320, 4830, 260);
+
+        // 6. Overhead Overhead 3-Aspect Traffic Signals on Gantry (X: 5040)
+        midG.fillStyle(0x0f172a, 1);
+        midG.fillRoundedRect(5040, 295, 34, 90, 6);
+        midG.lineStyle(2, 0x334155, 1);
+        midG.strokeRoundedRect(5040, 295, 34, 90, 6);
+        // Visor Hoods & Signal Lenses (Green illuminated for intersection traffic)
+        midG.fillStyle(0xef4444, 0.35); midG.fillCircle(5057, 312, 10); // Red (Dim)
+        midG.fillStyle(0xf59e0b, 0.35); midG.fillCircle(5057, 340, 10); // Amber (Dim)
+        midG.fillStyle(0x10b981, 1); midG.fillCircle(5057, 368, 10); // Green (Active Glowing)
+        midG.fillStyle(0xa7f3d0, 0.8); midG.fillCircle(5057, 368, 4);
+
+        // 7. Overhead Street Direction Sign on Truss
+        midG.fillStyle(0x047857, 1);
+        midG.fillRoundedRect(4870, 225, 160, 32, 4);
+        midG.lineStyle(1.5, 0xffffff, 0.9);
+        midG.strokeRoundedRect(4870, 225, 160, 32, 4);
+        midG.fillStyle(0xffffff, 1);
+        midG.fillRect(4882, 238, 136, 6); // Street text placeholder
+
+        // Modern Glass Bus Transit Shelter (at X: 5320 - 5640)
+        midG.fillStyle(0x0284c7, 0.4);
+        midG.fillRoundedRect(5340, 480, 280, 245, 10);
+        midG.lineStyle(3.5, 0x0284c7, 1);
+        midG.strokeRoundedRect(5340, 480, 280, 245, 10);
+        // Roof Canopy
+        midG.fillStyle(0x1e293b, 1);
+        midG.fillRoundedRect(5320, 470, 320, 24, 6);
+        // Illuminated Digital Route Map inside Shelter
+        midG.fillStyle(0x0f172a, 1);
+        midG.fillRect(5360, 510, 80, 110);
+        midG.fillStyle(0x00e676, 1);
+        midG.fillRect(5370, 525, 60, 6); // Green bus route
+        midG.fillStyle(0x38bdf8, 1);
+        midG.fillRect(5370, 545, 60, 6); // Blue express line
+        // Passenger Bench
+        midG.fillStyle(0x78350f, 1);
+        midG.fillRoundedRect(5460, 650, 140, 14, 4);
+
+        // -------------------------------------------------------------------------
+        // SECTOR 4: HERITAGE PROMENADE & ARTISAN COURTYARD (X: 5760 to 7680)
+        // -------------------------------------------------------------------------
+        // Historic Victorian Brick & Stonework Facades
+        midG.fillStyle(0x7c2d12, 1); // Rich Terracotta Brick
+        midG.fillRect(5800, 200, 1840, 535);
+
+        // Detailed Brick Texture Lines
+        midG.fillStyle(0x451a03, 0.35);
+        for (let y = 220; y < 730; y += 22) {
+            midG.fillRect(5800, y, 1840, 2);
+        }
+
+        // Arched Heritage Windows with White Stone Lintels
+        for (let hx = 5880; hx < 7580; hx += 380) {
+            // Arched Window Frame
+            midG.fillStyle(0xf1f5f9, 1);
+            midG.fillRoundedRect(hx, 280, 240, 380, 24);
+            midG.fillStyle(0x1e1b4b, 1);
+            midG.fillRoundedRect(hx + 12, 292, 216, 356, 18);
+
+            // Warm Lantern Glow inside Heritage Rooms
+            midG.fillStyle(0xfef08a, 0.4);
+            midG.fillCircle(hx + 120, 380, 50);
+
+            // Window Muntin Grid
+            midG.fillStyle(0xf1f5f9, 1);
+            midG.fillRect(hx + 116, 292, 8, 356);
+            midG.fillRect(hx + 12, 450, 216, 8);
+        }
+
+        // Ornate Wrought-Iron Park Benches on Heritage Walkway
+        midG.fillStyle(0x1e293b, 1);
+        midG.fillRoundedRect(6180, 670, 160, 16, 4);
+        midG.fillRect(6200, 686, 10, 45);
+        midG.fillRect(6310, 686, 10, 45);
+
+        // Decorative Street Trees with Ambient Golden Fairy Light Strings
+        const treeXPositions = [5820, 6720, 7520];
+        treeXPositions.forEach(tx => {
+            // Textured Tree Trunk
+            midG.fillStyle(0x522e17, 1);
+            midG.fillRect(tx - 12, 450, 24, 280);
+
+            // Lush Foliage Canopy
+            midG.fillStyle(0x064e3b, 1);
+            midG.fillCircle(tx, 390, 85);
+            midG.fillCircle(tx - 45, 430, 65);
+            midG.fillCircle(tx + 45, 430, 65);
+
+            // Twinkling Golden Fairy Lights
+            midG.fillStyle(0xfde047, 0.95);
+            const lightOffsets = [[-30, 360], [15, 340], [45, 380], [-40, 420], [0, 410], [35, 440]];
+            lightOffsets.forEach(([lx, ly]) => {
+                midG.fillCircle(tx + lx, ly, 3.5);
+            });
+        });
+
+        // High-Quality Granite Paved Sidewalk Walkway (Y: 720 to 765)
+        midG.fillStyle(0x64748b, 1);
+        midG.fillRect(0, 720, ww, 45);
+        // Granite Sidewalk Paving Paver Stones
+        midG.fillStyle(0x475569, 0.7);
+        for (let px = 0; px < ww; px += 80) {
+            midG.fillRect(px, 720, 2, 45);
+        }
+
+        // Tactile Yellow Guidance Raised Domes Strip (Along robot lane & curb ramps)
+        midG.fillStyle(0xf59e0b, 1);
+        midG.fillRect(0, 755, ww, 10);
+        midG.fillStyle(0xffd600, 1);
+        for (let dx = 8; dx < ww; dx += 16) {
+            midG.fillCircle(dx, 760, 2.5);
+        }
+
+        // Heavy Concrete Sidewalk Curbstone Edge (Y: 765 to 780)
+        midG.fillStyle(0x334155, 1);
+        midG.fillRect(0, 765, ww, 15);
+
+        // High-Traction Asphalt Roadway (Y: 780 to sh: 1080)
+        midG.fillStyle(0x0f172a, 1);
+        midG.fillRect(0, 780, ww, sh - 780);
+
+        // Dedicated Green-Painted Autonomous Delivery & Bicycle Lane (Y: 780 to 830)
+        midG.fillStyle(0x059669, 0.45);
+        midG.fillRect(0, 780, ww, 50);
+        midG.fillStyle(0xffffff, 0.9);
+        // Bicycle & Rover Icon Dashes
+        for (let bx = 120; bx < ww; bx += 480) {
+            midG.fillRect(bx, 802, 40, 6);
+        }
+
+        // White Road Lane Dashes (Y: 900)
+        midG.fillStyle(0xffffff, 0.9);
+        for (let x = 0; x < ww; x += 220) {
+            midG.fillRoundedRect(x, 900, 120, 14, 4);
+        }
+
+        // Cast-Iron Storm Drain Grates & Street Manhole Covers
+        for (let mx = 450; mx < ww; mx += 1400) {
+            // Circular Utility Manhole Cover
+            midG.fillStyle(0x1e293b, 1);
+            midG.fillCircle(mx, 860, 28);
+            midG.lineStyle(2.5, 0x475569, 1);
+            midG.strokeCircle(mx, 860, 28);
+            midG.strokeCircle(mx, 860, 16);
+
+            // Drainage Grate near Curb
+            midG.fillStyle(0x0f172a, 1);
+            midG.fillRect(mx + 600, 782, 60, 26);
+            midG.fillStyle(0x334155, 1);
+            for (let gx = mx + 606; gx < mx + 655; gx += 8) {
+                midG.fillRect(gx, 784, 4, 22);
+            }
+        }
+
+        this.midLayerCont.add(midG);
+
+        // =========================================================================
+        // 3. NEAR LAYER (1.2x Parallax): Top/Bottom Ambient Vignette
+        // =========================================================================
+        const nearG = this.scene.add.graphics();
+        nearG.fillStyle(0x000000, 0.18);
+        nearG.fillRect(0, 0, ww, 35);
+        nearG.fillRect(0, sh - 15, ww, 15);
+        this.nearLayerCont.add(nearG);
     }
 
     private createWorldObjects() {
@@ -2942,7 +3771,7 @@ export class WorldParallaxView {
         });
 
         // Show celebration room clear banner
-        this.showRoomClearBanner(nextRoomIndex + 1);
+        this.showRoomClearBanner();
 
         // Chimpu skates forward towards the next room
         this.chimpuSprite.setFlipX(false);
@@ -2982,33 +3811,19 @@ export class WorldParallaxView {
         });
     }
 
-    private showRoomClearBanner(nextRoomNum: number) {
+    private showRoomClearBanner() {
         const bannerCont = this.scene.add.container(this.screenWidth / 2, this.screenHeight / 2 - 120)
             .setDepth(UILayers.MODAL_PANEL);
 
-        const bg = this.scene.add.graphics();
-        bg.fillStyle(0x0f172a, 0.94);
-        bg.fillRoundedRect(-410, -75, 820, 150, 26);
-        bg.lineStyle(4, 0x10b981, 1);
-        bg.strokeRoundedRect(-410, -75, 820, 150, 26);
-
-        const text1 = this.scene.add.text(0, -26, '🎉 ROOM CLEARED!', {
-            fontSize: '44px',
+        const text1 = this.scene.add.text(0, 0, '🎉🎉🎉', {
+            fontSize: '150px',
             fontFamily: 'Arial Black, Outfit, sans-serif',
-            color: '#10b981',
+            color: '#ffffff',
             stroke: '#000000',
             strokeThickness: 7
         }).setOrigin(0.5);
 
-        const text2 = this.scene.add.text(0, 26, `Rolling into Room ${nextRoomNum} ➡️`, {
-            fontSize: '32px',
-            fontFamily: 'Arial Black, Outfit, sans-serif',
-            color: '#f8fafc',
-            stroke: '#000000',
-            strokeThickness: 5
-        }).setOrigin(0.5);
-
-        bannerCont.add([bg, text1, text2]);
+        bannerCont.add(text1);
         bannerCont.setScale(0.7);
         bannerCont.setAlpha(0);
 
@@ -3035,34 +3850,37 @@ export class WorldParallaxView {
         });
     }
 
-    public playChimpuTrick() {
-        if (this.scene.anims.exists('chimpu_celebrate_cheer')) {
-            this.chimpuSprite.play('chimpu_celebrate_cheer');
-        } else if (this.scene.textures.exists('chimpu_celebrate_4')) {
-            this.chimpuSprite.setTexture('chimpu_celebrate_4');
-        } else {
-            this.chimpuSprite.setTexture('chimpu_skater_trick');
-        }
-        this.scene.tweens.add({
-            targets: this.chimpuContainer,
-            y: this.chimpuBaseY - 60,
-            angle: 360,
-            duration: 600,
-            yoyo: true,
-            ease: 'Back.easeOut',
-            onComplete: () => {
-                this.chimpuContainer.setAngle(0);
-                this.chimpuContainer.setY(this.chimpuBaseY);
-                if (this.chimpuSprite.anims) {
-                    this.chimpuSprite.stop();
-                }
-                const defaultTex = this.scene.textures.exists('chimpu_riding_skateboard')
-                    ? 'chimpu_riding_skateboard'
-                    : (this.scene.textures.exists('chimpu_skater_move') ? 'chimpu_skater_move' : 'chimpu_detective_1');
-                this.chimpuSprite.setTexture(defaultTex);
-            }
-        });
-    }
+    // public playChimpuTrick(onComplete?: () => void) {
+    //     if (this.scene.anims.exists('chimpu_celebrate_cheer')) {
+    //         this.chimpuSprite.play('chimpu_celebrate_cheer');
+    //     } else if (this.scene.textures.exists('chimpu_celebrate_4')) {
+    //         this.chimpuSprite.setTexture('chimpu_celebrate_4');
+    //     } else {
+    //         this.chimpuSprite.setTexture('chimpu_skater_trick');
+    //     }
+    //     this.scene.tweens.add({
+    //         targets: this.chimpuContainer,
+    //         y: this.chimpuBaseY - 60,
+    //         angle: 360,
+    //         duration: 600,
+    //         yoyo: true,
+    //         ease: 'Back.easeOut',
+    //         onComplete: () => {
+    //             if (onComplete) {
+    //                 onComplete();
+    //             }
+    //             this.chimpuContainer.setAngle(0);
+    //             this.chimpuContainer.setY(this.chimpuBaseY);
+    //             if (this.chimpuSprite.anims) {
+    //                 this.chimpuSprite.stop();
+    //             }
+    //             const defaultTex = this.scene.textures.exists('chimpu_riding_skateboard')
+    //                 ? 'chimpu_riding_skateboard'
+    //                 : (this.scene.textures.exists('chimpu_skater_move') ? 'chimpu_skater_move' : 'chimpu_detective_1');
+    //             this.chimpuSprite.setTexture(defaultTex);
+    //         }
+    //     });
+    // }
 
     public setChimpuScanPose(active: boolean) {
         if (active) {

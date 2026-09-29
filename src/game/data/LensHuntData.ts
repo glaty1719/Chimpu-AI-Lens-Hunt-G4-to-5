@@ -81,7 +81,7 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 worldX: 1300,
                 worldY: 610,
                 width: 100,
-                height: 140,
+                height: 206,
                 hintText: 'Look at the smartphone glowing on the foyer console table!'
             },
             {
@@ -95,11 +95,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Listens and Responds',
                 detailedExplanation: 'AI listens to acoustic soundwaves, converts speech into words, and understands user voice commands in real time.',
                 visualDiagramType: 'soundwave_listen',
-                worldX: 3000,
+                worldX: 6800,
                 worldY: 588,
-                width: 140,
-                height: 180,
-                hintText: 'Check the speaker with the glowing LED ring on the kitchen island!'
+                width: 120,
+                height: 220,
+                hintText: 'Check the smart speaker with the glowing LED ring on the sunroom breakfast bar!'
             },
             {
                 id: 'streaming_tv',
@@ -115,7 +115,7 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 worldX: 4380,
                 worldY: 370,
                 width: 250,
-                height: 200,
+                height: 168,
                 hintText: 'Observe the smart entertainment TV unit in the living room!'
             },
             {
@@ -129,11 +129,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Maps the Room & Detects Obstacles',
                 detailedExplanation: 'AI uses optical sensors and laser LIDAR to map the floor plan, detect furniture obstacles, and navigate efficiently.',
                 visualDiagramType: 'map_obstacles',
-                worldX: 6200,
-                worldY: 760,
+                worldX: 2580,
+                worldY: 810,
                 width: 170,
-                height: 120,
-                hintText: 'Look down in the sunroom for the roaming floor vacuum!'
+                height: 114,
+                hintText: 'Look down in the kitchen aisle for the roaming smart robot vacuum!'
             },
             // --- Non-AI Decoys (4) ---
             {
@@ -147,11 +147,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Fixed Heat & Spring',
                 detailedExplanation: 'Heating coils warm bread using a simple bi-metal timer spring. It has no camera, voice sensor, or AI logic.',
                 visualDiagramType: 'gear_spin',
-                worldX: 2520,
+                worldX: 7100,
                 worldY: 608,
                 width: 150,
-                height: 140,
-                hintText: 'A toaster uses electricity and a mechanical spring.'
+                height: 132,
+                hintText: 'Look for the manual toaster on the sunroom patio counter!'
             },
             {
                 id: 'lamp_switch',
@@ -164,11 +164,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Physical Circuit Switch',
                 detailedExplanation: 'Pressing the switch physically closes a wire circuit to illuminate the bulb. No software or AI calculations happen.',
                 visualDiagramType: 'button_arrow',
-                worldX: 3680,
-                worldY: 480,
-                width: 120,
-                height: 180,
-                hintText: 'Lamps turn on and off through direct electrical circuits.'
+                worldX: 5480,
+                worldY: 575,
+                width: 130,
+                height: 161,
+                hintText: 'Observe the reading lamp beside the sofa in the living room!'
             },
             {
                 id: 'analog_clock',
@@ -198,11 +198,11 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 tagline: 'Direct Motor Spin',
                 detailedExplanation: 'A motor turns the blade at whatever speed dial is selected. It does not identify foods or make smart decisions.',
                 visualDiagramType: 'gear_spin',
-                worldX: 6980,
+                worldX: 3450,
                 worldY: 593,
-                width: 130,
-                height: 170,
-                hintText: 'Blenders spin at fixed motor speeds.'
+                width: 115,
+                height: 220,
+                hintText: 'Look for the electric blender on the kitchen quartz countertop!'
             }
         ]
     },
@@ -368,8 +368,8 @@ export const HUNT_ZONES: ZoneConfig[] = [
         themeColor: 0x9333ea, // Cyber Purple
         themeHex: '#9333ea',
         bgMusicKey: 'detective_street',
-        worldWidth: 3800,
-        scrollSpeed: 210,
+        worldWidth: 7680,
+        scrollSpeed: 200,
         requiredAIDiscoveries: 4,
         objects: [
             // --- AI Targets (4) ---
@@ -382,13 +382,13 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 textureKey: 'obj_map_app',
                 shortLabel: 'PREDICTS ROUTES',
                 tagline: 'Predicts Traffic & Compares Routes',
-                detailedExplanation: 'AI aggregates traffic speeds across roads to forecast congestion and recommend the fastest journey route.',
+                detailedExplanation: 'AI aggregates real-time traffic speeds across thousands of road segments to forecast congestion and recommend the fastest journey route.',
                 visualDiagramType: 'route_highlight',
-                worldX: 650,
-                worldY: 610,
-                width: 150,
-                height: 170,
-                hintText: 'Look at the smartphone navigation map on the kiosk!'
+                worldX: 1100,
+                worldY: 590,
+                width: 135,
+                height: 275,
+                hintText: 'Look at the smart navigation map on the Metro Transit Kiosk!'
             },
             {
                 id: 'delivery_robot',
@@ -399,13 +399,13 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 textureKey: 'obj_delivery_robot',
                 shortLabel: 'AVOIDS OBSTACLES',
                 tagline: 'Detects & Avoids Pedestrians',
-                detailedExplanation: 'Using cameras and radar, the rover detects pedestrians and recalculates safe steering paths in real time.',
+                detailedExplanation: 'Using LiDAR sensors, cameras, and neural path-planning AI, the rover detects pedestrians and recalculates safe steering paths in real time.',
                 visualDiagramType: 'robot_swerve',
-                worldX: 1450,
-                worldY: 760,
-                width: 170,
-                height: 150,
-                hintText: 'Spot the cute rolling delivery cooler on the sidewalk!'
+                worldX: 2950,
+                worldY: 710,
+                width: 200,
+                height: 175,
+                hintText: 'Spot the high-tech delivery bot cruising along the sidewalk delivery lane!'
             },
             {
                 id: 'adaptive_traffic_camera',
@@ -416,13 +416,13 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 textureKey: 'obj_traffic_cam',
                 shortLabel: 'RECOGNIZES TRAFFIC',
                 tagline: 'Recognizes Traffic Patterns',
-                detailedExplanation: 'Vision AI identifies cars, buses, and cyclists, adjusting green light intervals to reduce road traffic queues.',
+                detailedExplanation: 'Computer vision AI identifies cars, buses, and cyclists in real time, dynamically adjusting green light intervals to reduce road traffic queues.',
                 visualDiagramType: 'traffic_boxes',
-                worldX: 2250,
-                worldY: 410,
-                width: 160,
-                height: 190,
-                hintText: 'Look up at the smart traffic pole camera!'
+                worldX: 4840,
+                worldY: 355,
+                width: 120,
+                height: 128,
+                hintText: 'Look up at the smart traffic gantry pole camera over the intersection!'
             },
             {
                 id: 'visual_search_camera',
@@ -433,13 +433,13 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 textureKey: 'obj_visual_search',
                 shortLabel: 'RECOGNIZES LANDMARKS',
                 tagline: 'Recognizes Historic Buildings',
-                detailedExplanation: 'AI compares building architecture against a vast world landmark database to instantly show tour facts.',
+                detailedExplanation: 'Computer vision AI analyzes building architecture, contours, and landmark features against global databases to instantly display history facts.',
                 visualDiagramType: 'landmark_card',
-                worldX: 3080,
-                worldY: 600,
-                width: 150,
-                height: 170,
-                hintText: 'Inspect the tourist visual scanner camera!'
+                worldX: 6500,
+                worldY: 575,
+                width: 135,
+                height: 297,
+                hintText: 'Inspect the tourist visual scanner phone capturing the historic clock tower!'
             },
             // --- Non-AI Decoys (4) ---
             {
@@ -451,13 +451,13 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 textureKey: 'obj_bicycle',
                 shortLabel: 'MECHANICAL',
                 tagline: 'Chain & Gear Pedal Drive',
-                detailedExplanation: 'Pedals turn sprockets connected by a chain to rotate the back wheel. 100% human-powered mechanics without AI.',
+                detailedExplanation: 'Pedals turn sprockets connected by a chain to rotate the back wheel. 100% human-powered mechanics without any AI or software.',
                 visualDiagramType: 'gear_spin',
-                worldX: 1040,
-                worldY: 680,
-                width: 180,
-                height: 140,
-                hintText: 'Bicycles use human legs and mechanical chain gears.'
+                worldX: 1650,
+                worldY: 670,
+                width: 240,
+                height: 179,
+                hintText: 'Bicycles use human pedaling power and mechanical chain gears.'
             },
             {
                 id: 'countdown_timer',
@@ -468,13 +468,13 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 textureKey: 'obj_crossing_timer',
                 shortLabel: 'FIXED TIMER',
                 tagline: 'Fixed Numeric Timer',
-                detailedExplanation: 'Counts down seconds (15, 14, 13...) using an electronic clock chip. It does not measure pedestrian crowds.',
+                detailedExplanation: 'Counts down seconds (15, 14, 13...) using an electronic fixed clock chip. It runs on a fixed timer and does not observe pedestrian crowds.',
                 visualDiagramType: 'timer_tick',
-                worldX: 1840,
-                worldY: 480,
-                width: 120,
-                height: 180,
-                hintText: 'Crossing timers count down at fixed second intervals.'
+                worldX: 3620,
+                worldY: 565,
+                width: 80,
+                height: 397,
+                hintText: 'Crossing timers tick down at fixed second intervals regardless of traffic.'
             },
             {
                 id: 'vending_machine',
@@ -485,13 +485,13 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 textureKey: 'obj_vending_machine',
                 shortLabel: 'MECHANICAL COILS',
                 tagline: 'Coin Sensor & Turning Spiral',
-                detailedExplanation: 'A coin weight sensor validates coins, then an electric motor spins a metal spiral coil to drop your drink.',
+                detailedExplanation: 'A mechanical coin sensor tests coin diameter and weight, then an electric motor spins a metal spiral coil to drop the selected drink.',
                 visualDiagramType: 'gear_spin',
-                worldX: 2660,
-                worldY: 570,
+                worldX: 5500,
+                worldY: 615,
                 width: 160,
-                height: 220,
-                hintText: 'Vending machines drop snacks using mechanical spirals.'
+                height: 251,
+                hintText: 'Vending machines drop snacks using mechanical turning spirals.'
             },
             {
                 id: 'fixed_streetlight',
@@ -502,13 +502,13 @@ export const HUNT_ZONES: ZoneConfig[] = [
                 textureKey: 'obj_streetlight',
                 shortLabel: 'FIXED TIMER',
                 tagline: 'Preset Schedule Switch',
-                detailedExplanation: 'Turns on automatically at 7:00 PM and off at 6:00 AM using a preset mechanical clock. No AI logic is involved.',
+                detailedExplanation: 'Turns on automatically at 7:00 PM and off at 6:00 AM using a preset mechanical clockwork dial. No AI vision or sensors are involved.',
                 visualDiagramType: 'timer_tick',
-                worldX: 3480,
-                worldY: 370,
-                width: 140,
-                height: 240,
-                hintText: 'Streetlights switch on based on preset time schedules.'
+                worldX: 7200,
+                worldY: 540,
+                width: 55,
+                height: 405,
+                hintText: 'Streetlights switch on based on a preset mechanical time schedule.'
             }
         ]
     }
