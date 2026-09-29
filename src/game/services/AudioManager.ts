@@ -1,4 +1,4 @@
-import { Scene } from 'phaser';
+import { Math as PhaserMath, Scene } from 'phaser';
 
 export class AudioManager {
     private static instance: AudioManager;
@@ -61,7 +61,7 @@ export class AudioManager {
     }
 
     public setMusicVolume(volume: number) {
-        this.musicVolume = Phaser.Math.Clamp(volume, 0, 1);
+        this.musicVolume = PhaserMath.Clamp(volume, 0, 1);
         if (this.currentMusic && !this._isMusicMuted) {
             (this.currentMusic as Phaser.Sound.WebAudioSound).setVolume(this.musicVolume);
         }
@@ -72,7 +72,7 @@ export class AudioManager {
     }
 
     public setSFXVolume(volume: number) {
-        this.sfxVolume = Phaser.Math.Clamp(volume, 0, 1);
+        this.sfxVolume = PhaserMath.Clamp(volume, 0, 1);
         import('./SynthesizerAudio').then(({ SynthesizerAudio }) => {
             SynthesizerAudio.getInstance().setSfxVolume(this.sfxVolume);
         });
@@ -113,14 +113,40 @@ export class AudioManager {
             });
             this.currentMusic.play();
         } else {
-            // Procedural Synthesizer Detective BGM fallback
+            // Procedural Synthesizer Detective BGM fallback.
+            // AudioContext must be created/resumed after a user gesture.
+            // Register a one-shot listener and start BGM on first interaction.
+            this.startSynthBGMAfterGesture();
+        }
+    }
+
+    /** Pending flag so we only register one gesture listener at a time. */
+    private _bgmPending: boolean = false;
+
+    /**
+     * Registers a one-shot user-gesture listener (pointer + key) that will
+     * initialise the AudioContext and start the detective BGM.
+     * Has no effect if a listener is already pending.
+     */
+    private startSynthBGMAfterGesture() {
+        if (this._bgmPending) return;
+        this._bgmPending = true;
+
+        const startBGM = () => {
+            this._bgmPending = false;
             import('./SynthesizerAudio').then(({ SynthesizerAudio }) => {
                 const synth = SynthesizerAudio.getInstance();
                 synth.setMuted(this._isMusicMuted);
                 synth.setBgmVolume(this.musicVolume);
+                synth.initOnGesture(); // creates + resumes AudioContext
                 synth.startDetectiveBGM();
             });
-        }
+            document.removeEventListener('pointerdown', startBGM);
+            document.removeEventListener('keydown', startBGM);
+        };
+
+        document.addEventListener('pointerdown', startBGM, { once: true });
+        document.addEventListener('keydown', startBGM, { once: true });
     }
 
     public stopMusic() {

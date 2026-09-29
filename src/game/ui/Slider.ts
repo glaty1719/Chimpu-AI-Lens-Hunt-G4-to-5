@@ -1,4 +1,4 @@
-import { GameObjects, Scene } from 'phaser';
+import { GameObjects, Math as PhaserMath, Input as PhaserInput, Scene } from 'phaser';
 
 export class Slider {
     public container: GameObjects.Container;
@@ -16,7 +16,7 @@ export class Slider {
     private onChange: (value: number) => void;
 
     // Stored handlers so we can unsubscribe on destroy (prevents stacking listeners)
-    private onMove!: (pointer: Phaser.Input.Pointer) => void;
+    private onMove!: (pointer: PhaserInput.Pointer) => void;
     private onUp!: () => void;
 
     constructor(
@@ -61,7 +61,7 @@ export class Slider {
         this.setValue(initialValue, false);
 
         // --- Input wiring ---
-        this.handleHit.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        this.handleHit.on('pointerdown', (pointer: PhaserInput.Pointer) => {
             this.isDragging = true;
             this.updateFromPointer(pointer)
         });
@@ -73,12 +73,12 @@ export class Slider {
 
         this.container.add(trackHit);
 
-        trackHit.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        trackHit.on('pointerdown', (pointer: PhaserInput.Pointer) => {
             this.isDragging = true;
             this.updateFromPointer(pointer);
         });
 
-        this.onMove = (pointer: Phaser.Input.Pointer) => {
+        this.onMove = (pointer: PhaserInput.Pointer) => {
             if (!this.isDragging || !this.container.active) return;
             this.updateFromPointer(pointer);
         };
@@ -94,8 +94,8 @@ export class Slider {
         this.container.bringToTop(this.handleHit);
     }
 
-    private updateFromPointer(pointer: Phaser.Input.Pointer) {
-        const localPoint = new Phaser.Math.Vector2();
+    private updateFromPointer(pointer: PhaserInput.Pointer) {
+        const localPoint = new PhaserMath.Vector2();
 
         // Get the world transform matrix of the container and invert it to get local coordinates.
         // This is the robust way to handle nested containers and camera transforms.
@@ -103,7 +103,7 @@ export class Slider {
         matrix.applyInverse(pointer.x, pointer.y, localPoint);
 
         const localX = localPoint.x;
-        const t = Phaser.Math.Clamp(localX / this.sliderWidth, 0, 1);
+        const t = PhaserMath.Clamp(localX / this.sliderWidth, 0, 1);
 
         const newValue = Math.round(t * 100);
         this.value = newValue;
@@ -145,7 +145,7 @@ export class Slider {
      * @param fireCallback whether to call onChange
      */
     public setValue(value: number, fireCallback: boolean = true) {
-        this.value = Phaser.Math.Clamp(value, 0, 100);
+        this.value = PhaserMath.Clamp(value, 0, 100);
         this.updateSlider((this.value / 100) * this.sliderWidth);
         if (fireCallback) this.onChange(this.value);
     }

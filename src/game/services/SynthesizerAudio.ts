@@ -16,6 +16,9 @@ export class SynthesizerAudio {
     private bgmVolume: number = 0.35;
     private sfxVolume: number = 0.6;
 
+    /** Set to true once the AudioContext has been successfully created. */
+    private isInitialized: boolean = false;
+
     private constructor() {}
 
     public static getInstance(): SynthesizerAudio {
@@ -26,7 +29,7 @@ export class SynthesizerAudio {
     }
 
     public init() {
-        if (this.ctx) return;
+        if (this.isInitialized) return;
         try {
             const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
             if (AudioContextClass) {
@@ -42,15 +45,36 @@ export class SynthesizerAudio {
                 this.sfxGain = this.ctx.createGain();
                 this.sfxGain.gain.setValueAtTime(this.sfxVolume, this.ctx.currentTime);
                 this.sfxGain.connect(this.masterGain);
+
+                this.isInitialized = true;
             }
         } catch (e) {
             console.warn('Web Audio synthesis not supported:', e);
         }
     }
 
-    private resumeContext() {
-        this.init();
+    /**
+     * Called inside user-gesture handlers to initialise (first time) and
+     * resume the AudioContext if it was suspended by the browser.
+     * Safe to call multiple times.
+     */
+    public initOnGesture() {
+        if (!this.isInitialized) {
+            this.init();
+        }
         if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
+    }
+
+    /**
+     * Resume-only: used internally by SFX methods that are already
+     * triggered from user-gesture code paths. Does NOT create a new
+     * AudioContext — that would violate the autoplay policy.
+     */
+    private resumeContext() {
+        if (!this.isInitialized || !this.ctx) return; // Never create ctx here
+        if (this.ctx.state === 'suspended') {
             this.ctx.resume().catch(() => {});
         }
     }
@@ -344,6 +368,9 @@ export class SynthesizerAudio {
 
     public startDetectiveBGM() {
         if (this.isBgmPlaying) return;
+        // Only start if the AudioContext has been initialised via a user gesture.
+        // If not yet initialised, do nothing — AudioManager will retry on gesture.
+        if (!this.isInitialized || !this.ctx) return;
         this.resumeContext();
         this.isBgmPlaying = true;
         this.currentBgmStep = 0;
@@ -363,7 +390,8 @@ export class SynthesizerAudio {
         ];
 
         this.bgmTimer = window.setInterval(() => {
-            if (!this.isBgmPlaying || !this.ctx || !this.bgmGain || this.isMuted) return;
+            // Silently skip if context isn't ready — never log a warning here.
+            if (!this.isBgmPlaying || !this.isInitialized || !this.ctx || !this.bgmGain || this.isMuted) return;
 
             const now = this.ctx.currentTime;
             const step = this.currentBgmStep % 16;

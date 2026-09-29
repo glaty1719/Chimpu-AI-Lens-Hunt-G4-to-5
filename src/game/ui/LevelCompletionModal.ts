@@ -151,91 +151,75 @@ export class LevelCompletionModal {
         this.container.add(title);
 
         // --- Action Buttons Layout ---
-        const hasNextLevel = levelNumber < 3;
-        const row1Y = 32;
-        const row2Y = 132;
+const btnY = 82;
+const btnW = 178;
+const btnH = 78;
+const btnFontSize = '30px';
+const gap = 198; // center-to-center spacing
 
-        if (hasNextLevel) {
-            // 1. Prominent full-width NEXT LEVEL button at top (Emerald Victory)
-            this.createButton(
-                scene,
-                0,
-                row1Y,
-                610,
-                84,
-                0x059669,
-                0x34d399,
-                '#064e3b',
-                'NEXT LEVEL',
-                '40px',
-                onNext
-            );
+const hasNextLevel = levelNumber < 3;
 
-            // 2. Smaller PLAY AGAIN & HOME buttons side-by-side underneath with clean padding
-            const subBtnW = 288;
-            const subBtnH = 74;
-            const subFontSize = '32px';
-            const gapSpacing = 162; // Provides a generous 36px clean gap between the buttons
+// Calculate X positions based on whether NEXT button is present
+let restartX: number;
+let homeX: number;
 
-            // PLAY AGAIN (Byte Neon Azure / Cyan theme)
-            this.createButton(
-                scene,
-                -gapSpacing,
-                row2Y,
-                subBtnW,
-                subBtnH,
-                0x0284c7,
-                0x00f2fe,
-                '#0c4a6e',
-                'PLAY AGAIN',
-                subFontSize,
-                onPlayAgain
-            );
+if (hasNextLevel) {
+    // 3 Buttons Layout: RESTART (-gap) | HOME (0) | NEXT (+gap)
+    restartX = -gap;
+    homeX = 0;
+} else {
+    // 2 Buttons Layout (Centered): RESTART (-gap / 2) | HOME (+gap / 2)
+    restartX = -gap / 2; // -99
+    homeX = gap / 2;     // +99
+}
 
-            // HOME (Chimpu Warm Gold / Cyber Slate theme)
-            this.createButton(
-                scene,
-                gapSpacing,
-                row2Y,
-                subBtnW,
-                subBtnH,
-                0x1e293b,
-                0xffd166,
-                '#0f172a',
-                'HOME',
-                subFontSize,
-                onHome
-            );
-        } else {
-            // Final level: Prominent PLAY AGAIN at top, HOME underneath
-            this.createButton(
-                scene,
-                0,
-                row1Y,
-                360,
-                74,
-                0x0284c7,
-                0x00f2fe,
-                '#0c4a6e',
-                'PLAY AGAIN',
-                '38px',
-                onPlayAgain
-            );
+// RESTART (Cyan)
+this.createButton(
+    scene,
+    restartX,
+    btnY,
+    btnW,
+    btnH,
+    0x0284c7,
+    0x00f2fe,
+    '#0c4a6e',
+    'RESTART',
+    btnFontSize,
+    onPlayAgain
+);
 
-            this.createButton(
-                scene,
-                0,
-                row2Y,
-                360,
-                74,
-                0x1e293b,
-                0xffd166,
-                '#0f172a',
-                'HOME',
-                '34px',
-                onHome
-            );
-        }
+// HOME (Slate gold)
+this.createButton(
+    scene,
+    homeX,
+    btnY,
+    btnW,
+    btnH,
+    0x1e293b,
+    0xffd166,
+    '#0f172a',
+    'HOME',
+    btnFontSize,
+    onHome
+);
+
+// NEXT (hidden on final level)
+if (hasNextLevel) {
+    this.createButton(
+        scene,
+        gap,
+        btnY,
+        btnW,
+        btnH,
+        0x059669,
+        0x34d399,
+        '#064e3b',
+        'NEXT',
+        btnFontSize,
+        onNext
+    );
+}
+
 
         // Pop in animation
         scene.tweens.add({
@@ -321,9 +305,11 @@ export class LevelCompletionModal {
         strokeColor: string,
         label: string,
         fontSize: string,
-        onClick: () => void
+        onClick: () => void,
+        disabled: boolean = false
     ) {
         const btnCont = scene.add.container(x, y);
+        if (disabled) btnCont.setAlpha(0.45);
 
         const bg = scene.add.graphics();
         const r = 22;
@@ -355,19 +341,21 @@ export class LevelCompletionModal {
         }).setOrigin(0.5);
         btnCont.add(text);
 
-        const hit = scene.add.zone(0, 0, w, h).setInteractive({ useHandCursor: true });
-        hit.on('pointerdown', () => {
-            AudioManager.getInstance().playSFX('button_tap');
-            this.destroy();
-            onClick();
-        });
-        hit.on('pointerover', () => {
-            btnCont.setScale(1.05);
-        });
-        hit.on('pointerout', () => {
-            btnCont.setScale(1.0);
-        });
-        btnCont.add(hit);
+        if (!disabled) {
+            const hit = scene.add.zone(0, 0, w, h).setInteractive({ useHandCursor: true });
+            hit.on('pointerdown', () => {
+                AudioManager.getInstance().playSFX('button_tap');
+                this.destroy();
+                onClick();
+            });
+            hit.on('pointerover', () => {
+                btnCont.setScale(1.05);
+            });
+            hit.on('pointerout', () => {
+                btnCont.setScale(1.0);
+            });
+            btnCont.add(hit);
+        }
 
         this.container.add(btnCont);
     }

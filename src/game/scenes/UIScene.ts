@@ -1,4 +1,4 @@
-import { Scene, GameObjects } from 'phaser';
+import { Scene, GameObjects, Math as PhaserMath } from 'phaser';
 import { IconButton } from '../ui/IconButton';
 import { PausePanel } from '../ui/PausePanel';
 import { SettingsPanel } from '../ui/SettingsPanel';
@@ -176,7 +176,7 @@ export class UIScene extends Scene {
     private drawSparkBar(percent: number) {
         this.teamSparkBar.clear();
         const { width } = this.scale;
-        const clamped = Phaser.Math.Clamp(percent, 0, 100);
+        const clamped = PhaserMath.Clamp(percent, 0, 100);
 
         const barX = width / 2 - 235;
         const barY = 74;

@@ -1,4 +1,4 @@
-import { Scene, GameObjects } from 'phaser';
+import { Scene, GameObjects, Math as PhaserMath, Input as PhaserInput } from 'phaser';
 import { HuntObjectData, ZoneConfig } from '../data/LensHuntData';
 import { UILayers } from '../utils/UILayers';
 
@@ -63,7 +63,7 @@ export class WorldParallaxView {
 
     // Keyboard Input
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
-    private wasdKeys: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key } | null = null;
+    private wasdKeys: { W: PhaserInput.Keyboard.Key; A: PhaserInput.Keyboard.Key; S: PhaserInput.Keyboard.Key; D: PhaserInput.Keyboard.Key } | null = null;
 
     // Callbacks
     private onObjectSelectCallback: (obj: WorldObjectItem, index: number) => void;
@@ -92,10 +92,10 @@ export class WorldParallaxView {
         if (this.scene.input.keyboard) {
             this.cursors = this.scene.input.keyboard.createCursorKeys();
             this.wasdKeys = {
-                W: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-                A: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
-                S: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
-                D: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+                W: this.scene.input.keyboard.addKey(PhaserInput.Keyboard.KeyCodes.W),
+                A: this.scene.input.keyboard.addKey(PhaserInput.Keyboard.KeyCodes.A),
+                S: this.scene.input.keyboard.addKey(PhaserInput.Keyboard.KeyCodes.S),
+                D: this.scene.input.keyboard.addKey(PhaserInput.Keyboard.KeyCodes.D)
             };
         }
 
@@ -3383,8 +3383,8 @@ export class WorldParallaxView {
             const isUp = this.cursors.up.isDown || this.wasdKeys.W.isDown;
             const isDown = this.cursors.down.isDown || this.wasdKeys.S.isDown;
 
-            const leftJustDown = Phaser.Input.Keyboard.JustDown(this.cursors.left) || Phaser.Input.Keyboard.JustDown(this.wasdKeys.A);
-            const rightJustDown = Phaser.Input.Keyboard.JustDown(this.cursors.right) || Phaser.Input.Keyboard.JustDown(this.wasdKeys.D);
+            const leftJustDown = PhaserInput.Keyboard.JustDown(this.cursors.left) || PhaserInput.Keyboard.JustDown(this.wasdKeys.A);
+            const rightJustDown = PhaserInput.Keyboard.JustDown(this.cursors.right) || PhaserInput.Keyboard.JustDown(this.wasdKeys.D);
 
             if (leftJustDown) {
                 this.applyTapBoost(-1);
@@ -3416,7 +3416,7 @@ export class WorldParallaxView {
         }
 
         // Progressive hold turbo boost: up to +520 px/s after continuous hold
-        const holdProgress = Phaser.Math.Clamp(this.holdDuration / 1.6, 0, 1.0);
+        const holdProgress = PhaserMath.Clamp(this.holdDuration / 1.6, 0, 1.0);
         const holdBoost = holdProgress * 520;
 
         // Dynamic max speeds combining base + hold ramp + rapid tap boost
@@ -3427,7 +3427,7 @@ export class WorldParallaxView {
         const maxReverseSpeed = -(260 + totalExtraSpeed * 0.85); // normal max -260, turbo max -920 px/s!
 
         // Dynamically track which room Chimpu is currently standing in (Room 0 to maxUnlockedRoomIndex)
-        const activeRoom = Phaser.Math.Clamp(
+        const activeRoom = PhaserMath.Clamp(
             Math.floor(this.chimpuWorldX / this.roomWidth),
             0,
             this.maxUnlockedRoomIndex
@@ -3458,22 +3458,22 @@ export class WorldParallaxView {
         if (moveX > 0) {
             // Accelerate forward with skate thrust & turbo responsiveness
             const accelRate = 8.5 + (holdProgress * 4.5);
-            this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, maxForwardSpeed, dt * accelRate);
+            this.chimpuVx = PhaserMath.Linear(this.chimpuVx, maxForwardSpeed, dt * accelRate);
             this.patrolDir = 1;
         } else if (moveX < 0) {
             // Skate backward into previous rooms
             const accelRate = 9.0 + (holdProgress * 4.5);
-            this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, maxReverseSpeed, dt * accelRate);
+            this.chimpuVx = PhaserMath.Linear(this.chimpuVx, maxReverseSpeed, dt * accelRate);
             this.patrolDir = -1;
         } else {
             // Smoothly glide towards patrol speed in current room and skate continuously
             const targetCruiseVx = this.patrolDir * baseCruiseSpeed;
-            this.chimpuVx = Phaser.Math.Linear(this.chimpuVx, targetCruiseVx, dt * 3.5);
+            this.chimpuVx = PhaserMath.Linear(this.chimpuVx, targetCruiseVx, dt * 3.5);
         }
 
         // 3. Update Vertical Position (Lane riding & Jump)
         const targetBaseY = this.chimpuBaseY + moveY * 35; // Lane range: 855 to 925
-        this.chimpuCurrentY = Phaser.Math.Linear(this.chimpuCurrentY, targetBaseY, dt * 5.0);
+        this.chimpuCurrentY = PhaserMath.Linear(this.chimpuCurrentY, targetBaseY, dt * 5.0);
 
         // Skateboard Ollie / Hop on UP tap
         if (jumpRequested && !this.isJumping) {
@@ -3505,7 +3505,7 @@ export class WorldParallaxView {
 
         // 5. Camera stays locked and framed on whichever Room Chimpu is currently visiting
         const roomBaseScroll = this.currentRoomIndex * this.roomWidth;
-        this.targetScrollX = Phaser.Math.Clamp(
+        this.targetScrollX = PhaserMath.Clamp(
             roomBaseScroll,
             0,
             this.worldWidth - this.screenWidth
@@ -3513,7 +3513,7 @@ export class WorldParallaxView {
 
         // Smooth camera scroll interpolation (Lerp)
         const cameraLerpSpeed = Math.min(10.0, 6.0 + holdProgress * 4.0);
-        this.scrollX = Phaser.Math.Linear(this.scrollX, this.targetScrollX, dt * cameraLerpSpeed);
+        this.scrollX = PhaserMath.Linear(this.scrollX, this.targetScrollX, dt * cameraLerpSpeed);
 
         // 6. Apply Parallax Offsets across layers
         this.farLayerCont.x = -this.scrollX * 0.35;
@@ -3529,14 +3529,14 @@ export class WorldParallaxView {
         // Dynamic tilt angle and facing direction
         if (this.chimpuVx > 15) {
             this.chimpuSprite.setFlipX(false);
-            const targetAngle = Phaser.Math.Clamp((this.chimpuVx / 550) * 8, 0, 9);
-            this.chimpuContainer.setAngle(Phaser.Math.Linear(this.chimpuContainer.angle, targetAngle, dt * 8.0));
+            const targetAngle = PhaserMath.Clamp((this.chimpuVx / 550) * 8, 0, 9);
+            this.chimpuContainer.setAngle(PhaserMath.Linear(this.chimpuContainer.angle, targetAngle, dt * 8.0));
         } else if (this.chimpuVx < -15) {
             this.chimpuSprite.setFlipX(true);
-            const targetAngle = Phaser.Math.Clamp((this.chimpuVx / 450) * -8, -9, 0);
-            this.chimpuContainer.setAngle(Phaser.Math.Linear(this.chimpuContainer.angle, targetAngle, dt * 8.0));
+            const targetAngle = PhaserMath.Clamp((this.chimpuVx / 450) * -8, -9, 0);
+            this.chimpuContainer.setAngle(PhaserMath.Linear(this.chimpuContainer.angle, targetAngle, dt * 8.0));
         } else {
-            this.chimpuContainer.setAngle(Phaser.Math.Linear(this.chimpuContainer.angle, 0, dt * 6.0));
+            this.chimpuContainer.setAngle(PhaserMath.Linear(this.chimpuContainer.angle, 0, dt * 6.0));
         }
 
         // 8. Render Dynamic Skateboard Thruster Wake & Glow
@@ -3625,7 +3625,7 @@ export class WorldParallaxView {
         this.selectedObjectIndex = index;
 
         // Ensure current room tracks the selected object
-        this.currentRoomIndex = Phaser.Math.Clamp(
+        this.currentRoomIndex = PhaserMath.Clamp(
             Math.floor(selected.worldX / this.roomWidth),
             0,
             this.maxUnlockedRoomIndex
@@ -3788,8 +3788,8 @@ export class WorldParallaxView {
             ease: 'Cubic.easeInOut',
             onUpdate: (tween) => {
                 const val = tween.getValue() ?? 0;
-                this.scrollX = Phaser.Math.Linear(startScrollX, nextRoomScrollX, val);
-                this.chimpuWorldX = Phaser.Math.Linear(startChimpuX, targetChimpuX, val);
+                this.scrollX = PhaserMath.Linear(startScrollX, nextRoomScrollX, val);
+                this.chimpuWorldX = PhaserMath.Linear(startChimpuX, targetChimpuX, val);
 
                 this.farLayerCont.x = -this.scrollX * 0.35;
                 this.midLayerCont.x = -this.scrollX;

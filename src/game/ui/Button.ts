@@ -1,4 +1,4 @@
-import { GameObjects, Scene } from 'phaser';
+import { Display, GameObjects, Geom, Scene } from 'phaser';
 import { AudioManager } from '../services/AudioManager';
 
 export class Button {
@@ -60,7 +60,7 @@ export class Button {
         this.draw(false);
 
         // Interaction
-        this.bg.setInteractive(new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height), Phaser.Geom.Rectangle.Contains)
+        this.bg.setInteractive(new Geom.Rectangle(-width / 2, -height / 2, width, height), Geom.Rectangle.Contains)
             .on('pointerover', () => this.onHover(true))
             .on('pointerout', () => this.onHover(false))
             .on('pointerdown', () => {
@@ -147,7 +147,7 @@ export class Button {
     public setStyles(backgroundColor: number, strokeColor: number) {
         this.normalColor = backgroundColor;
         this.strokeColor = strokeColor;
-        const color = Phaser.Display.Color.IntegerToColor(backgroundColor);
+        const color = Display.Color.IntegerToColor(backgroundColor);
         color.brighten(15);
         this.hoverColor = color.color;
         this.draw(false);

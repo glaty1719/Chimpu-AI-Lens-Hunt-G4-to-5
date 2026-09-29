@@ -261,41 +261,21 @@ export class DetectiveScanner {
 
         // 3. Right Educational Breakdown Panel (760x520)
         const rightBox = this.scene.add.container(255, -50);
-        const rightBg = this.scene.add.graphics();
-        rightBg.fillStyle(0x0f172a, 0.95);
-        rightBg.fillRoundedRect(-380, -260, 760, 520, 24);
-        rightBg.lineStyle(3, 0x38bdf8, 0.85);
-        rightBg.strokeRoundedRect(-380, -260, 760, 520, 24);
-        rightBox.add(rightBg);
 
-        // Educational Tagline
-        const taglineTxt = this.scene.add.text(0, -140, `"${data.tagline}"`, {
+        // Detailed Educational Explanation (Kid-Friendly, Large & Clear)
+        const expTxt = this.scene.add.text(0, 0, data.detailedExplanation, {
             fontFamily: 'Arial Black',
-            fontSize: '48px',
-            color: isAI ? '#69f0ae' : '#fef08a',
-            stroke: '#000000',
-            strokeThickness: 8,
-            align: 'center',
-            wordWrap: { width: 700 },
-            lineSpacing: 10
-        }).setOrigin(0.5);
-        rightBox.add(taglineTxt);
-
-        // Detailed Educational Explanation (Kid-Friendly & Clear)
-        const expTxt = this.scene.add.text(0, 50, data.detailedExplanation, {
-            fontFamily: 'Arial Black',
-            fontSize: '42px',
+            fontSize: '54px',
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 5,
+            strokeThickness: 6,
             align: 'center',
-            wordWrap: { width: 700 },
-            lineSpacing: 18
+            wordWrap: { width: 720 },
+            lineSpacing: 16
         }).setOrigin(0.5);
         rightBox.add(expTxt);
 
         this.modalContainer.add(rightBox);
-
         // 4. "CONTINUE" Button at Bottom
         const btnW = 520;
         const btnH = 82;
