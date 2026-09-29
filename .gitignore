@@ -49,3 +49,6 @@ Desktop.ini
 .vite/
 .eslintcache
 .cache/
+
+# Scratch files
+scratch/
