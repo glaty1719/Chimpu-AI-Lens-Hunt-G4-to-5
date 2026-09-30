@@ -131,23 +131,23 @@ export class UIScene extends Scene {
         );
         this.soundButton.setDepth(UILayers.UI_BUTTONS);
 
-        // Top Right: Zone & Score
-        const headerStartX = width - 250;
-        this.levelTitleText = this.add.text(headerStartX, 50, `Level: ${this.currentLevel}`, {
+        // Top Right: Zone & Score (Right-aligned with 45px safe right margin to prevent text clipping)
+        const rightMarginX = width - 45;
+        this.levelTitleText = this.add.text(rightMarginX, 50, `Level: ${this.currentLevel}`, {
             fontFamily: 'Arial Black',
-            fontSize: '40px',
+            fontSize: '36px',
             color: '#38bdf8',
             stroke: '#000000',
             strokeThickness: 6,
-        }).setOrigin(0, 0.5).setDepth(UILayers.UI_TEXT);
+        }).setOrigin(1, 0.5).setDepth(UILayers.UI_TEXT);
 
-        this.scoreText = this.add.text(headerStartX, 105, 'SCORE: 0', {
+        this.scoreText = this.add.text(rightMarginX, 105, 'SCORE: 0', {
             fontFamily: 'Arial Black',
-            fontSize: '40px',
+            fontSize: '36px',
             color: '#4ade80',
             stroke: '#000000',
             strokeThickness: 6,
-        }).setOrigin(0, 0.5).setDepth(UILayers.UI_TEXT);
+        }).setOrigin(1, 0.5).setDepth(UILayers.UI_TEXT);
 
         // Top Center: Team Spark & Combo Meter Box
         const centerBox = this.add.graphics().setDepth(UILayers.UI_BACKGROUND_PANELS);
@@ -351,7 +351,7 @@ export class UIScene extends Scene {
         ptrG.closePath();
         ptrG.fillPath();
 
-        this.tutorialPointerText = this.add.text(0, -14, '👇 TAP OBJECT TO SELECT', {
+        this.tutorialPointerText = this.add.text(0, -14, '🛹 SKATE TO OBJECT', {
             fontFamily: 'Arial Black',
             fontSize: '24px',
             color: '#0f172a'
@@ -393,7 +393,7 @@ export class UIScene extends Scene {
             if (!state.hasTargetSelected) {
                 // Whenever an object is not selected during tutorial, display directly over the AI object
                 this.tutorialPointer.setVisible(true);
-                this.tutorialPointerText.setText('👇 TAP OBJECT TO SELECT');
+                this.tutorialPointerText.setText('🛹 SKATE TO OBJECT');
                 if (state.tutorialTargetPos) {
                     this.tutorialPointer.setPosition(state.tutorialTargetPos.x, state.tutorialTargetPos.y);
                 }

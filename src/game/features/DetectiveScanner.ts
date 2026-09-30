@@ -76,6 +76,7 @@ export class DetectiveScanner {
     }
 
     public lockOn(target: WorldObjectItem, scrollX: number) {
+        if (this.currentTarget === target) return;
         this.currentTarget = target;
         const screenX = target.worldX - scrollX;
         const screenY = target.worldY;

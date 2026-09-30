@@ -27,100 +27,100 @@ export class LevelCompletionModal {
             .setScale(0.7)
             .setAlpha(0);
 
-        // Modal Frame Box
-        const mw = 760;
-        const mh = 480;
+        // Modal Frame Box (Updated dimensions)
+        const mw = 600;
+        const mh = 380;
         const bg = scene.add.graphics();
 
         // Layered Outer Glow: Team Violet (Synergy) + Cyber Cyan
         bg.fillStyle(0x7c3aed, 0.28);
-        bg.fillRoundedRect(-mw / 2 - 16, -mh / 2 - 16, mw + 32, mh + 32, 42);
+        bg.fillRoundedRect(-mw / 2 - 12, -mh / 2 - 12, mw + 24, mh + 24, 34);
         bg.fillStyle(0x00f2fe, 0.12);
-        bg.fillRoundedRect(-mw / 2 - 8, -mh / 2 - 8, mw + 16, mh + 16, 36);
+        bg.fillRoundedRect(-mw / 2 - 6, -mh / 2 - 6, mw + 12, mh + 12, 28);
 
         // Panel Background: Deep Midnight Slate (Cyber Asphalt theme)
         bg.fillStyle(0x0c1022, 0.98);
-        bg.fillRoundedRect(-mw / 2, -mh / 2, mw, mh, 32);
+        bg.fillRoundedRect(-mw / 2, -mh / 2, mw, mh, 26);
 
         // Panel Border: Neon Electric Cyan (Byte Accent)
-        bg.lineStyle(5, 0x00f2fe, 1);
-        bg.strokeRoundedRect(-mw / 2, -mh / 2, mw, mh, 32);
+        bg.lineStyle(4, 0x00f2fe, 1);
+        bg.strokeRoundedRect(-mw / 2, -mh / 2, mw, mh, 26);
 
         this.container.add(bg);
 
         // --- Radiant Golden Glow Behind Stars ---
-        const starCenterY = -mh / 2 + 58;
+        const starCenterY = -mh / 2 + 48;
         const starGlow = scene.add.graphics();
         starGlow.fillStyle(0xfbbf24, 0.25);
-        starGlow.fillCircle(0, starCenterY, 120);
+        starGlow.fillCircle(0, starCenterY, 90);
         starGlow.fillStyle(0xf59e0b, 0.14);
-        starGlow.fillCircle(0, starCenterY, 170);
+        starGlow.fillCircle(0, starCenterY, 130);
         this.container.add(starGlow);
 
         // --- 3 Golden 3D Stars ---
         const starGraphics = scene.add.graphics();
-        // Left Star (Tilted left, slightly lower)
-        this.drawStyledStar(starGraphics, -88, starCenterY + 10, 5, 38, 19, -0.18);
-        // Right Star (Tilted right, slightly lower)
-        this.drawStyledStar(starGraphics, 88, starCenterY + 10, 5, 38, 19, 0.18);
-        // Center Star (Largest, highest)
-        this.drawStyledStar(starGraphics, 0, starCenterY - 6, 5, 52, 26, 0);
+        // Left Star
+        this.drawStyledStar(starGraphics, -70, starCenterY + 8, 5, 30, 15, -0.18);
+        // Right Star
+        this.drawStyledStar(starGraphics, 70, starCenterY + 8, 5, 30, 15, 0.18);
+        // Center Star
+        this.drawStyledStar(starGraphics, 0, starCenterY - 4, 5, 42, 21, 0);
         this.container.add(starGraphics);
 
         // --- Sparkle Glints around stars ---
         const sparkles = scene.add.graphics();
-        this.drawSparkle(sparkles, -135, starCenterY + 2, 7);
-        this.drawSparkle(sparkles, -42, starCenterY - 32, 6);
-        this.drawSparkle(sparkles, 42, starCenterY - 32, 6);
-        this.drawSparkle(sparkles, 135, starCenterY + 2, 7);
+        this.drawSparkle(sparkles, -105, starCenterY + 2, 5);
+        this.drawSparkle(sparkles, -32, starCenterY - 24, 5);
+        this.drawSparkle(sparkles, 32, starCenterY - 24, 5);
+        this.drawSparkle(sparkles, 105, starCenterY + 2, 5);
         this.container.add(sparkles);
 
         // --- Championship Ribbon Banner: "LEVEL COMPLETED" ---
-        const bannerY = -mh / 2 + 138;
+        const bannerY = -mh / 2 + 115;
         const bannerGraphics = scene.add.graphics();
 
-        // 1. Left Ribbon Tail (Folded & notched swallowtail)
-        bannerGraphics.fillStyle(0x4c1d95, 1); // Darker purple fold
+        // 1. Left Ribbon Tail
+        bannerGraphics.fillStyle(0x4c1d95, 1);
         bannerGraphics.beginPath();
-        bannerGraphics.moveTo(-235, bannerY - 30);
-        bannerGraphics.lineTo(-295, bannerY - 16);
-        bannerGraphics.lineTo(-275, bannerY + 6);
-        bannerGraphics.lineTo(-295, bannerY + 28);
-        bannerGraphics.lineTo(-235, bannerY + 34);
+        bannerGraphics.moveTo(-185, bannerY - 24);
+        bannerGraphics.lineTo(-235, bannerY - 12);
+        bannerGraphics.lineTo(-218, bannerY + 5);
+        bannerGraphics.lineTo(-235, bannerY + 22);
+        bannerGraphics.lineTo(-185, bannerY + 27);
         bannerGraphics.closePath();
         bannerGraphics.fillPath();
-        bannerGraphics.lineStyle(3, 0xffd166, 1);
+        bannerGraphics.lineStyle(2.5, 0xffd166, 1);
         bannerGraphics.strokePath();
 
         // Left fold shadow triangle
         bannerGraphics.fillStyle(0x2e1065, 1);
-        bannerGraphics.fillTriangle(-235, bannerY - 30, -235, bannerY + 34, -220, bannerY + 20);
+        bannerGraphics.fillTriangle(-185, bannerY - 24, -185, bannerY + 27, -172, bannerY + 16);
 
-        // 2. Right Ribbon Tail (Folded & notched swallowtail)
+        // 2. Right Ribbon Tail
         bannerGraphics.fillStyle(0x4c1d95, 1);
         bannerGraphics.beginPath();
-        bannerGraphics.moveTo(235, bannerY - 30);
-        bannerGraphics.lineTo(295, bannerY - 16);
-        bannerGraphics.lineTo(275, bannerY + 6);
-        bannerGraphics.lineTo(295, bannerY + 28);
-        bannerGraphics.lineTo(235, bannerY + 34);
+        bannerGraphics.moveTo(185, bannerY - 24);
+        bannerGraphics.lineTo(235, bannerY - 12);
+        bannerGraphics.lineTo(218, bannerY + 5);
+        bannerGraphics.lineTo(235, bannerY + 22);
+        bannerGraphics.lineTo(185, bannerY + 27);
         bannerGraphics.closePath();
         bannerGraphics.fillPath();
-        bannerGraphics.lineStyle(3, 0xffd166, 1);
+        bannerGraphics.lineStyle(2.5, 0xffd166, 1);
         bannerGraphics.strokePath();
 
         // Right fold shadow triangle
         bannerGraphics.fillStyle(0x2e1065, 1);
-        bannerGraphics.fillTriangle(235, bannerY - 30, 235, bannerY + 34, 220, bannerY + 20);
+        bannerGraphics.fillTriangle(185, bannerY - 24, 185, bannerY + 27, 172, bannerY + 16);
 
         // 3. Main Center Ribbon Plaque
-        const bw = 480;
-        const bh = 76;
-        const br = 18;
+        const bw = 380;
+        const bh = 60;
+        const br = 14;
 
         // Shadow under plaque
         bannerGraphics.fillStyle(0x1e1b4b, 0.9);
-        bannerGraphics.fillRoundedRect(-bw / 2, bannerY - bh / 2 + 4, bw, bh, br);
+        bannerGraphics.fillRoundedRect(-bw / 2, bannerY - bh / 2 + 3, bw, bh, br);
 
         // Royal Violet Ribbon body
         bannerGraphics.fillStyle(0x6b21a8, 1);
@@ -128,98 +128,95 @@ export class LevelCompletionModal {
 
         // Top glossy shine
         bannerGraphics.fillStyle(0xc084fc, 0.35);
-        bannerGraphics.fillRoundedRect(-bw / 2 + 4, bannerY - bh / 2 + 4, bw - 8, bh / 2 - 4, br - 4);
+        bannerGraphics.fillRoundedRect(-bw / 2 + 3, bannerY - bh / 2 + 3, bw - 6, bh / 2 - 3, br - 3);
 
         // Outer Gold Trim
-        bannerGraphics.lineStyle(4, 0xffd166, 1);
+        bannerGraphics.lineStyle(3, 0xffd166, 1);
         bannerGraphics.strokeRoundedRect(-bw / 2, bannerY - bh / 2, bw, bh, br);
 
         // Inner Golden Accent Pinstripe
-        bannerGraphics.lineStyle(1.5, 0xfbbf24, 0.7);
-        bannerGraphics.strokeRoundedRect(-bw / 2 + 6, bannerY - bh / 2 + 6, bw - 12, bh - 12, br - 6);
+        bannerGraphics.lineStyle(1, 0xfbbf24, 0.7);
+        bannerGraphics.strokeRoundedRect(-bw / 2 + 4, bannerY - bh / 2 + 4, bw - 8, bh - 8, br - 4);
 
         this.container.add(bannerGraphics);
 
-        // "LEVEL COMPLETED" Title (Championship Gold Typography)
+        // "LEVEL COMPLETED" Title
         const title = scene.add.text(0, bannerY - 1, 'LEVEL COMPLETED', {
             fontFamily: 'Arial Black',
-            fontSize: '44px',
+            fontSize: '32px',
             color: '#fef08a',
             stroke: '#3b0764',
-            strokeThickness: 8
+            strokeThickness: 6
         }).setOrigin(0.5);
         this.container.add(title);
 
         // --- Action Buttons Layout ---
-const btnY = 82;
-const btnW = 178;
-const btnH = 78;
-const btnFontSize = '30px';
-const gap = 198; // center-to-center spacing
+        const btnY = 65;
+        const btnW = 145;
+        const btnH = 62;
+        const btnFontSize = '22px';
+        const gap = 155; // center-to-center spacing
 
-const hasNextLevel = levelNumber < 3;
+        const hasNextLevel = levelNumber < 3;
 
-// Calculate X positions based on whether NEXT button is present
-let restartX: number;
-let homeX: number;
+        // Calculate X positions based on whether NEXT button is present
+        let restartX: number;
+        let homeX: number;
 
-if (hasNextLevel) {
-    // 3 Buttons Layout: RESTART (-gap) | HOME (0) | NEXT (+gap)
-    restartX = -gap;
-    homeX = 0;
-} else {
-    // 2 Buttons Layout (Centered): RESTART (-gap / 2) | HOME (+gap / 2)
-    restartX = -gap / 2; // -99
-    homeX = gap / 2;     // +99
-}
+        if (hasNextLevel) {
+            restartX = -gap;
+            homeX = 0;
+        } else {
+            restartX = -gap / 2;
+            homeX = gap / 2;
+        }
 
-// RESTART (Cyan)
-this.createButton(
-    scene,
-    restartX,
-    btnY,
-    btnW,
-    btnH,
-    0x0284c7,
-    0x00f2fe,
-    '#0c4a6e',
-    'RESTART',
-    btnFontSize,
-    onPlayAgain
-);
+        // RESTART (Cyan)
+        this.createButton(
+            scene,
+            restartX,
+            btnY,
+            btnW,
+            btnH,
+            0x0284c7,
+            0x00f2fe,
+            '#0c4a6e',
+            'RESTART',
+            btnFontSize,
+            onPlayAgain
+        );
 
-// HOME (Slate gold)
-this.createButton(
-    scene,
-    homeX,
-    btnY,
-    btnW,
-    btnH,
-    0x1e293b,
-    0xffd166,
-    '#0f172a',
-    'HOME',
-    btnFontSize,
-    onHome
-);
+        // HOME (Slate gold)
+        this.createButton(
+            scene,
+            homeX,
+            btnY,
+            btnW,
+            btnH,
+            0x1e293b,
+            0xffd166,
+            '#0f172a',
+            'HOME',
+            btnFontSize,
+            onHome
+        );
 
-// NEXT (hidden on final level)
-if (hasNextLevel) {
-    this.createButton(
-        scene,
-        gap,
-        btnY,
-        btnW,
-        btnH,
-        0x059669,
-        0x34d399,
-        '#064e3b',
-        'NEXT',
-        btnFontSize,
-        onNext
-    );
-}
-
+        // NEXT (hidden on final level)
+        if (hasNextLevel) {
+            this.createButton(
+                scene,
+                gap,
+                btnY,
+                btnW,
+                btnH,
+                0x059669,
+                0x34d399,
+                '#064e3b',
+                'NEXT',
+                btnFontSize,
+                onNext
+            );
+        }
 
         // Pop in animation
         scene.tweens.add({
@@ -240,11 +237,8 @@ if (hasNextLevel) {
         innerR: number,
         angleOffset: number
     ) {
-        // Outer glow/shadow
         this.renderStarPath(graphics, cx, cy + 3, points, outerR + 2, innerR + 1, angleOffset, 0xb45309, 1, 0, 0);
-        // Base gold star
         this.renderStarPath(graphics, cx, cy, points, outerR, innerR, angleOffset, 0xfbbf24, 1, 0xd97706, 3);
-        // Top highlight shine
         this.renderStarPath(graphics, cx, cy - 2, points, outerR * 0.72, innerR * 0.72, angleOffset, 0xfef08a, 0.45, 0, 0);
     }
 
@@ -312,11 +306,11 @@ if (hasNextLevel) {
         if (disabled) btnCont.setAlpha(0.45);
 
         const bg = scene.add.graphics();
-        const r = 22;
+        const r = 18;
 
         // Bottom shadow bevel
         bg.fillStyle(0x000000, 0.35);
-        bg.fillRoundedRect(-w / 2, -h / 2 + 4, w, h, r);
+        bg.fillRoundedRect(-w / 2, -h / 2 + 3, w, h, r);
 
         // Main button fill
         bg.fillStyle(bgColor, 1);
@@ -324,20 +318,20 @@ if (hasNextLevel) {
 
         // Top glossy shine
         bg.fillStyle(0xffffff, 0.18);
-        bg.fillRoundedRect(-w / 2 + 4, -h / 2 + 3, w - 8, h / 2 - 3, r - 4);
+        bg.fillRoundedRect(-w / 2 + 3, -h / 2 + 2, w - 6, h / 2 - 2, r - 3);
 
         // Border outline
-        bg.lineStyle(4, borderColor, 1);
+        bg.lineStyle(3, borderColor, 1);
         bg.strokeRoundedRect(-w / 2, -h / 2, w, h, r);
         btnCont.add(bg);
 
-        // Button text with enlarged font and crisp outline
+        // Button text
         const text = scene.add.text(0, 0, label, {
             fontFamily: 'Arial Black',
             fontSize: fontSize,
             color: '#ffffff',
             stroke: strokeColor,
-            strokeThickness: 5
+            strokeThickness: 4
         }).setOrigin(0.5);
         btnCont.add(text);
 

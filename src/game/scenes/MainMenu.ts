@@ -20,8 +20,8 @@ export class MainMenu extends Scene {
             .setDepth(UILayers.GAME_BACKGROUND);
 
         // 5. Play Button & Text
-        const playBtnX = width - 260;
-        const playBtnY = height - 210;
+        const playBtnX = width/2;
+        const playBtnY = height - 150;
 
         let isStarting = false;
         const startGame = () => {

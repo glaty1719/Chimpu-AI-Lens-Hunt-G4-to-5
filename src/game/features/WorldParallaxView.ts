@@ -67,13 +67,14 @@ export class WorldParallaxView {
 
     // Callbacks
     private onObjectSelectCallback: (obj: WorldObjectItem, index: number) => void;
-    private onObjectDoubleTapCallback: (obj: WorldObjectItem, index: number) => void;
+    private onObjectDeselectCallback?: () => void;
+    private justScannedIndex: number = -1;
 
     constructor(
         scene: Scene,
         zoneConfig: ZoneConfig,
         onSelect: (obj: WorldObjectItem, index: number) => void,
-        onDoubleTap: (obj: WorldObjectItem, index: number) => void
+        onDeselect?: () => void
     ) {
         this.scene = scene;
         this.zoneConfig = zoneConfig;
@@ -87,7 +88,7 @@ export class WorldParallaxView {
         this.patrolDir = 1;
         this.isTransitioningRoom = false;
         this.onObjectSelectCallback = onSelect;
-        this.onObjectDoubleTapCallback = onDoubleTap;
+        this.onObjectDeselectCallback = onDeselect;
 
         if (this.scene.input.keyboard) {
             this.cursors = this.scene.input.keyboard.createCursorKeys();
@@ -3275,43 +3276,10 @@ export class WorldParallaxView {
             statusIconCont.setVisible(false);
             cont.add(statusIconCont);
 
-            // 5. Interactive Hit Zone & Hover FX
+            // 5. Hit Zone (Non-interactive; object selection is driven by Chimpu proximity)
             const hitW = Math.max(objData.width + 30, 100);
             const hitH = Math.max(objData.height + 40, 100);
-            const hitZone = this.scene.add.zone(0, 0, hitW, hitH).setInteractive({ useHandCursor: true });
-            hitZone.setData('isWorldObject', true);
-
-            hitZone.on('pointerover', () => {
-                this.scene.tweens.add({
-                    targets: cont,
-                    scale: 1.06,
-                    duration: 160,
-                    ease: 'Quad.easeOut'
-                });
-            });
-
-            hitZone.on('pointerout', () => {
-                this.scene.tweens.add({
-                    targets: cont,
-                    scale: 1.0,
-                    duration: 160,
-                    ease: 'Quad.easeOut'
-                });
-            });
-
-            let lastTapTime = 0;
-            hitZone.on('pointerdown', () => {
-                const now = Date.now();
-                const isDoubleTap = now - lastTapTime < 350;
-                lastTapTime = now;
-
-                if (isDoubleTap) {
-                    this.onObjectDoubleTapCallback(worldItem, idx);
-                } else {
-                    this.selectObject(idx);
-                }
-            });
-
+            const hitZone = this.scene.add.zone(0, 0, hitW, hitH);
             cont.add(hitZone);
             this.objectLayerCont.add(cont);
 
@@ -3575,13 +3543,70 @@ export class WorldParallaxView {
         const shadowAlpha = this.isJumping ? 0.2 : 0.35;
         this.chimpuShadow.setScale(shadowScale);
         this.chimpuShadow.setAlpha(shadowAlpha);
+
+        // 10. Check Chimpu proximity to interactable objects (Auto-enable Scan button)
+        this.updateObjectProximity();
     }
 
-    public isObjectHitZone(gameObject: GameObjects.GameObject): boolean {
-        return gameObject.getData('isWorldObject') === true;
+    private updateObjectProximity() {
+        if (this.isTransitioningRoom || this.isPaused) return;
+
+        // Check if Chimpu has moved away from the object that was just scanned
+        if (this.justScannedIndex >= 0 && this.justScannedIndex < this.worldObjects.length) {
+            const scannedObj = this.worldObjects[this.justScannedIndex];
+            const distToScanned = Math.abs(this.chimpuWorldX - scannedObj.worldX);
+            const exitThreshold = Math.max(160, scannedObj.data.width / 2 + 110);
+            if (distToScanned > exitThreshold) {
+                this.justScannedIndex = -1;
+            }
+        }
+
+        // Find the closest eligible interactable object in unlocked rooms
+        const unlockedMaxX = (this.maxUnlockedRoomIndex + 1) * this.roomWidth;
+        let bestIndex = -1;
+        let bestDist = Infinity;
+        let bestIsUndiscovered = false;
+
+        for (let i = 0; i < this.worldObjects.length; i++) {
+            const obj = this.worldObjects[i];
+            if (obj.worldX > unlockedMaxX) continue;
+            if (i === this.justScannedIndex) continue;
+
+            const dist = Math.abs(this.chimpuWorldX - obj.worldX);
+            const baseThreshold = Math.max(160, obj.data.width / 2 + 85);
+            // Apply hysteresis (+30px) if this object is currently selected
+            const threshold = (i === this.selectedObjectIndex) ? baseThreshold + 30 : baseThreshold;
+
+            if (dist <= threshold) {
+                const isUndiscovered = !obj.isDiscovered;
+                if (!bestIsUndiscovered && isUndiscovered) {
+                    bestDist = dist;
+                    bestIndex = i;
+                    bestIsUndiscovered = true;
+                } else if (isUndiscovered === bestIsUndiscovered && dist < bestDist) {
+                    bestDist = dist;
+                    bestIndex = i;
+                }
+            }
+        }
+
+        if (bestIndex !== -1) {
+            if (this.selectedObjectIndex !== bestIndex) {
+                this.selectObject(bestIndex);
+            }
+        } else {
+            if (this.selectedObjectIndex !== -1) {
+                this.deselectObject();
+            }
+        }
+    }
+
+    public isObjectHitZone(_gameObject: GameObjects.GameObject): boolean {
+        return false;
     }
 
     public deselectObject() {
+        if (this.selectedObjectIndex === -1) return;
         this.selectedObjectIndex = -1;
         this.worldObjects.forEach((obj) => {
             obj.glowGraphics.clear();
@@ -3590,6 +3615,10 @@ export class WorldParallaxView {
             obj.glowGraphics.fillStyle(glowColor, 0.18);
             obj.glowGraphics.fillCircle(0, 0, r * 0.85);
         });
+
+        if (this.onObjectDeselectCallback) {
+            this.onObjectDeselectCallback();
+        }
     }
 
     public applyTapBoost(dir: number) {
@@ -3686,6 +3715,7 @@ export class WorldParallaxView {
 
     public markObjectDiscovered(index: number) {
         if (index < 0 || index >= this.worldObjects.length) return;
+        this.justScannedIndex = index;
         const obj = this.worldObjects[index];
         obj.isDiscovered = true;
 

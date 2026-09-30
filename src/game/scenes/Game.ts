@@ -81,8 +81,8 @@ export class Game extends Scene {
             (obj: WorldObjectItem, _index: number) => {
                 this.onObjectSelected(obj);
             },
-            (obj: WorldObjectItem, _index: number) => {
-                this.onObjectDoubleTapped(obj);
+            () => {
+                this.onObjectDeselected();
             }
         );
 
@@ -91,31 +91,19 @@ export class Game extends Scene {
             this.onScanCompleted(result);
         });
 
-        this.events.on('scanner-modal-changed', () => {
+        this.events.on('scanner-modal-changed', (isOpen: boolean) => {
+            if (isOpen) {
+                this.worldView?.pause();
+            } else {
+                this.worldView?.resume();
+            }
             this.broadcastHUDState();
         });
 
-        // 6. Setup Keyboard Controls (Space/Enter: Scan, Tab/Q/E: Cycle Targets, Arrow Keys & WASD: Skate Move)
+        // 6. Setup Keyboard Controls (Space/Enter: Scan, Arrow Keys & WASD: Skate Move)
         this.setupKeyboardControls();
 
-        // 7. Listen for clicks outside objects to deselect & remove reticle
-        this.input.on('pointerdown', (pointer: Phaser.Input.Pointer, currentlyOver: Phaser.GameObjects.GameObject[]) => {
-            if (this.scanner?.isModalOpen() || this.albumActivity || this.finaleModal || this.levelCompletionModal || this.isZoneFinished) {
-                return;
-            }
-
-            // Ignore top HUD area and bottom console area
-            if (pointer.y <= 120 || pointer.y >= 960) {
-                return;
-            }
-
-            const clickedObject = currentlyOver.some((obj) => this.worldView?.isObjectHitZone(obj));
-            if (!clickedObject) {
-                this.onDeselectObject();
-            }
-        });
-
-        // 8. Initial HUD Broadcast
+        // 7. Initial HUD Broadcast
         this.broadcastHUDState();
     }
 
@@ -130,27 +118,10 @@ export class Game extends Scene {
         this.input.keyboard.on('keydown-ENTER', () => {
             this.onTriggerScan();
         });
-
-        // Tab, Q, E cycle targets
-        this.input.keyboard.on('keydown-TAB', (e: KeyboardEvent) => {
-            e.preventDefault();
-            this.worldView?.selectNextObject();
-        });
-
-        this.input.keyboard.on('keydown-Q', () => {
-            this.worldView?.selectPrevObject();
-        });
-
-        this.input.keyboard.on('keydown-E', () => {
-            this.worldView?.selectNextObject();
-        });
     }
 
-    private onDeselectObject() {
-        if (!this.worldView || !this.scanner) return;
-        if (this.worldView.getSelectedObjectIndex() === -1) return;
-
-        this.worldView.deselectObject();
+    private onObjectDeselected() {
+        if (!this.scanner) return;
         this.scanner.unlock();
 
         if (this.isTutorialActive) {
@@ -169,12 +140,6 @@ export class Game extends Scene {
         }
 
         this.broadcastHUDState();
-    }
-
-    private onObjectDoubleTapped(obj: WorldObjectItem) {
-        if (!this.worldView || !this.scanner) return;
-        this.scanner.lockOn(obj, this.worldView.getScrollX());
-        this.onTriggerScan();
     }
 
     private onTriggerScan() {
