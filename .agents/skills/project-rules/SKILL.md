@@ -40,7 +40,7 @@ This skill defines the development patterns, scene organization, UI layers, coor
 
 ## 🧹 Cleanup Checklist for New Games
 
-When starting a new game within this repository:
+When building a new game from scratch:
 1. [ ] **`src/game/features/`**: Clear previous game feature logic.
 2. [ ] **`src/game/ui/`**: Remove game-specific overlays (keep standard `IconButton`, `SettingsPanel`, `PausePanel`, `GameOverPanel`).
 3. [ ] **`src/game/scenes/Game.ts`**: Reset to skeleton structure with clean feature initialization.
